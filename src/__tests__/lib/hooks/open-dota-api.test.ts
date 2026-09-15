@@ -12,12 +12,14 @@ interface OpenDotaFixture {
     jobId: number
   }
   lobby_type?: number
-  players?: Array<{
-    assists?: number
-    deaths?: number
-    hero_id: number
-    kills?: number
-  }> | null
+  players?:
+    | {
+        assists?: number
+        deaths?: number
+        hero_id: number
+        kills?: number
+      }[]
+    | null
   radiant_score?: number
   radiant_win?: boolean
   status?: string

@@ -141,7 +141,35 @@ interface MatchDataRequest {
   matchId: string
 }
 
-type MatchDataCallback = (data: Awaited<ReturnType<typeof getMatchData>> | null) => void
+type MatchDataAcknowledge = (data: Awaited<ReturnType<typeof getMatchData>> | null) => void
+
+const socketEventNames = [
+  'connect',
+  'connect_error',
+  'disconnect',
+  'DATA_buildings',
+  'DATA_heroes',
+  'DATA_couriers',
+  'DATA_creeps',
+  'DATA_hero_units',
+  'STATUS',
+  'requestHeroData',
+  'requestMatchData',
+  'block',
+  'paused',
+  'notable-players',
+  'aegis-picked-up',
+  'chatMessage',
+  'roshan-killed',
+  'auth_error',
+  'refresh-settings',
+  'diagnostic-overlay-probe',
+  'channelPollOrBet',
+  'update-medal',
+  'update-wl',
+  'update-radiant-win-chance',
+  'refresh',
+] as const
 
 export const useSocket = ({
   setPollData,
@@ -183,14 +211,15 @@ export const useSocket = ({
     }
   }, [])
 
+  // oxlint-disable-next-line react-doctor/effect-needs-cleanup -- Chat timers are owned by the unmount-only effect above; this effect cleans its intervals, block timer, manager listener, and socket listeners below.
   useEffect(() => {
     if (!userId) {
       return
     }
 
     let lastReceivedTime = Date.now()
-    let blockTimeout: NodeJS.Timeout | undefined
-    let pendingPlayingBlock: blockType | undefined
+    let blockTimeout: NodeJS.Timeout | null = null
+    let pendingPlayingBlock: blockType | null = null
 
     console.log('Connecting to socket init...', { userId })
 
@@ -284,7 +313,8 @@ export const useSocket = ({
 
     const handleRequestMatchData = async (
       { matchId, heroSlot }: MatchDataRequest,
-      cb: MatchDataCallback,
+      // oxlint-disable-next-line promise/prefer-await-to-callbacks -- Socket.IO acknowledgements are callbacks by protocol.
+      acknowledge: MatchDataAcknowledge,
     ) => {
       updateLastReceived()
       console.log('[MMR] requestMatchData event received', {
@@ -295,17 +325,21 @@ export const useSocket = ({
       try {
         const data = await getMatchData(matchId, heroSlot)
         console.log('[MMR] Match data fetched:', data)
-        cb(data)
+        acknowledge(data)
       } catch (error) {
         captureException(error)
         console.log('[MMR] Error fetching match data', { error })
-        cb(null)
+        acknowledge(null)
       }
     }
 
-    socket.on('requestMatchData', (payload: MatchDataRequest, cb: MatchDataCallback) => {
-      void handleRequestMatchData(payload, cb)
-    })
+    socket.on(
+      'requestMatchData',
+      // oxlint-disable-next-line promise/prefer-await-to-callbacks -- The second Socket.IO event argument is its acknowledgement callback.
+      (payload: MatchDataRequest, acknowledge: MatchDataAcknowledge) => {
+        void handleRequestMatchData(payload, acknowledge)
+      },
+    )
 
     socket.on('block', (data: WireBlockType) => {
       updateLastReceived()
@@ -318,21 +352,23 @@ export const useSocket = ({
 
       if (normalizedData.type === 'playing') {
         pendingPlayingBlock = normalizedData
-        blockTimeout ??= setTimeout(() => {
-          if (pendingPlayingBlock !== undefined) {
-            setBlock(pendingPlayingBlock)
-          }
-          pendingPlayingBlock = undefined
-          blockTimeout = undefined
-        }, 5_000)
+        if (blockTimeout === null) {
+          blockTimeout = setTimeout(() => {
+            if (pendingPlayingBlock !== null) {
+              setBlock(pendingPlayingBlock)
+            }
+            pendingPlayingBlock = null
+            blockTimeout = null
+          }, 5000)
+        }
         return
       }
 
-      if (blockTimeout !== undefined) {
+      if (blockTimeout !== null) {
         clearTimeout(blockTimeout)
-        blockTimeout = undefined
+        blockTimeout = null
       }
-      pendingPlayingBlock = undefined
+      pendingPlayingBlock = null
       setBlock(normalizedData)
     })
     socket.on('paused', (data) => {
@@ -456,38 +492,14 @@ export const useSocket = ({
     return () => {
       clearInterval(connectionMonitor)
       clearInterval(diagnosticHeartbeat)
-      if (blockTimeout !== undefined) {
+      if (blockTimeout !== null) {
         clearTimeout(blockTimeout)
       }
       activeSocket.io.off('ping', handlePing)
 
-      // Don't disconnect the socket on every effect cleanup
-      // Only clean up event handlers
-      socket?.off('connect')
-      socket?.off('connect_error')
-      socket?.off('disconnect')
-      socket?.off('DATA_buildings')
-      socket?.off('DATA_heroes')
-      socket?.off('DATA_couriers')
-      socket?.off('DATA_creeps')
-      socket?.off('DATA_hero_units')
-      socket?.off('STATUS')
-      socket?.off('requestHeroData')
-      socket?.off('requestMatchData')
-      socket?.off('block')
-      socket?.off('paused')
-      socket?.off('notable-players')
-      socket?.off('aegis-picked-up')
-      socket?.off('chatMessage')
-      socket?.off('roshan-killed')
-      socket?.off('auth_error')
-      socket?.off('refresh-settings')
-      activeSocket.off('diagnostic-overlay-probe')
-      socket?.off('channelPollOrBet')
-      socket?.off('update-medal')
-      socket?.off('update-wl')
-      socket?.off('update-radiant-win-chance')
-      socket?.off('refresh')
+      for (const eventName of socketEventNames) {
+        activeSocket.off(eventName)
+      }
     }
   }, [
     dispatch,

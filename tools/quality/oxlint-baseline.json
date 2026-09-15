@@ -209,26 +209,6 @@
         "severity": "error"
       }
     },
-    "006bfd49ddf82e63efcc8d523e3318778ba130b3ae2fb4199bd8c4f7cd179df0": {
-      "count": 1,
-      "summary": {
-        "code": "eslint(complexity)",
-        "file": "src/lib/hooks/use-socket.tsx",
-        "labels": [
-          {
-            "context": {
-              "current": "return () => {",
-              "next": "clearInterval(connectionMonitor)",
-              "previous": "// Clean up"
-            },
-            "span": "() => {\n      clearInterval(connectionMonitor)\n      clearInterval(diagnosticHeartbeat)\n      // Clear all message timeouts\n      messageTimeoutsRef.current.forEach((timeoutId) => {\n        clearTimeout(timeoutId)\n      })\n      messageTimeoutsRef.current.clear()\n\n      // Don't disconnect the socket on every effect cleanup\n      // Only clean up event handlers\n      socket?.off('connect')\n      socket?.off('connect_error')\n      socket?.off('disconnect')\n      socket?.off('DATA_buildings')\n      socket?.off('DATA_heroes')\n      socket?.off('DATA_couriers')\n      socket?.off('DATA_creeps')\n      socket?.off('DATA_hero_units')\n      socket?.off('STATUS')\n      socket?.off('requestHeroData')\n      socket?.off('requestMatchData')\n      socket?.off('block')\n      socket?.off('paused')\n      socket?.off('notable-players')\n      socket?.off('aegis-picked-up')\n      socket?.off('chatMessage')\n      socket?.off('roshan-killed')\n      socket?.off('auth_error')\n      socket?.off('refresh-settings')\n      activeSocket.off('diagnostic-overlay-probe')\n      socket?.off('channelPollOrBet')\n      socket?.off('update-medal')\n      socket?.off('update-wl')\n      socket?.off('update-radiant-win-chance')\n      socket?.off('refresh')\n    }",
-            "text": ""
-          }
-        ],
-        "message": "function has a complexity of 25. Maximum allowed is 20.",
-        "severity": "error"
-      }
-    },
     "0074ee27ee7a6b083f4f42d9e7a8fa008d0eea98744432a50c069f86ab9695ee": {
       "count": 1,
       "summary": {
@@ -898,26 +878,6 @@
         "severity": "error"
       }
     },
-    "02215f1048065cb4de5b8f528b37d7e1d800360e1ced9b126ac8cea80cfa90ec": {
-      "count": 6,
-      "summary": {
-        "code": "typescript(strict-void-return)",
-        "file": "src/__tests__/lib/hooks/use-socket.test.tsx",
-        "labels": [
-          {
-            "context": {
-              "current": "setRadiantWinChance: vi.fn(),",
-              "next": "setRankImageDetails: vi.fn(),",
-              "previous": "setPollData: vi.fn(),"
-            },
-            "span": "vi.fn()",
-            "text": ""
-          }
-        ],
-        "message": "Value-returning function used in a context where a void function is expected.",
-        "severity": "error"
-      }
-    },
     "022a5a81bf5f57479001d2bdb3c0e84b38cd490570d44ce091fef334657a802f": {
       "count": 1,
       "summary": {
@@ -984,26 +944,6 @@
           }
         ],
         "message": "Unexpected nullable string value in conditional. Please handle the nullish and empty string cases explicitly.",
-        "severity": "error"
-      }
-    },
-    "027050cac92684a4dcbaed25643871348abf8cfbf1cffeaa97709dd7a644d22f": {
-      "count": 6,
-      "summary": {
-        "code": "typescript(strict-void-return)",
-        "file": "src/__tests__/lib/hooks/use-socket.test.tsx",
-        "labels": [
-          {
-            "context": {
-              "current": "setAegis: vi.fn(),",
-              "next": "setBetData: vi.fn(),",
-              "previous": "useSocket({"
-            },
-            "span": "vi.fn()",
-            "text": ""
-          }
-        ],
-        "message": "Value-returning function used in a context where a void function is expected.",
         "severity": "error"
       }
     },
@@ -1124,26 +1064,6 @@
           }
         ],
         "message": "Require test cases and hooks to be inside a `describe` block",
-        "severity": "error"
-      }
-    },
-    "02867bfea6801a1e563356de52f1cf4fc772c4df3cebca87a670fa768f64d680": {
-      "count": 3,
-      "summary": {
-        "code": "vitest(require-mock-type-parameters)",
-        "file": "src/__tests__/lib/hooks/use-socket.test.tsx",
-        "labels": [
-          {
-            "context": {
-              "current": "setChatMessages: vi.fn(),",
-              "next": "setConnected: vi.fn(),",
-              "previous": "setBlock,"
-            },
-            "span": "fn",
-            "text": ""
-          }
-        ],
-        "message": "Missing type parameters on mock function call",
         "severity": "error"
       }
     },
@@ -2521,26 +2441,6 @@
         "severity": "error"
       }
     },
-    "04d918e4f57c7b1155374af306187973b7c00a3fcb52e938e8e2c9d20fde19ec": {
-      "count": 1,
-      "summary": {
-        "code": "typescript(strict-void-return)",
-        "file": "src/__tests__/lib/hooks/use-socket.test.tsx",
-        "labels": [
-          {
-            "context": {
-              "current": "setChatMessages: vi.fn(),",
-              "next": "setConnected,",
-              "previous": "setBlock: vi.fn(),"
-            },
-            "span": "vi.fn()",
-            "text": ""
-          }
-        ],
-        "message": "Value-returning function used in a context where a void function is expected.",
-        "severity": "error"
-      }
-    },
     "04e0e7fd9e5fe9affb6b9df0c71306a8313e026af0a707138988e97c21d4aca0": {
       "count": 1,
       "summary": {
@@ -3256,26 +3156,6 @@
           }
         ],
         "message": "Missing type parameters on mock function call",
-        "severity": "error"
-      }
-    },
-    "0632f6df8337d81b31eee115c87e61e8fa016f3d1c75d601f75b1664767e1281": {
-      "count": 1,
-      "summary": {
-        "code": "typescript(no-unsafe-member-access)",
-        "file": "src/components/Dashboard/chat-bot.tsx",
-        "labels": [
-          {
-            "context": {
-              "current": "personalSet: data?.emote_set?.id,",
-              "next": "}",
-              "previous": "id: data?.user?.id,"
-            },
-            "span": "emote_set",
-            "text": ""
-          }
-        ],
-        "message": "Unsafe member access .emote_set on an `any` value.",
         "severity": "error"
       }
     },
@@ -4006,26 +3886,6 @@
         "severity": "error"
       }
     },
-    "07e2a060c4d3f6c25d9930bf2eb9159fada3a5aadecde19995ab82d2dab476be": {
-      "count": 1,
-      "summary": {
-        "code": "typescript(no-unsafe-assignment)",
-        "file": "src/components/Dashboard/chat-bot.tsx",
-        "labels": [
-          {
-            "context": {
-              "current": "id: data?.user?.id,",
-              "next": "personalSet: data?.emote_set?.id,",
-              "previous": "),"
-            },
-            "span": "id: data?.user?.id",
-            "text": ""
-          }
-        ],
-        "message": "Unsafe assignment of an any value.",
-        "severity": "error"
-      }
-    },
     "07e5574313fb465f5110880a1d8a38e32051f8e51f6f0d365de0421871332c53": {
       "count": 1,
       "summary": {
@@ -4063,26 +3923,6 @@
           }
         ],
         "message": "Unsafe array destructuring of a tuple element with an error typed value.",
-        "severity": "error"
-      }
-    },
-    "07eb210b21dd4b329e3213a9fcd709529782dd545faaddb5cf20671180140a9a": {
-      "count": 2,
-      "summary": {
-        "code": "typescript(strict-void-return)",
-        "file": "src/__tests__/lib/hooks/use-socket.test.tsx",
-        "labels": [
-          {
-            "context": {
-              "current": "setRoshan: vi.fn(),",
-              "next": "setWL,",
-              "previous": "setRankImageDetails: vi.fn(),"
-            },
-            "span": "vi.fn()",
-            "text": ""
-          }
-        ],
-        "message": "Value-returning function used in a context where a void function is expected.",
         "severity": "error"
       }
     },
@@ -6625,26 +6465,6 @@
         "severity": "error"
       }
     },
-    "0bffff8869f23d310008524ac91bfa4c14c4ad903cc431fd3a4ace70b6c2bae3": {
-      "count": 1,
-      "summary": {
-        "code": "typescript(no-unsafe-argument)",
-        "file": "src/lib/hooks/use-socket.tsx",
-        "labels": [
-          {
-            "context": {
-              "current": "setAegis(data)",
-              "next": "})",
-              "previous": "updateLastReceived()"
-            },
-            "span": "data",
-            "text": ""
-          }
-        ],
-        "message": "Unsafe argument of type any assigned to a parameter of type SetStateAction<AegisState>.",
-        "severity": "error"
-      }
-    },
     "0c0cea7e9f6cab74058a9dfdbb304bc686452bd4af0aa1b4788661dbd1567c44": {
       "count": 1,
       "summary": {
@@ -7670,26 +7490,6 @@
         "severity": "error"
       }
     },
-    "0dbb7ef1b72ab4473f2c08cc0448c8529de25b44e12cb62734114404c825beec": {
-      "count": 2,
-      "summary": {
-        "code": "typescript(no-unsafe-member-access)",
-        "file": "src/lib/hooks/open-dota-api.tsx",
-        "labels": [
-          {
-            "context": {
-              "current": "if (jobStatus?.data?.status === 'processing' || jobStatus?.data?.status === 'queued') {",
-              "next": "if (operation.retry(new Error('Job still in progress'))) {",
-              "previous": "// If job is still in progress or queued"
-            },
-            "span": "status",
-            "text": ""
-          }
-        ],
-        "message": "Unsafe member access .status on an `any` value.",
-        "severity": "error"
-      }
-    },
     "0dc016b8dee216374db1ea02e0b4c96eee9db224b35f1d54a51b09b84c8d2df2": {
       "count": 1,
       "summary": {
@@ -8067,26 +7867,6 @@
           }
         ],
         "message": "Value returned in a context where a void return is expected.",
-        "severity": "error"
-      }
-    },
-    "0e59e5bdc6077cb0a6495e5d0f8633c86af35eaf6d18151bd809a8bd243b6a4a": {
-      "count": 4,
-      "summary": {
-        "code": "typescript(strict-void-return)",
-        "file": "src/__tests__/lib/hooks/use-socket.test.tsx",
-        "labels": [
-          {
-            "context": {
-              "current": "setWL: vi.fn(),",
-              "next": "})",
-              "previous": "setRoshan: vi.fn(),"
-            },
-            "span": "vi.fn()",
-            "text": ""
-          }
-        ],
-        "message": "Value-returning function used in a context where a void function is expected.",
         "severity": "error"
       }
     },
@@ -12022,26 +11802,6 @@
         "severity": "error"
       }
     },
-    "15c2c1a85b6f3cdf8f74a3a256a81b5086de70ada2aa059609da123de86aca80": {
-      "count": 1,
-      "summary": {
-        "code": "vitest(require-mock-type-parameters)",
-        "file": "src/__tests__/lib/hooks/use-socket.test.tsx",
-        "labels": [
-          {
-            "context": {
-              "current": "const setBlock = vi.fn()",
-              "next": "",
-              "previous": "it('preserves empty block states while a match is still loading', () => {"
-            },
-            "span": "fn",
-            "text": ""
-          }
-        ],
-        "message": "Missing type parameters on mock function call",
-        "severity": "error"
-      }
-    },
     "15cddf13f43ded078bd80d0c59b788eba7fce7a0c1a33ffecce715db8831585f": {
       "count": 1,
       "summary": {
@@ -13495,26 +13255,6 @@
           }
         ],
         "message": "Replace module mocking with dependency injection through a real interface, service layer, or faithful test implementation.",
-        "severity": "error"
-      }
-    },
-    "18ec6d81ec74c25175a87b73ee1cbfbe74d3269ebe0ab8f6360733454a28f844": {
-      "count": 1,
-      "summary": {
-        "code": "vitest(require-mock-type-parameters)",
-        "file": "src/__tests__/lib/hooks/use-socket.test.tsx",
-        "labels": [
-          {
-            "context": {
-              "current": "const setWL = vi.fn()",
-              "next": "",
-              "previous": "it('treats legacy WL socket updates without a window as this stream', () => {"
-            },
-            "span": "fn",
-            "text": ""
-          }
-        ],
-        "message": "Missing type parameters on mock function call",
         "severity": "error"
       }
     },
@@ -16221,26 +15961,6 @@
         "severity": "error"
       }
     },
-    "1ee50be9a0819f227e87e7cab6984b8883d328a1b69f1aa6c1a0957f47f33204": {
-      "count": 1,
-      "summary": {
-        "code": "vitest(require-mock-type-parameters)",
-        "file": "src/__tests__/lib/hooks/use-socket.test.tsx",
-        "labels": [
-          {
-            "context": {
-              "current": "const setWL = vi.fn()",
-              "next": "",
-              "previous": "it('stores the WL records with the stats window sent by the server', () => {"
-            },
-            "span": "fn",
-            "text": ""
-          }
-        ],
-        "message": "Missing type parameters on mock function call",
-        "severity": "error"
-      }
-    },
     "1eea75b84537650440e227b48a9dc280d813bd7daa1313fe2a7538d1698489f3": {
       "count": 1,
       "summary": {
@@ -18124,26 +17844,6 @@
         "severity": "error"
       }
     },
-    "22a80d00b83ae92a8ee3e89d09389f207def90432cf354f185150b163e829506": {
-      "count": 3,
-      "summary": {
-        "code": "vitest(require-mock-type-parameters)",
-        "file": "src/__tests__/lib/hooks/use-socket.test.tsx",
-        "labels": [
-          {
-            "context": {
-              "current": "setBetData: vi.fn(),",
-              "next": "setBlock: vi.fn(),",
-              "previous": "setAegis: vi.fn(),"
-            },
-            "span": "fn",
-            "text": ""
-          }
-        ],
-        "message": "Missing type parameters on mock function call",
-        "severity": "error"
-      }
-    },
     "22be3823ee9e3b3dc7d9028e71370649774096dff5adf2fddea19e39268c19c3": {
       "count": 1,
       "summary": {
@@ -19599,26 +19299,6 @@
           }
         ],
         "message": "Unsafe type assertion: type 'Session' is more narrow than the original type.",
-        "severity": "error"
-      }
-    },
-    "253b714cda4da0b6fd3283ec1cddf6ab5c276fad268bf86dfabe95abcd0b5a65": {
-      "count": 1,
-      "summary": {
-        "code": "typescript(no-unsafe-assignment)",
-        "file": "src/lib/hooks/use-socket.tsx",
-        "labels": [
-          {
-            "context": {
-              "current": "matchId,",
-              "next": "})",
-              "previous": "heroSlot,"
-            },
-            "span": "matchId",
-            "text": ""
-          }
-        ],
-        "message": "Unsafe assignment of an any value.",
         "severity": "error"
       }
     },
@@ -24935,26 +24615,6 @@
         "severity": "error"
       }
     },
-    "2f320cd708facd737ba80f2443b3225859be858a9f46cb0cbc20b0dac66b5580": {
-      "count": 1,
-      "summary": {
-        "code": "typescript(strict-boolean-expressions)",
-        "file": "src/components/Dashboard/chat-bot.tsx",
-        "labels": [
-          {
-            "context": {
-              "current": ": updateEmoteSetError",
-              "next": "? 'error'",
-              "previous": "? 'finish'"
-            },
-            "span": "updateEmoteSetError",
-            "text": ""
-          }
-        ],
-        "message": "Unexpected any value in conditional. Use a more specific type to ensure type safety.",
-        "severity": "error"
-      }
-    },
     "2f40cfd24ff52c020fa2f3e729104f44c90aed1f3e663d4fdbd80a0aa37f6a41": {
       "count": 1,
       "summary": {
@@ -25564,26 +25224,6 @@
         "severity": "error"
       }
     },
-    "3055d0a8de44e00c7b97f2c6cc37d69bd01a983f5897a726a323a28eeb12eec4": {
-      "count": 6,
-      "summary": {
-        "code": "typescript(strict-void-return)",
-        "file": "src/__tests__/lib/hooks/use-socket.test.tsx",
-        "labels": [
-          {
-            "context": {
-              "current": "setRankImageDetails: vi.fn(),",
-              "next": "setRoshan: vi.fn(),",
-              "previous": "setRadiantWinChance: vi.fn(),"
-            },
-            "span": "vi.fn()",
-            "text": ""
-          }
-        ],
-        "message": "Value-returning function used in a context where a void function is expected.",
-        "severity": "error"
-      }
-    },
     "30577a0544efaf6e82b796a04abc695ef0f37e29cfdd4c862d4fd3037ead4430": {
       "count": 1,
       "summary": {
@@ -25801,26 +25441,6 @@
           }
         ],
         "message": "Replace module mocking with dependency injection through a real interface, service layer, or faithful test implementation.",
-        "severity": "error"
-      }
-    },
-    "30c822f43fb17fde79794a35c505a2293230d59011a8c2082aeafee8172a45ed": {
-      "count": 1,
-      "summary": {
-        "code": "typescript(no-unsafe-member-access)",
-        "file": "src/components/Dashboard/chat-bot.tsx",
-        "labels": [
-          {
-            "context": {
-              "current": "id: data?.user?.id,",
-              "next": "personalSet: data?.emote_set?.id,",
-              "previous": "),"
-            },
-            "span": "user",
-            "text": ""
-          }
-        ],
-        "message": "Unsafe member access .user on an `any` value.",
         "severity": "error"
       }
     },
@@ -28354,35 +27974,6 @@
         "severity": "error"
       }
     },
-    "35d62ffcdfd7fdc33a1cbfca5e99015f3e5457938dda4fe9548e17a9c6dec618": {
-      "count": 1,
-      "summary": {
-        "code": "eslint(no-use-before-define)",
-        "file": "src/lib/hooks/open-dota-api.tsx",
-        "labels": [
-          {
-            "context": {
-              "current": "const jobId = await createJob(matchId)",
-              "next": "await getJobStatus(jobId)",
-              "previous": "try {"
-            },
-            "span": "createJob",
-            "text": "used here"
-          },
-          {
-            "context": {
-              "current": "const createJob = async function createJob(matchId: string): Promise<number> {",
-              "next": "// Check if we already have a job request in progress for this match",
-              "previous": ""
-            },
-            "span": "createJob",
-            "text": "defined here"
-          }
-        ],
-        "message": "'createJob' was used before it was defined.",
-        "severity": "error"
-      }
-    },
     "35d99494cfa6428b5ffdf1e2ab77d3550a103608bcc8a845e33d4b71ee43d417": {
       "count": 1,
       "summary": {
@@ -28560,26 +28151,6 @@
           }
         ],
         "message": "Unexpected nullable string value in conditional. Please handle the nullish and empty string cases explicitly.",
-        "severity": "error"
-      }
-    },
-    "36194a7ed2f8fc405a3eb8c12c8acb2355cd9e4799ad396c286ab3f48211edb5": {
-      "count": 1,
-      "summary": {
-        "code": "vitest(require-mock-type-parameters)",
-        "file": "src/__tests__/lib/hooks/use-socket.test.tsx",
-        "labels": [
-          {
-            "context": {
-              "current": "setChatMessages: vi.fn(),",
-              "next": "setConnected,",
-              "previous": "setBlock: vi.fn(),"
-            },
-            "span": "fn",
-            "text": ""
-          }
-        ],
-        "message": "Missing type parameters on mock function call",
         "severity": "error"
       }
     },
@@ -31766,26 +31337,6 @@
         "severity": "error"
       }
     },
-    "3c7568c9428c6c1315951843c7a3d22f6b239abb9097f6aff5ef33c573a80b57": {
-      "count": 1,
-      "summary": {
-        "code": "vitest(require-mock-type-parameters)",
-        "file": "src/__tests__/lib/hooks/use-socket.test.tsx",
-        "labels": [
-          {
-            "context": {
-              "current": "const setBlock = vi.fn()",
-              "next": "",
-              "previous": "it('normalizes the legacy empty block state to the main-screen state', () => {"
-            },
-            "span": "fn",
-            "text": ""
-          }
-        ],
-        "message": "Missing type parameters on mock function call",
-        "severity": "error"
-      }
-    },
     "3c7ed74b42010909f9a127eb7f66eacc84494622663f45b323f7526a48a97147": {
       "count": 1,
       "summary": {
@@ -31843,26 +31394,6 @@
           }
         ],
         "message": "Replace module mocking with dependency injection through a real interface, service layer, or faithful test implementation.",
-        "severity": "error"
-      }
-    },
-    "3ca758143fc39bd85c392edab1f1810fe4222cf6b5e23966fc8ab0faf7cc0576": {
-      "count": 5,
-      "summary": {
-        "code": "typescript(strict-void-return)",
-        "file": "src/__tests__/lib/hooks/use-socket.test.tsx",
-        "labels": [
-          {
-            "context": {
-              "current": "setNotablePlayers: vi.fn(),",
-              "next": "setPaused: vi.fn(),",
-              "previous": "setConnected: vi.fn(),"
-            },
-            "span": "vi.fn()",
-            "text": ""
-          }
-        ],
-        "message": "Value-returning function used in a context where a void function is expected.",
         "severity": "error"
       }
     },
@@ -34447,26 +33978,6 @@
         "severity": "error"
       }
     },
-    "414723395f54848d39e325a8d105a6906982ab60ddcc888f22869ccabeaa6947": {
-      "count": 1,
-      "summary": {
-        "code": "vitest(require-mock-type-parameters)",
-        "file": "src/__tests__/lib/hooks/use-socket.test.tsx",
-        "labels": [
-          {
-            "context": {
-              "current": "const setConnected = vi.fn()",
-              "next": "",
-              "previous": "vi.useFakeTimers()"
-            },
-            "span": "fn",
-            "text": ""
-          }
-        ],
-        "message": "Missing type parameters on mock function call",
-        "severity": "error"
-      }
-    },
     "415ab650db51153331e5e8c6a598853ab36c7dd51782f9cfb4f07e499a8d76cd": {
       "count": 1,
       "summary": {
@@ -34724,26 +34235,6 @@
           }
         ],
         "message": "Unexpected nullable string value in conditional. Please handle the nullish and empty string cases explicitly.",
-        "severity": "error"
-      }
-    },
-    "41e819d7485563b5af2c80211abc18dc4ce1a650fe9467e4fe88c4fb3b18d7b1": {
-      "count": 5,
-      "summary": {
-        "code": "vitest(require-mock-type-parameters)",
-        "file": "src/__tests__/lib/hooks/use-socket.test.tsx",
-        "labels": [
-          {
-            "context": {
-              "current": "setConnected: vi.fn(),",
-              "next": "setNotablePlayers: vi.fn(),",
-              "previous": "setChatMessages: vi.fn(),"
-            },
-            "span": "fn",
-            "text": ""
-          }
-        ],
-        "message": "Missing type parameters on mock function call",
         "severity": "error"
       }
     },
@@ -38925,26 +38416,6 @@
           }
         ],
         "message": "Async function has no `await` expression.",
-        "severity": "error"
-      }
-    },
-    "4a0579d544982c9d68e4f7fdf8156f7e7def3e2bf4dc4e7d78b8a4305763f5cb": {
-      "count": 6,
-      "summary": {
-        "code": "typescript(strict-void-return)",
-        "file": "src/__tests__/lib/hooks/use-socket.test.tsx",
-        "labels": [
-          {
-            "context": {
-              "current": "setPollData: vi.fn(),",
-              "next": "setRadiantWinChance: vi.fn(),",
-              "previous": "setPaused: vi.fn(),"
-            },
-            "span": "vi.fn()",
-            "text": ""
-          }
-        ],
-        "message": "Value-returning function used in a context where a void function is expected.",
         "severity": "error"
       }
     },
@@ -45706,26 +45177,6 @@
         "severity": "error"
       }
     },
-    "57f3b7de78d52bb34929b01b24d579958b8838fc504aebc48d8f4f069cc9fc2a": {
-      "count": 1,
-      "summary": {
-        "code": "typescript(no-unsafe-call)",
-        "file": "src/components/Dashboard/chat-bot.tsx",
-        "labels": [
-          {
-            "context": {
-              "current": "data.user?.editors?.find(",
-              "next": "(editor: { id: string }) =>",
-              "previous": "Boolean("
-            },
-            "span": "data.user?.editors?.find",
-            "text": ""
-          }
-        ],
-        "message": "Unsafe call of a(n) `any` typed value.",
-        "severity": "error"
-      }
-    },
     "58205159350213fc43df83a6b49f2903e0162699239c6e44af4198529b62ef03": {
       "count": 1,
       "summary": {
@@ -46412,26 +45863,6 @@
           }
         ],
         "message": "Do not nest ternary expressions.",
-        "severity": "error"
-      }
-    },
-    "59f348e2f844773728a0314732fe3860fef24e67585cd03f0ebc67ec75bb8163": {
-      "count": 6,
-      "summary": {
-        "code": "sonarjs(function-name)",
-        "file": "src/__tests__/lib/hooks/use-socket.test.tsx",
-        "labels": [
-          {
-            "context": {
-              "current": "const TestComponent = () => {",
-              "next": "useSocket({",
-              "previous": ""
-            },
-            "span": "TestComponent",
-            "text": ""
-          }
-        ],
-        "message": "Rename this 'TestComponent' function to match the regular expression '^[_a-z][a-zA-Z0-9]*$'.",
         "severity": "error"
       }
     },
@@ -47682,26 +47113,6 @@
         "severity": "error"
       }
     },
-    "5c9f9d1eae807603e51c7685f216711bb5c3067e1e3d81984a3430c6ce547c6a": {
-      "count": 1,
-      "summary": {
-        "code": "sonarjs(cognitive-complexity)",
-        "file": "src/components/Dashboard/chat-bot.tsx",
-        "labels": [
-          {
-            "context": {
-              "current": "const ChatBot = () => {",
-              "next": "const { data: accountData } = useUpdateAccount()",
-              "previous": ""
-            },
-            "span": "=>",
-            "text": ""
-          }
-        ],
-        "message": "Refactor this function to reduce its Cognitive Complexity from 26 to the 20 allowed.",
-        "severity": "error"
-      }
-    },
     "5ca2af0fef3a914297066ba2c6a18148c833023d40f59a5f6736775eaabd7926": {
       "count": 1,
       "summary": {
@@ -48506,26 +47917,6 @@
           }
         ],
         "message": "Prefer `return value` over `return Promise.resolve(value)`.",
-        "severity": "error"
-      }
-    },
-    "5e8ac5d297082c4fb7bcd629dcca049e5132c41de94cd5a923e90af3f0e7f7e1": {
-      "count": 1,
-      "summary": {
-        "code": "unicorn(prefer-array-some)",
-        "file": "src/components/Dashboard/chat-bot.tsx",
-        "labels": [
-          {
-            "context": {
-              "current": "data.user?.editors?.find(",
-              "next": "(editor: { id: string }) =>",
-              "previous": "Boolean("
-            },
-            "span": "find",
-            "text": ""
-          }
-        ],
-        "message": "Prefer `.some(…)` over `.find(…)` or `.findLast(…)`.",
         "severity": "error"
       }
     },
@@ -50930,26 +50321,6 @@
         "severity": "error"
       }
     },
-    "635d2fedbe32a4f8c59d9a5c94dcdee52b0c843760e97e0bba44c7e15c12e6e0": {
-      "count": 1,
-      "summary": {
-        "code": "typescript(no-unsafe-argument)",
-        "file": "src/lib/hooks/use-socket.tsx",
-        "labels": [
-          {
-            "context": {
-              "current": "setRoshan(data)",
-              "next": "})",
-              "previous": "updateLastReceived()"
-            },
-            "span": "data",
-            "text": ""
-          }
-        ],
-        "message": "Unsafe argument of type any assigned to a parameter of type SetStateAction<RoshanState>.",
-        "severity": "error"
-      }
-    },
     "636e944fdc69db9d76d687b332e725bfe54a2fcbc76554b6a42d4b2266c97544": {
       "count": 1,
       "summary": {
@@ -51087,26 +50458,6 @@
           }
         ],
         "message": "Unexpected nullable string value in conditional. Please handle the nullish and empty string cases explicitly.",
-        "severity": "error"
-      }
-    },
-    "63e2d5365ba0069e4f845d11e7089b2cdf7c66ca4b17caffe33c519f3b0b4466": {
-      "count": 3,
-      "summary": {
-        "code": "typescript(strict-void-return)",
-        "file": "src/__tests__/lib/hooks/use-socket.test.tsx",
-        "labels": [
-          {
-            "context": {
-              "current": "setBetData: vi.fn(),",
-              "next": "setBlock,",
-              "previous": "setAegis: vi.fn(),"
-            },
-            "span": "vi.fn()",
-            "text": ""
-          }
-        ],
-        "message": "Value-returning function used in a context where a void function is expected.",
         "severity": "error"
       }
     },
@@ -51370,26 +50721,6 @@
         "severity": "error"
       }
     },
-    "644332d48af455c53212f1da0062e8e51edfdec65ef21a5dc10c4a8604022621": {
-      "count": 1,
-      "summary": {
-        "code": "typescript(no-unsafe-call)",
-        "file": "src/components/Dashboard/chat-bot.tsx",
-        "labels": [
-          {
-            "context": {
-              "current": "data.emote_set?.emotes?.find((e: { name: string }) => e.name === emote.label),",
-              "next": "),",
-              "previous": "Array.isArray(data.emote_set?.emotes) &&"
-            },
-            "span": "data.emote_set?.emotes?.find",
-            "text": ""
-          }
-        ],
-        "message": "Unsafe call of a(n) `any` typed value.",
-        "severity": "error"
-      }
-    },
     "644da0ddf79c54c1767546e0f237fc35d6653d27529aa4ff5ab7934af27441d6": {
       "count": 1,
       "summary": {
@@ -51587,26 +50918,6 @@
           }
         ],
         "message": "Prefer `async`/`await` to the callback pattern",
-        "severity": "error"
-      }
-    },
-    "64e8eadb5d9a510915703d49534a933ef8d7c58b36462641fe76615a99e5b97b": {
-      "count": 1,
-      "summary": {
-        "code": "vitest(require-mock-type-parameters)",
-        "file": "src/__tests__/lib/hooks/use-socket.test.tsx",
-        "labels": [
-          {
-            "context": {
-              "current": "const setBlock = vi.fn()",
-              "next": "",
-              "previous": "it('normalizes a legacy main-menu init state after reconnecting', () => {"
-            },
-            "span": "fn",
-            "text": ""
-          }
-        ],
-        "message": "Missing type parameters on mock function call",
         "severity": "error"
       }
     },
@@ -52857,26 +52168,6 @@
         "severity": "error"
       }
     },
-    "67512bb9561ee0020759198a53da25afe299e0343ae3fb3e0069ee050528b938": {
-      "count": 1,
-      "summary": {
-        "code": "typescript(strict-boolean-expressions)",
-        "file": "src/components/Dashboard/chat-bot.tsx",
-        "labels": [
-          {
-            "context": {
-              "current": "hasAuto7TVAccess && user?.id ? '/api/update-emote-set' : null,",
-              "next": "async (url) => {",
-              "previous": "const { error: updateEmoteSetError } = useSWR("
-            },
-            "span": "user?.id",
-            "text": ""
-          }
-        ],
-        "message": "Unexpected nullable string value in conditional. Please handle the nullish and empty string cases explicitly.",
-        "severity": "error"
-      }
-    },
     "675799229f05e48b3621a4de7cc24c931e785697f682c3e98f380f45cde0ded1": {
       "count": 2,
       "summary": {
@@ -53403,26 +52694,6 @@
           }
         ],
         "message": "Unexpected nullable string value in conditional. Please handle the nullish and empty string cases explicitly.",
-        "severity": "error"
-      }
-    },
-    "686f0080c873971af5ea849c78dd82c59c7b2c366cd07798b6568ff2eb8a0782": {
-      "count": 1,
-      "summary": {
-        "code": "typescript(no-unsafe-member-access)",
-        "file": "src/components/Dashboard/chat-bot.tsx",
-        "labels": [
-          {
-            "context": {
-              "current": "Array.isArray(data.user?.editors) &&",
-              "next": "Boolean(",
-              "previous": "hasDotabodEditor:"
-            },
-            "span": "user",
-            "text": ""
-          }
-        ],
-        "message": "Unsafe member access .user on an `any` value.",
         "severity": "error"
       }
     },
@@ -56127,26 +55398,6 @@
         "severity": "error"
       }
     },
-    "6d8996b5f2aeefb30459e47c5aa7eb633296159627c3673aca41106945d4088a": {
-      "count": 6,
-      "summary": {
-        "code": "vitest(require-mock-type-parameters)",
-        "file": "src/__tests__/lib/hooks/use-socket.test.tsx",
-        "labels": [
-          {
-            "context": {
-              "current": "setRankImageDetails: vi.fn(),",
-              "next": "setRoshan: vi.fn(),",
-              "previous": "setRadiantWinChance: vi.fn(),"
-            },
-            "span": "fn",
-            "text": ""
-          }
-        ],
-        "message": "Missing type parameters on mock function call",
-        "severity": "error"
-      }
-    },
     "6d8c9f877556a67c0b00cca3cc71651ae8b733bb0c7e643bf6ca2974689fc787": {
       "count": 1,
       "summary": {
@@ -57643,26 +56894,6 @@
         "severity": "error"
       }
     },
-    "70cc91c92d94488c1021e4370c82d1fa7d67a7fe3bd0247f67900820a4cfda90": {
-      "count": 6,
-      "summary": {
-        "code": "vitest(require-mock-type-parameters)",
-        "file": "src/__tests__/lib/hooks/use-socket.test.tsx",
-        "labels": [
-          {
-            "context": {
-              "current": "setRadiantWinChance: vi.fn(),",
-              "next": "setRankImageDetails: vi.fn(),",
-              "previous": "setPollData: vi.fn(),"
-            },
-            "span": "fn",
-            "text": ""
-          }
-        ],
-        "message": "Missing type parameters on mock function call",
-        "severity": "error"
-      }
-    },
     "70cd60c2d158bd246eed69c30f1563cdbd178dbeb47a1d7bddf17ff99d623b52": {
       "count": 1,
       "summary": {
@@ -58160,26 +57391,6 @@
           }
         ],
         "message": "Unsafe member access ._getJSONData on an `error` typed value.",
-        "severity": "error"
-      }
-    },
-    "71a15f947a97d6267575d72b27137f4307b270a64a56b97516528fb9fafe48ed": {
-      "count": 2,
-      "summary": {
-        "code": "typescript(strict-void-return)",
-        "file": "src/__tests__/lib/hooks/use-socket.test.tsx",
-        "labels": [
-          {
-            "context": {
-              "current": "setChatMessages: vi.fn(),",
-              "next": "setConnected: vi.fn(),",
-              "previous": "setBlock: vi.fn(),"
-            },
-            "span": "vi.fn()",
-            "text": ""
-          }
-        ],
-        "message": "Value-returning function used in a context where a void function is expected.",
         "severity": "error"
       }
     },
@@ -59425,26 +58636,6 @@
           }
         ],
         "message": "React Compiler can cache this value automatically. Verify that removing `useMemo` preserves behavior before simplifying it.",
-        "severity": "error"
-      }
-    },
-    "74372d4f89ca422a71649d715edb8795a7610ca9898a2c60b5b99434d3ab0586": {
-      "count": 1,
-      "summary": {
-        "code": "typescript(no-unsafe-member-access)",
-        "file": "src/components/Dashboard/chat-bot.tsx",
-        "labels": [
-          {
-            "context": {
-              "current": "data.user?.editors?.find(",
-              "next": "(editor: { id: string }) =>",
-              "previous": "Boolean("
-            },
-            "span": "user",
-            "text": ""
-          }
-        ],
-        "message": "Unsafe member access .user on an `any` value.",
         "severity": "error"
       }
     },
@@ -61061,26 +60252,6 @@
           }
         ],
         "message": "`setTimeout` creates a timer in useEffect without guaranteed cleanup. Return a cleanup function that owns every allocation so it does not leak after unmount.",
-        "severity": "error"
-      }
-    },
-    "77ed29d6b33a114736a63b408f54be3b9438f10d6a09103f0b5b7c48360c8748": {
-      "count": 1,
-      "summary": {
-        "code": "anti-slop(no-runtime-typeof)",
-        "file": "src/lib/hooks/open-dota-api.tsx",
-        "labels": [
-          {
-            "context": {
-              "current": "if (typeof jobId !== 'number') {",
-              "next": "if (operation.retry(new Error('Match not ready to be parsed'))) {",
-              "previous": "const jobId = createdJob.data?.job?.jobId"
-            },
-            "span": "typeof jobId",
-            "text": ""
-          }
-        ],
-        "message": "A `typeof` check narrows a representation without establishing its contract. Parse input at its I/O boundary, then branch on the domain value.",
         "severity": "error"
       }
     },
@@ -64532,26 +63703,6 @@
         "severity": "error"
       }
     },
-    "7e07edd41b5f2f7d6bdbdb286e34f9a4631f5943ef93d55f88033288aeb3244c": {
-      "count": 3,
-      "summary": {
-        "code": "typescript(strict-void-return)",
-        "file": "src/__tests__/lib/hooks/use-socket.test.tsx",
-        "labels": [
-          {
-            "context": {
-              "current": "setBlock,",
-              "next": "setChatMessages: vi.fn(),",
-              "previous": "setBetData: vi.fn(),"
-            },
-            "span": "setBlock",
-            "text": ""
-          }
-        ],
-        "message": "Value-returning function used in a context where a void function is expected.",
-        "severity": "error"
-      }
-    },
     "7e09f3899cb47faaabbdf2b51550392f963d4fa331cf9e22659d46cc3c286ef7": {
       "count": 1,
       "summary": {
@@ -64841,26 +63992,6 @@
               "current": "handleInvoiceEvent: vi.fn(),",
               "next": "prisma: {",
               "previous": "return {"
-            },
-            "span": "fn",
-            "text": ""
-          }
-        ],
-        "message": "Missing type parameters on mock function call",
-        "severity": "error"
-      }
-    },
-    "7e73120d5696e7b334656a5dd1936136d762673e9d97bdf849daebb7855d7d0e": {
-      "count": 3,
-      "summary": {
-        "code": "vitest(require-mock-type-parameters)",
-        "file": "src/__tests__/lib/hooks/use-socket.test.tsx",
-        "labels": [
-          {
-            "context": {
-              "current": "setBlock: vi.fn(),",
-              "next": "setChatMessages: vi.fn(),",
-              "previous": "setBetData: vi.fn(),"
             },
             "span": "fn",
             "text": ""
@@ -66726,26 +65857,6 @@
         "severity": "error"
       }
     },
-    "823a7abc8a86913ad5896a5bc055d983cda168ad5b1e87048229cbfbc93c6e2f": {
-      "count": 4,
-      "summary": {
-        "code": "vitest(require-mock-type-parameters)",
-        "file": "src/__tests__/lib/hooks/use-socket.test.tsx",
-        "labels": [
-          {
-            "context": {
-              "current": "setRoshan: vi.fn(),",
-              "next": "setWL: vi.fn(),",
-              "previous": "setRankImageDetails: vi.fn(),"
-            },
-            "span": "fn",
-            "text": ""
-          }
-        ],
-        "message": "Missing type parameters on mock function call",
-        "severity": "error"
-      }
-    },
     "824c25b55f064b8233b1390ff5b29f053950fe96e5d8b3fb339728455cd11119": {
       "count": 1,
       "summary": {
@@ -68328,26 +67439,6 @@
           }
         ],
         "message": "Extract this nested ternary operation into an independent statement.",
-        "severity": "error"
-      }
-    },
-    "859616dde1bcb64238854816898d26e4813443ca71254e2969abab58171859ab": {
-      "count": 6,
-      "summary": {
-        "code": "vitest(require-mock-type-parameters)",
-        "file": "src/__tests__/lib/hooks/use-socket.test.tsx",
-        "labels": [
-          {
-            "context": {
-              "current": "setPollData: vi.fn(),",
-              "next": "setRadiantWinChance: vi.fn(),",
-              "previous": "setPaused: vi.fn(),"
-            },
-            "span": "fn",
-            "text": ""
-          }
-        ],
-        "message": "Missing type parameters on mock function call",
         "severity": "error"
       }
     },
@@ -70225,26 +69316,6 @@
         "severity": "error"
       }
     },
-    "88ec4bb89ebc7e17ac295723e328581487de0fb18d97c611a4f1f189cdd711fd": {
-      "count": 6,
-      "summary": {
-        "code": "vitest(require-mock-type-parameters)",
-        "file": "src/__tests__/lib/hooks/use-socket.test.tsx",
-        "labels": [
-          {
-            "context": {
-              "current": "setAegis: vi.fn(),",
-              "next": "setBetData: vi.fn(),",
-              "previous": "useSocket({"
-            },
-            "span": "fn",
-            "text": ""
-          }
-        ],
-        "message": "Missing type parameters on mock function call",
-        "severity": "error"
-      }
-    },
     "88f5295016094e462f7704f9772570c9c1a832be285164aafc2863f600ec4494": {
       "count": 1,
       "summary": {
@@ -71578,26 +70649,6 @@
           }
         ],
         "message": "Replace module mocking with dependency injection through a real interface, service layer, or faithful test implementation.",
-        "severity": "error"
-      }
-    },
-    "8ba2c403a658332cacb7a546b3c35dfc604db3005895917fe74cdeddec008d35": {
-      "count": 1,
-      "summary": {
-        "code": "typescript(strict-void-return)",
-        "file": "src/__tests__/lib/hooks/use-socket.test.tsx",
-        "labels": [
-          {
-            "context": {
-              "current": "setNotablePlayers: vi.fn(),",
-              "next": "setPaused: vi.fn(),",
-              "previous": "setConnected,"
-            },
-            "span": "vi.fn()",
-            "text": ""
-          }
-        ],
-        "message": "Value-returning function used in a context where a void function is expected.",
         "severity": "error"
       }
     },
@@ -74639,26 +73690,6 @@
           }
         ],
         "message": "Unexpected function expression.",
-        "severity": "error"
-      }
-    },
-    "91c67fee4ece023b4281ae741b89c672cb0082702e40c0e32ec677108def89d1": {
-      "count": 6,
-      "summary": {
-        "code": "vitest(require-mock-type-parameters)",
-        "file": "src/__tests__/lib/hooks/use-socket.test.tsx",
-        "labels": [
-          {
-            "context": {
-              "current": "setPaused: vi.fn(),",
-              "next": "setPollData: vi.fn(),",
-              "previous": "setNotablePlayers: vi.fn(),"
-            },
-            "span": "fn",
-            "text": ""
-          }
-        ],
-        "message": "Missing type parameters on mock function call",
         "severity": "error"
       }
     },
@@ -77801,26 +76832,6 @@
         "severity": "error"
       }
     },
-    "98267df27df1856d555bcc068b875f591cfcb3e43a69abf56fc0b3ad53884176": {
-      "count": 1,
-      "summary": {
-        "code": "typescript(no-unsafe-assignment)",
-        "file": "src/components/Dashboard/chat-bot.tsx",
-        "labels": [
-          {
-            "context": {
-              "current": "const data = await response.json()",
-              "next": "const user = {",
-              "previous": "const response = await fetch(`${stvUrl}?cacheBust=${Date.now()}`)"
-            },
-            "span": "data = await response.json()",
-            "text": ""
-          }
-        ],
-        "message": "Unsafe assignment of an any value.",
-        "severity": "error"
-      }
-    },
     "9828c62410866d7ae6402c5b9c00206a34765302c778710e451a62375bef076b": {
       "count": 1,
       "summary": {
@@ -80297,26 +79308,6 @@
         "severity": "error"
       }
     },
-    "9c8c78992924cb86237fc9a94506de719b48ef04777c267a9dbd98abee1117fe": {
-      "count": 3,
-      "summary": {
-        "code": "typescript(strict-void-return)",
-        "file": "src/__tests__/lib/hooks/use-socket.test.tsx",
-        "labels": [
-          {
-            "context": {
-              "current": "setBlock: vi.fn(),",
-              "next": "setChatMessages: vi.fn(),",
-              "previous": "setBetData: vi.fn(),"
-            },
-            "span": "vi.fn()",
-            "text": ""
-          }
-        ],
-        "message": "Value-returning function used in a context where a void function is expected.",
-        "severity": "error"
-      }
-    },
     "9c8dcdc2ce46b68348c577dbc3c764ff0e9aec89dc83b1eac8d3676a5106c6a5": {
       "count": 1,
       "summary": {
@@ -81973,26 +80964,6 @@
         "severity": "error"
       }
     },
-    "a015a548eb2c9ef40030dba3fc627ba20bdb0aa858e351417ef2d2f1a437055b": {
-      "count": 1,
-      "summary": {
-        "code": "typescript(no-unsafe-assignment)",
-        "file": "src/lib/hooks/open-dota-api.tsx",
-        "labels": [
-          {
-            "context": {
-              "current": "const jobId = createdJob.data?.job?.jobId",
-              "next": "if (typeof jobId !== 'number') {",
-              "previous": ""
-            },
-            "span": "jobId = createdJob.data?.job?.jobId",
-            "text": ""
-          }
-        ],
-        "message": "Unsafe assignment of an any value.",
-        "severity": "error"
-      }
-    },
     "a016b01bdb7307a4e7d224ebd498fc79fb42dc3defea3bf92e67c45cc99fce1b": {
       "count": 2,
       "summary": {
@@ -83440,26 +82411,6 @@
         "severity": "error"
       }
     },
-    "a2cd1032bbc80baa724f9cf4e82b7b6ba4d541022532af88c47d0ac92126c556": {
-      "count": 1,
-      "summary": {
-        "code": "typescript(no-unsafe-argument)",
-        "file": "src/lib/hooks/use-socket.tsx",
-        "labels": [
-          {
-            "context": {
-              "current": "const data = await getMatchData(matchId, heroSlot)",
-              "next": "console.log('[MMR] Match data fetched:', data)",
-              "previous": "console.log('[MMR] Fetching match data for matchId:', matchId, 'and heroSlot:', heroSlot)"
-            },
-            "span": "matchId",
-            "text": ""
-          }
-        ],
-        "message": "Unsafe argument of type any assigned to a parameter of type string.",
-        "severity": "error"
-      }
-    },
     "a2d7bd085454b393c38dd4edf305f205ff84bfe0fd6c2818176ef48e52db5d03": {
       "count": 1,
       "summary": {
@@ -83997,26 +82948,6 @@
           }
         ],
         "message": "The explicit anonymous object type on return value of `findBestMatchingMenuItem` discards known type evidence. Keep inference, validate with `satisfies`, or use a named owner contract.",
-        "severity": "error"
-      }
-    },
-    "a41fb62d00211f305869f3107f5a1cfedbe8011da619111a2dafeabf6d6f2108": {
-      "count": 2,
-      "summary": {
-        "code": "vitest(require-mock-type-parameters)",
-        "file": "src/__tests__/lib/hooks/use-socket.test.tsx",
-        "labels": [
-          {
-            "context": {
-              "current": "setChatMessages: vi.fn(),",
-              "next": "setConnected: vi.fn(),",
-              "previous": "setBlock: vi.fn(),"
-            },
-            "span": "fn",
-            "text": ""
-          }
-        ],
-        "message": "Missing type parameters on mock function call",
         "severity": "error"
       }
     },
@@ -89660,26 +88591,6 @@
         "severity": "error"
       }
     },
-    "b05626229a843664239922eded889e8cd83be3f9b2a24e5fbbc5592a7d53dd16": {
-      "count": 1,
-      "summary": {
-        "code": "typescript(no-unsafe-member-access)",
-        "file": "src/lib/hooks/open-dota-api.tsx",
-        "labels": [
-          {
-            "context": {
-              "current": "if (jobStatus?.data?.status === 'completed') {",
-              "next": "resolve(true)",
-              "previous": "// According to OpenDota API, we need to check the status field"
-            },
-            "span": "status",
-            "text": ""
-          }
-        ],
-        "message": "Unsafe member access .status on an `any` value.",
-        "severity": "error"
-      }
-    },
     "b06433f9706056e9673bb6cc95a91a95619916776c0a5a14a0e1517cbe202a3e": {
       "count": 1,
       "summary": {
@@ -90386,26 +89297,6 @@
           }
         ],
         "message": "Replace module mocking with dependency injection through a real interface, service layer, or faithful test implementation.",
-        "severity": "error"
-      }
-    },
-    "b14aa5610b97f312a2639d24ec052daeffa21916e955126e4e90b5ab39602d11": {
-      "count": 1,
-      "summary": {
-        "code": "typescript(no-unsafe-member-access)",
-        "file": "src/components/Dashboard/chat-bot.tsx",
-        "labels": [
-          {
-            "context": {
-              "current": "data.emote_set?.emotes?.find((e: { name: string }) => e.name === emote.label),",
-              "next": "),",
-              "previous": "Array.isArray(data.emote_set?.emotes) &&"
-            },
-            "span": "emote_set",
-            "text": ""
-          }
-        ],
-        "message": "Unsafe member access .emote_set on an `any` value.",
         "severity": "error"
       }
     },
@@ -92534,26 +91425,6 @@
         "severity": "error"
       }
     },
-    "b60186587aea425fd14c3bfa2f8b25670d0fcca3a3aec20565d5c7d9e7a74e1f": {
-      "count": 1,
-      "summary": {
-        "code": "typescript(strict-void-return)",
-        "file": "src/__tests__/lib/hooks/use-socket.test.tsx",
-        "labels": [
-          {
-            "context": {
-              "current": "setConnected,",
-              "next": "setNotablePlayers: vi.fn(),",
-              "previous": "setChatMessages: vi.fn(),"
-            },
-            "span": "setConnected",
-            "text": ""
-          }
-        ],
-        "message": "Value-returning function used in a context where a void function is expected.",
-        "severity": "error"
-      }
-    },
     "b626c13315d822091ccc7c925be05a7efd273e4b1ac02ad4904cd522a65a8b50": {
       "count": 1,
       "summary": {
@@ -94181,26 +93052,6 @@
         "severity": "error"
       }
     },
-    "ba56570122f6c3745ed96b64e2eef006c61deb7cbf3bc6f1be69690a7c831ebe": {
-      "count": 5,
-      "summary": {
-        "code": "typescript(strict-void-return)",
-        "file": "src/__tests__/lib/hooks/use-socket.test.tsx",
-        "labels": [
-          {
-            "context": {
-              "current": "setConnected: vi.fn(),",
-              "next": "setNotablePlayers: vi.fn(),",
-              "previous": "setChatMessages: vi.fn(),"
-            },
-            "span": "vi.fn()",
-            "text": ""
-          }
-        ],
-        "message": "Value-returning function used in a context where a void function is expected.",
-        "severity": "error"
-      }
-    },
     "ba5ba72c42734dd1f82d0786671d7f20fdf43687036a523b50d36caaeeb44991": {
       "count": 1,
       "summary": {
@@ -94618,26 +93469,6 @@
           }
         ],
         "message": "This type assertion has no `SAFETY:` justification. State the checked invariant immediately before the assertion or its containing statement.",
-        "severity": "error"
-      }
-    },
-    "bb7116d5cfd2061869cdeb5f018056e82b5ef24d15acb40b083a774219a558b1": {
-      "count": 3,
-      "summary": {
-        "code": "typescript(strict-void-return)",
-        "file": "src/__tests__/lib/hooks/use-socket.test.tsx",
-        "labels": [
-          {
-            "context": {
-              "current": "setChatMessages: vi.fn(),",
-              "next": "setConnected: vi.fn(),",
-              "previous": "setBlock,"
-            },
-            "span": "vi.fn()",
-            "text": ""
-          }
-        ],
-        "message": "Value-returning function used in a context where a void function is expected.",
         "severity": "error"
       }
     },
@@ -97231,26 +96062,6 @@
         "severity": "error"
       }
     },
-    "c0ff1f4d3a0d5a51deacd2cd879ba3e24217cebdc92334594ddaa0ba2974b71a": {
-      "count": 1,
-      "summary": {
-        "code": "eslint(complexity)",
-        "file": "src/components/Dashboard/chat-bot.tsx",
-        "labels": [
-          {
-            "context": {
-              "current": "const ChatBot = () => {",
-              "next": "const { data: accountData } = useUpdateAccount()",
-              "previous": ""
-            },
-            "span": "() => {\n  const { data: accountData } = useUpdateAccount()\n  const session = useSession()\n  const [emotes, setEmotes] = useState<Emote[]>([])\n  const [user, setUser] = useState<User | null>(null)\n  const [loading, setLoading] = useState(true)\n  const stvUrl = `https://7tv.io/v3/users/twitch/${session?.data?.user?.twitchId}`\n  const track = useTrack()\n  const { hasAccess: hasAutoModeratorAccess } = useFeatureAccess('autoModerator')\n  // Pro: fire-and-forget the POST that adds dotabod as a moderator. We don't read its\n  // Result anymore — current mod state comes from useSetupModStatus below — but the\n  // POST still needs to run so the auto-mod action happens for Pro users.\n  useSWR(hasAutoModeratorAccess ? '/api/make-dotabod-mod' : null, fetcher, SETTINGS_SWR_OPTIONS)\n  const { data: modStatus } = useSetupModStatus()\n  const { hasAccess: hasAuto7TVAccess } = useFeatureAccess('auto7TV')\n  const { error: updateEmoteSetError } = useSWR(\n    hasAuto7TVAccess && user?.id ? '/api/update-emote-set' : null,\n    async (url) => {\n      track('updateEmoteSet called')\n      return fetcher(url)\n    },\n    SETTINGS_SWR_OPTIONS,\n  )\n  const [activeKey7TV, setActiveKey7TV] = useState('auto')\n  const [activeKeyMod, setActiveKeyMod] = useState('auto')\n  const router = useRouter()\n\n  useEffect(() => {\n    const parsedMod = router.query.modType\n    const parsed7TV = router.query.sevenTvType\n\n    if (parsedMod === 'auto' || parsedMod === 'manual') {\n      setActiveKeyMod(parsedMod)\n    }\n    if (parsed7TV === 'auto' || parsed7TV === 'manual') {\n      setActiveKey7TV(parsed7TV)\n    }\n  }, [router.query.modType, router.query.sevenTvType])\n\n  const updateUrlWithModType = (newType: 'auto' | 'manual') => {\n    void router.replace(\n      {\n        pathname: router.pathname,\n        query: { ...router.query, modType: newType },\n      },\n      undefined,\n      { shallow: true },\n    )\n  }\n\n  const updateUrlWith7TVType = (newType: 'auto' | 'manual') => {\n    void router.replace(\n      {\n        pathname: router.pathname,\n        query: { ...router.query, sevenTvType: newType },\n      },\n      undefined,\n      { shallow: true },\n    )\n  }\n\n  useEffect(() => {\n    const fetchUserData = async () => {\n      try {\n        const response = await fetch(`${stvUrl}?cacheBust=${Date.now()}`)\n        const data = await response.json()\n        const user = {\n          hasDotabodEditor:\n            Array.isArray(data.user?.editors) &&\n            Boolean(\n              data.user?.editors?.find(\n                (editor: { id: string }) =>\n                  editor.id?.toLowerCase() === '01GQZ0CEDR000AH5YBCSXQWR0V'.toLowerCase(),\n              ),\n            ),\n          hasDotabodEmoteSet: emotesRequired.every(\n            (emote) =>\n              Array.isArray(data.emote_set?.emotes) &&\n              data.emote_set?.emotes?.find((e: { name: string }) => e.name === emote.label),\n          ),\n          id: data?.user?.id,\n          personalSet: data?.emote_set?.id,\n        }\n\n        if (updateEmoteSetError) {\n          setUser((prev) => (prev ? { ...prev, hasDotabodEmoteSet: false } : null))\n          clearInterval(intervalId)\n        }\n\n        if (user?.id) {\n          setUser(user)\n          if (user.hasDotabodEditor && user.hasDotabodEmoteSet) {\n            clearInterval(intervalId)\n          }\n          if (Array.isArray(data?.emote_set?.emotes)) {\n            setEmotes(data.emote_set.emotes)\n          }\n        }\n      } catch (error) {\n        console.error('Error fetching user data:', error)\n      } finally {\n        setLoading(false)\n      }\n    }\n\n    // On load\n    void fetchUserData()\n\n    // Every 5 seconds\n    const intervalId = setInterval(fetchUserData, 5000)\n\n    return () => {\n      clearInterval(intervalId)\n    }\n  }, [stvUrl, updateEmoteSetError])\n\n  const { data: mmr } = useUpdateSetting(Settings.mmr)\n  const accountsWithMmr = accountData?.accounts as { mmr: number }[] | undefined\n\n  const accountCount = accountData?.accounts?.length ?? 0\n  const stepOneComplete =\n    accountCount > 0 ? (accountsWithMmr?.filter((a) => a.mmr > 0).length ?? 0) > 0 : mmr\n  const stepModComplete = Boolean(modStatus?.modded)\n  const stepTwoComplete = user?.id\n  const stepThreeComplete = user?.hasDotabodEditor\n  const stepFourComplete = user?.hasDotabodEmoteSet\n  const initialStep = [stepTwoComplete, stepThreeComplete, stepFourComplete].filter(Boolean).length\n\n  return (\n    <Card>\n      <h1 className='text-xl font-bold'>Twitch</h1>\n      <div className='gap-4 pb-8 text-sm text-gray-300'>\n        <Tabs\n          defaultActiveKey={activeKeyMod}\n          activeKey={activeKeyMod}\n          destroyInactiveTabPane\n          onTabClick={(key) => {\n            track('chatbot/change_mod_tab', { tab: key })\n          }}\n          onChange={(key) => {\n            if (key === 'auto' || key === 'manual') {\n              updateUrlWithModType(key)\n            }\n          }}\n          items={[\n            {\n              children: (\n                <>\n                  <StepComponent\n                    hideTitle={true}\n                    stepProps={[\n                      { status: stepOneComplete ? 'finish' : undefined },\n                      { status: stepModComplete ? 'finish' : undefined },\n                    ]}\n                    steps={[\n                      <span className='flex flex-col gap-4' key={1}>\n                        {stepOneComplete ? (\n                          <div>\n                            <span>\n                              Dotabod knows your MMR.{' '}\n                              <Link\n                                href='/dashboard/features'\n                                onClick={() => {\n                                  track('chatbot/change_mmr')\n                                }}\n                              >\n                                <span className='text-purple-300'>Change it</span>\n                              </Link>\n                            </span>\n                          </div>\n                        ) : (\n                          <>\n                            <div>\n                              <span>\n                                Dotabod doesn&apos;t know your MMR right now, so let&apos;s tell it\n                              </span>\n                              <span className='text-xs text-gray-500'>\n                                {' '}\n                                (you can change it later)\n                              </span>\n                            </div>\n                            <MmrForm hideText={true} />\n                          </>\n                        )}\n                      </span>,\n                      <span className='flex flex-row items-center gap-2' key={1}>\n                        {stepModComplete ? (\n                          <div>Dotabod is a moderator in your Twitch channel.</div>\n                        ) : (\n                          <>\n                            <Spin size='small' spinning={loading} />\n                            <div>\n                              Dotabod needs to be a moderator in your Twitch channel to function\n                              properly.\n                            </div>\n                          </>\n                        )}\n                      </span>,\n                    ]}\n                  />\n                </>\n              ),\n              key: 'auto',\n              label: (\n                <span>\n                  Automatic <TierBadge feature='autoModerator' />\n                </span>\n              ),\n            },\n            {\n              children: (\n                <StepComponent\n                  stepProps={[\n                    { status: stepOneComplete ? 'finish' : undefined },\n                    { status: stepModComplete ? 'finish' : undefined },\n                    { status: stepModComplete ? 'finish' : undefined },\n                    { status: stepModComplete ? 'finish' : undefined },\n                  ]}\n                  hideTitle={true}\n                  steps={[\n                    <span className='flex flex-col gap-4' key={1}>\n                      {stepOneComplete ? (\n                        <div>\n                          <span>\n                            Dotabod knows your MMR.{' '}\n                            <Link\n                              href='/dashboard/features'\n                              onClick={() => {\n                                track('chatbot/change_mmr')\n                              }}\n                            >\n                              <span className='text-purple-300'>Change it</span>\n                            </Link>\n                          </span>\n                        </div>\n                      ) : (\n                        <>\n                          <div>\n                            <span>\n                              Dotabod doesn&apos;t know your MMR right now, so let&apos;s tell it\n                            </span>\n                            <span className='text-xs text-gray-500'>\n                              {' '}\n                              (you can change it later)\n                            </span>\n                          </div>\n                          <MmrForm hideText={true} />\n                        </>\n                      )}\n                    </span>,\n                    <span key={1}>Go to your Twitch chat</span>,\n                    <span key={2}>Type the command: /mod dotabod</span>,\n                    <span key={3}>\n                      {stepModComplete ? (\n                        <div>Dotabod is a moderator in your Twitch channel.</div>\n                      ) : (\n                        <>\n                          <Spin size='small' spinning={loading} />\n                          <div>\n                            Dotabod needs to be a moderator in your Twitch channel to function\n                            properly.\n                          </div>\n                        </>\n                      )}\n                    </span>,\n                  ]}\n                />\n              ),\n              key: 'manual',\n              label: 'Manual',\n            },\n          ]}\n        />\n      </div>\n      <Divider />\n      <div className='flex items-center gap-2'>\n        <h1 className='text-xl font-bold'>7TV</h1>\n      </div>\n      <div className='gap-4 pb-8 text-sm text-gray-300'>\n        <Tabs\n          defaultActiveKey={activeKey7TV}\n          activeKey={activeKey7TV}\n          destroyInactiveTabPane\n          onTabClick={(key) => {\n            track('chatbot/change_7tv_tab', { tab: key })\n          }}\n          onChange={(key) => {\n            if (key === 'auto' || key === 'manual') {\n              updateUrlWith7TVType(key)\n            }\n          }}\n          items={[\n            {\n              children: (\n                <StepComponent\n                  initialStep={initialStep}\n                  stepProps={[\n                    { status: stepTwoComplete ? 'finish' : undefined },\n                    { status: stepThreeComplete ? 'finish' : undefined },\n                    {\n                      status: stepFourComplete\n                        ? 'finish'\n                        : updateEmoteSetError\n                          ? 'error'\n                          : undefined,\n                    },\n                  ]}\n                  steps={[\n                    <div key={1} className='flex flex-col gap-2'>\n                      <div className='flex flex-row items-center gap-2'>\n                        {loading && <Spin size='small' spinning={loading} />}\n                        {user ? (\n                          <div>You have a 7TV account connected to Twitch.</div>\n                        ) : (\n                          <>\n                            <div>\n                              You don&apos;t have a 7TV account setup yet! Dotabod uses 7TV to\n                              display emotes in your chat.{' '}\n                            </div>\n                            <div>\n                              <Button\n                                target='_blank'\n                                type='primary'\n                                href='https://7tv.app/'\n                                icon={<ExternalLinkIcon size={14} />}\n                                iconPosition='end'\n                                onClick={() => {\n                                  track('7TV Register')\n                                }}\n                              >\n                                Login to 7TV\n                              </Button>\n                            </div>\n                          </>\n                        )}\n                      </div>\n                    </div>,\n\n                    <div key={2}>\n                      <div className='flex flex-row items-center gap-2'>\n                        {user?.hasDotabodEditor ? (\n                          <div>Dotabod is an editor on your 7TV account.</div>\n                        ) : (\n                          <div>\n                            {user?.hasDotabodEmoteSet ? (\n                              <div>\n                                <div>\n                                  You already have all the required emotes, but you still need to\n                                  add Dotabod as an editor to enable auto-updates.\n                                </div>\n                                <div>\n                                  <Button\n                                    className='pl-0!'\n                                    target='_blank'\n                                    type='link'\n                                    href='https://7tv.app/settings/editors'\n                                    icon={<ExternalLinkIcon size={14} />}\n                                    iconPosition='end'\n                                    onClick={() => {\n                                      track('7TV Add Editor')\n                                    }}\n                                  >\n                                    Add Dotabod as editor on 7TV\n                                  </Button>\n                                </div>\n                              </div>\n                            ) : (\n                              <div>\n                                <div>\n                                  <span>You must add Dotabod as an editor </span>\n                                  <Button\n                                    className='pl-0!'\n                                    target='_blank'\n                                    type='link'\n                                    href='https://7tv.app/settings/editors'\n                                    icon={<ExternalLinkIcon size={14} />}\n                                    iconPosition='end'\n                                    onClick={() => {\n                                      track('7TV Add Editor')\n                                    }}\n                                  >\n                                    on your 7TV account\n                                  </Button>\n                                  <span>with permissions:</span>\n                                </div>\n\n                                <div className='flex flex-row items-center gap-3'>\n                                  <span>Emote sets: Admin</span>\n                                </div>\n\n                                <div className='flex flex-row items-center gap-3'>\n                                  {loading && <Spin size='small' spinning={true} />}\n                                  <span>Waiting for Dotabod to become an editor...</span>\n                                  <span>\n                                    Make sure you allow Dotabod to create emote sets on 7TV\n                                  </span>\n                                </div>\n                              </div>\n                            )}\n                          </div>\n                        )}\n                      </div>\n                    </div>,\n                    <div key={3}>\n                      <div className='mb-4 flex flex-row items-center gap-2'>\n                        <div className='flex flex-col'>\n                          {updateEmoteSetError ? (\n                            <div className='m-4'>\n                              <Alert\n                                message='There was an error adding the emotes to your 7TV account. Check back again later, or add the emotes manually.'\n                                type='error'\n                                showIcon\n                              />\n                            </div>\n                          ) : user?.hasDotabodEmoteSet ? (\n                            <div>All required emotes have been added to your channel!</div>\n                          ) : (\n                            <div className='flex flex-row gap-4'>\n                              <Spin size='small' spinning={true} />\n                              <p>\n                                Dotabod will automatically add the following emotes after the\n                                previous steps are completed.\n                              </p>\n                            </div>\n                          )}\n                        </div>\n                      </div>\n\n                      <EmoteList emotes={emotes} user={user} />\n                    </div>,\n                  ]}\n                />\n              ),\n              key: 'auto',\n              label: (\n                <span>\n                  Automatic <TierBadge feature='auto7TV' />\n                </span>\n              ),\n            },\n            {\n              children: (\n                <div>\n                  <p>To manually add the required emotes:</p>\n                  <StepComponent\n                    hideTitle={true}\n                    steps={[\n                      <span key={1}>\n                        <div>\n                          Make sure you have a 7TV account and it&apos;s connected to your Twitch\n                        </div>\n                      </span>,\n                      <span key={2}>\n                        <div>Click each emote below to open it on 7TV</div>\n                      </span>,\n                      <span key={3}>\n                        <div>Click the &quot;Add to...&quot; button for each emote</div>\n                      </span>,\n                    ]}\n                  />\n\n                  <EmoteList emotes={emotes} user={user} />\n                </div>\n              ),\n              key: 'manual',\n              label: 'Manual',\n            },\n          ]}\n        />\n      </div>\n    </Card>\n  )\n}",
-            "text": ""
-          }
-        ],
-        "message": "function has a complexity of 43. Maximum allowed is 20.",
-        "severity": "error"
-      }
-    },
     "c0ff820629e726a79703f3660c6af5368d13369c858035b6f6bc43c7ecc7646c": {
       "count": 1,
       "summary": {
@@ -98894,35 +97705,6 @@
         "severity": "error"
       }
     },
-    "c39a97ac1a98f617ba408c3b62791d61681b35b5287eb98654b649c01c0c8619": {
-      "count": 1,
-      "summary": {
-        "code": "eslint(no-use-before-define)",
-        "file": "src/lib/hooks/open-dota-api.tsx",
-        "labels": [
-          {
-            "context": {
-              "current": "await getJobStatus(jobId)",
-              "next": "// After job completes, try fetching the match data again",
-              "previous": "const jobId = await createJob(matchId)"
-            },
-            "span": "getJobStatus",
-            "text": "used here"
-          },
-          {
-            "context": {
-              "current": "const getJobStatus = async function getJobStatus(jobId: number): Promise<boolean> {",
-              "next": "// Check if we already have a job status check in progress",
-              "previous": ""
-            },
-            "span": "getJobStatus",
-            "text": "defined here"
-          }
-        ],
-        "message": "'getJobStatus' was used before it was defined.",
-        "severity": "error"
-      }
-    },
     "c39bddb2ba2228e2f6c45073de284381770a37d0e81b04035e1168143b6a5277": {
       "count": 1,
       "summary": {
@@ -100481,26 +99263,6 @@
         "severity": "error"
       }
     },
-    "c600b75f579096b1405dea7a776c3e2621e7acd4d569ebcb16efea3d98ff3fe1": {
-      "count": 1,
-      "summary": {
-        "code": "typescript(no-unsafe-assignment)",
-        "file": "src/lib/hooks/use-socket.tsx",
-        "labels": [
-          {
-            "context": {
-              "current": "heroSlot,",
-              "next": "matchId,",
-              "previous": "console.log('[MMR] requestMatchData event received', {"
-            },
-            "span": "heroSlot",
-            "text": ""
-          }
-        ],
-        "message": "Unsafe assignment of an any value.",
-        "severity": "error"
-      }
-    },
     "c60f802bd8c8eeae38d67231a14b61a72e6d224bab494be5da644243cdce34c0": {
       "count": 1,
       "summary": {
@@ -100896,26 +99658,6 @@
           }
         ],
         "message": "Replace module mocking with dependency injection through a real interface, service layer, or faithful test implementation.",
-        "severity": "error"
-      }
-    },
-    "c6e79c31322d0d632c0c1534e81d7682700748c25adeec965b30df25b151784f": {
-      "count": 1,
-      "summary": {
-        "code": "typescript(no-unsafe-assignment)",
-        "file": "src/components/Dashboard/chat-bot.tsx",
-        "labels": [
-          {
-            "context": {
-              "current": "personalSet: data?.emote_set?.id,",
-              "next": "}",
-              "previous": "id: data?.user?.id,"
-            },
-            "span": "personalSet: data?.emote_set?.id",
-            "text": ""
-          }
-        ],
-        "message": "Unsafe assignment of an any value.",
         "severity": "error"
       }
     },
@@ -103230,26 +101972,6 @@
           }
         ],
         "message": "Unsafe member access .getCurrentScene on an `any` value.",
-        "severity": "error"
-      }
-    },
-    "cbd86ff58d89900f8e07a256306e92be574a2752c9498b5816f40ea2e8bf7fe7": {
-      "count": 6,
-      "summary": {
-        "code": "typescript(strict-void-return)",
-        "file": "src/__tests__/lib/hooks/use-socket.test.tsx",
-        "labels": [
-          {
-            "context": {
-              "current": "setPaused: vi.fn(),",
-              "next": "setPollData: vi.fn(),",
-              "previous": "setNotablePlayers: vi.fn(),"
-            },
-            "span": "vi.fn()",
-            "text": ""
-          }
-        ],
-        "message": "Value-returning function used in a context where a void function is expected.",
         "severity": "error"
       }
     },
@@ -107630,26 +106352,6 @@
         "severity": "error"
       }
     },
-    "d3f0e447ad469a5b8e58e1233830ab77ba4977c4f0dc14c10a7b3514cbf6b51c": {
-      "count": 1,
-      "summary": {
-        "code": "typescript(no-unsafe-member-access)",
-        "file": "src/lib/hooks/open-dota-api.tsx",
-        "labels": [
-          {
-            "context": {
-              "current": "reject(new Error(`Job not finished or has unexpected status: ${jobStatus?.data?.status}`))",
-              "next": "} catch (error) {",
-              "previous": "jobStatusCache.delete(jobId)"
-            },
-            "span": "status",
-            "text": ""
-          }
-        ],
-        "message": "Unsafe member access .status on an `any` value.",
-        "severity": "error"
-      }
-    },
     "d3fbe8ca01e7e83f5d20a2e12ce76928add5ba8b79b8045a6d0578326eed379a": {
       "count": 1,
       "summary": {
@@ -111295,26 +109997,6 @@
         "severity": "error"
       }
     },
-    "dafcc256ace9bfb326cfa371e05927ad2ca5b12389889b40b1d9cfeeaf93026a": {
-      "count": 2,
-      "summary": {
-        "code": "typescript(strict-void-return)",
-        "file": "src/__tests__/lib/hooks/use-socket.test.tsx",
-        "labels": [
-          {
-            "context": {
-              "current": "setWL,",
-              "next": "})",
-              "previous": "setRoshan: vi.fn(),"
-            },
-            "span": "setWL",
-            "text": ""
-          }
-        ],
-        "message": "Value-returning function used in a context where a void function is expected.",
-        "severity": "error"
-      }
-    },
     "db04e8f1df4bcff25042a581177b1a312d5941ab35340fbceb135e3b69fce768": {
       "count": 1,
       "summary": {
@@ -111830,26 +110512,6 @@
           }
         ],
         "message": "This type assertion has no `SAFETY:` justification. State the checked invariant immediately before the assertion or its containing statement.",
-        "severity": "error"
-      }
-    },
-    "dbfe21e18e64dabf2726cd4479e5028db15c566a31ec70102cc74b88c8c2eee7": {
-      "count": 1,
-      "summary": {
-        "code": "typescript(no-unsafe-call)",
-        "file": "src/lib/hooks/use-socket.tsx",
-        "labels": [
-          {
-            "context": {
-              "current": "cb(null)",
-              "next": "}",
-              "previous": "console.log('[MMR] Error fetching match data', { error })"
-            },
-            "span": "cb",
-            "text": ""
-          }
-        ],
-        "message": "Unsafe call of a(n) `any` typed value.",
         "severity": "error"
       }
     },
@@ -112751,26 +111413,6 @@
         "severity": "error"
       }
     },
-    "dda89f3eb39f1d3f6de582b759a5346552eb563788281e006d3af4160b03418e": {
-      "count": 4,
-      "summary": {
-        "code": "typescript(strict-void-return)",
-        "file": "src/__tests__/lib/hooks/use-socket.test.tsx",
-        "labels": [
-          {
-            "context": {
-              "current": "setRoshan: vi.fn(),",
-              "next": "setWL: vi.fn(),",
-              "previous": "setRankImageDetails: vi.fn(),"
-            },
-            "span": "vi.fn()",
-            "text": ""
-          }
-        ],
-        "message": "Value-returning function used in a context where a void function is expected.",
-        "severity": "error"
-      }
-    },
     "ddb045a2024f820387f0bc7182360d698e1f81488f9587266d2b0a3842d95242": {
       "count": 1,
       "summary": {
@@ -112837,26 +111479,6 @@
           }
         ],
         "message": "Avoid referencing unbound methods which may cause unintentional scoping of `this`.",
-        "severity": "error"
-      }
-    },
-    "dde06314fda21c2c9b569812564f3e415276687f635173492dc2ab910b730456": {
-      "count": 1,
-      "summary": {
-        "code": "typescript(no-unsafe-member-access)",
-        "file": "src/components/Dashboard/chat-bot.tsx",
-        "labels": [
-          {
-            "context": {
-              "current": "Array.isArray(data.emote_set?.emotes) &&",
-              "next": "data.emote_set?.emotes?.find((e: { name: string }) => e.name === emote.label),",
-              "previous": "(emote) =>"
-            },
-            "span": "emote_set",
-            "text": ""
-          }
-        ],
-        "message": "Unsafe member access .emote_set on an `any` value.",
         "severity": "error"
       }
     },
@@ -114144,26 +112766,6 @@
           }
         ],
         "message": "Unsafe assignment of an any value.",
-        "severity": "error"
-      }
-    },
-    "e05ca20f078343c167fc25422c1a6f4474ccbb6e683a5cab7e382ada7923cd88": {
-      "count": 1,
-      "summary": {
-        "code": "promise(prefer-await-to-callbacks)",
-        "file": "src/lib/hooks/use-socket.tsx",
-        "labels": [
-          {
-            "context": {
-              "current": "socket.on('requestMatchData', async ({ matchId, heroSlot }, cb) => {",
-              "next": "updateLastReceived()",
-              "previous": ""
-            },
-            "span": "cb",
-            "text": ""
-          }
-        ],
-        "message": "Prefer `async`/`await` to the callback pattern",
         "severity": "error"
       }
     },
@@ -116691,26 +115293,6 @@
         "severity": "error"
       }
     },
-    "e4fa369928ad4cb81ebca25ad978b53307468a8143346c6ef1c3680928aa5e8c": {
-      "count": 2,
-      "summary": {
-        "code": "vitest(require-mock-type-parameters)",
-        "file": "src/__tests__/lib/hooks/use-socket.test.tsx",
-        "labels": [
-          {
-            "context": {
-              "current": "setRoshan: vi.fn(),",
-              "next": "setWL,",
-              "previous": "setRankImageDetails: vi.fn(),"
-            },
-            "span": "fn",
-            "text": ""
-          }
-        ],
-        "message": "Missing type parameters on mock function call",
-        "severity": "error"
-      }
-    },
     "e4fcc256be811db38190fd02fbbacab097ff9d2260ed52b8ebe4482b781ba906": {
       "count": 1,
       "summary": {
@@ -117257,26 +115839,6 @@
           }
         ],
         "message": "Missing type parameters on mock function call",
-        "severity": "error"
-      }
-    },
-    "e5f4807cce53113c332e9df62c50e2369156b3adccba61918edbee55f2724470": {
-      "count": 1,
-      "summary": {
-        "code": "typescript(strict-boolean-expressions)",
-        "file": "src/components/Dashboard/chat-bot.tsx",
-        "labels": [
-          {
-            "context": {
-              "current": "{updateEmoteSetError ? (",
-              "next": "<div className='m-4'>",
-              "previous": "<div className='flex flex-col'>"
-            },
-            "span": "updateEmoteSetError",
-            "text": ""
-          }
-        ],
-        "message": "Unexpected any value in conditional. Use a more specific type to ensure type safety.",
         "severity": "error"
       }
     },
@@ -119914,26 +118476,6 @@
         "severity": "error"
       }
     },
-    "ead557632f946dfb1d269315d0b2371bee617688553d2cba333a0af14a8b0867": {
-      "count": 1,
-      "summary": {
-        "code": "vitest(require-mock-type-parameters)",
-        "file": "src/__tests__/lib/hooks/use-socket.test.tsx",
-        "labels": [
-          {
-            "context": {
-              "current": "setNotablePlayers: vi.fn(),",
-              "next": "setPaused: vi.fn(),",
-              "previous": "setConnected,"
-            },
-            "span": "fn",
-            "text": ""
-          }
-        ],
-        "message": "Missing type parameters on mock function call",
-        "severity": "error"
-      }
-    },
     "eaec12d5df04b8547d5a195a8fd33c2156880d6ce42614078bcf5ed233acc18e": {
       "count": 1,
       "summary": {
@@ -120563,26 +119105,6 @@
         "severity": "error"
       }
     },
-    "ec21323ea1dfba3106db27c1b7a24a99b3f83d7329fb65281ea1b681c759aae4": {
-      "count": 3,
-      "summary": {
-        "code": "vitest(require-mock-type-parameters)",
-        "file": "src/__tests__/lib/hooks/use-socket.test.tsx",
-        "labels": [
-          {
-            "context": {
-              "current": "setBetData: vi.fn(),",
-              "next": "setBlock,",
-              "previous": "setAegis: vi.fn(),"
-            },
-            "span": "fn",
-            "text": ""
-          }
-        ],
-        "message": "Missing type parameters on mock function call",
-        "severity": "error"
-      }
-    },
     "ec2b40dedc78f4f88c5eac1e0d7ca03d4a7e2cd91c951621072627eb764840b0": {
       "count": 1,
       "summary": {
@@ -120909,26 +119431,6 @@
           }
         ],
         "message": "Unsafe assignment of an any value.",
-        "severity": "error"
-      }
-    },
-    "ecd53eb2e05f19c94e04180fb1a2ac937b7eed0de7200302b2f8e311c484d66c": {
-      "count": 3,
-      "summary": {
-        "code": "typescript(strict-void-return)",
-        "file": "src/__tests__/lib/hooks/use-socket.test.tsx",
-        "labels": [
-          {
-            "context": {
-              "current": "setBetData: vi.fn(),",
-              "next": "setBlock: vi.fn(),",
-              "previous": "setAegis: vi.fn(),"
-            },
-            "span": "vi.fn()",
-            "text": ""
-          }
-        ],
-        "message": "Value-returning function used in a context where a void function is expected.",
         "severity": "error"
       }
     },
@@ -123395,26 +121897,6 @@
         "severity": "error"
       }
     },
-    "f12a8f0b6e958df671b6141a90041dbe44ddfa322180ddb4ec42d970cf0ab07b": {
-      "count": 5,
-      "summary": {
-        "code": "vitest(require-mock-type-parameters)",
-        "file": "src/__tests__/lib/hooks/use-socket.test.tsx",
-        "labels": [
-          {
-            "context": {
-              "current": "setNotablePlayers: vi.fn(),",
-              "next": "setPaused: vi.fn(),",
-              "previous": "setConnected: vi.fn(),"
-            },
-            "span": "fn",
-            "text": ""
-          }
-        ],
-        "message": "Missing type parameters on mock function call",
-        "severity": "error"
-      }
-    },
     "f12ed2b936ed8a4c9664be253600075517e4b5c441c47d9111358181722b81eb": {
       "count": 1,
       "summary": {
@@ -124041,26 +122523,6 @@
           }
         ],
         "message": "Importing \"motion\" ships about 30 kb of extra code and slows page load. Use \"m\" with LazyMotion instead.",
-        "severity": "error"
-      }
-    },
-    "f295a42375c94c2f2a56e67f043b193564874f74b35a1266e50a8e9a8f9b0422": {
-      "count": 1,
-      "summary": {
-        "code": "typescript(strict-boolean-expressions)",
-        "file": "src/components/Dashboard/chat-bot.tsx",
-        "labels": [
-          {
-            "context": {
-              "current": "if (updateEmoteSetError) {",
-              "next": "setUser((prev) => (prev ? { ...prev, hasDotabodEmoteSet: false } : null))",
-              "previous": ""
-            },
-            "span": "updateEmoteSetError",
-            "text": ""
-          }
-        ],
-        "message": "Unexpected any value in conditional. Use a more specific type to ensure type safety.",
         "severity": "error"
       }
     },
@@ -124939,26 +123401,6 @@
           }
         ],
         "message": "Unsafe call of a(n) `error` type typed value.",
-        "severity": "error"
-      }
-    },
-    "f4b9982fccfe7a012d1ab1df1f91e3a9426e1f66fadb17856507f532f0ac4543": {
-      "count": 1,
-      "summary": {
-        "code": "typescript(no-unsafe-call)",
-        "file": "src/lib/hooks/use-socket.tsx",
-        "labels": [
-          {
-            "context": {
-              "current": "cb(data)",
-              "next": "} catch (error) {",
-              "previous": "console.log('[MMR] Match data fetched:', data)"
-            },
-            "span": "cb",
-            "text": ""
-          }
-        ],
-        "message": "Unsafe call of a(n) `any` typed value.",
         "severity": "error"
       }
     },
@@ -126467,26 +124909,6 @@
         "severity": "error"
       }
     },
-    "f7b7fb2a27a09fefc2ab873ab98c0c068ff19a3522b57566f9a8c82fa0bf2e4b": {
-      "count": 1,
-      "summary": {
-        "code": "typescript(no-unsafe-assignment)",
-        "file": "src/components/Dashboard/chat-bot.tsx",
-        "labels": [
-          {
-            "context": {
-              "current": "const { error: updateEmoteSetError } = useSWR(",
-              "next": "hasAuto7TVAccess && user?.id ? '/api/update-emote-set' : null,",
-              "previous": "const { hasAccess: hasAuto7TVAccess } = useFeatureAccess('auto7TV')"
-            },
-            "span": "updateEmoteSetError",
-            "text": ""
-          }
-        ],
-        "message": "Unsafe array destructuring of a tuple element with an any value.",
-        "severity": "error"
-      }
-    },
     "f7c625d75cb9184465e438a6b519676092f15d142494db5f3576047b3757cdf4": {
       "count": 1,
       "summary": {
@@ -127080,26 +125502,6 @@
           }
         ],
         "message": "(BuildHIR::lowerStatement) Handle TryStatement with a finalizer ('finally') clause",
-        "severity": "error"
-      }
-    },
-    "f8f380c8a6e215be92169fb78034bfaf9b4c0c73dbcf346fb319dc75bd6c9ea7": {
-      "count": 1,
-      "summary": {
-        "code": "typescript(no-unsafe-member-access)",
-        "file": "src/lib/hooks/open-dota-api.tsx",
-        "labels": [
-          {
-            "context": {
-              "current": "const jobId = createdJob.data?.job?.jobId",
-              "next": "if (typeof jobId !== 'number') {",
-              "previous": ""
-            },
-            "span": "job",
-            "text": ""
-          }
-        ],
-        "message": "Unsafe member access .job on an `any` value.",
         "severity": "error"
       }
     },
@@ -128701,26 +127103,6 @@
         "severity": "error"
       }
     },
-    "fbe80b9fcbd3259e7eabed5c947757cd77b2c194af4642653f28cda4b9730154": {
-      "count": 4,
-      "summary": {
-        "code": "vitest(require-mock-type-parameters)",
-        "file": "src/__tests__/lib/hooks/use-socket.test.tsx",
-        "labels": [
-          {
-            "context": {
-              "current": "setWL: vi.fn(),",
-              "next": "})",
-              "previous": "setRoshan: vi.fn(),"
-            },
-            "span": "fn",
-            "text": ""
-          }
-        ],
-        "message": "Missing type parameters on mock function call",
-        "severity": "error"
-      }
-    },
     "fbf4fd3adbbd241d4e23cea241381e1bb1bba07e64d4201e1eed156b268643dc": {
       "count": 1,
       "summary": {
@@ -129905,26 +128287,6 @@
           }
         ],
         "message": "Replace module mocking with dependency injection through a real interface, service layer, or faithful test implementation.",
-        "severity": "error"
-      }
-    },
-    "fe15bccd4ba22bd909f575a1a6ada73ef53116a3c7f3d2f13f58c8bb8a87f2cc": {
-      "count": 1,
-      "summary": {
-        "code": "typescript(no-unsafe-argument)",
-        "file": "src/lib/hooks/use-socket.tsx",
-        "labels": [
-          {
-            "context": {
-              "current": "const data = await getMatchData(matchId, heroSlot)",
-              "next": "console.log('[MMR] Match data fetched:', data)",
-              "previous": "console.log('[MMR] Fetching match data for matchId:', matchId, 'and heroSlot:', heroSlot)"
-            },
-            "span": "heroSlot",
-            "text": ""
-          }
-        ],
-        "message": "Unsafe argument of type any assigned to a parameter of type number.",
         "severity": "error"
       }
     },

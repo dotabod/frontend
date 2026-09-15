@@ -233,9 +233,9 @@ describe(useSocket, () => {
 
     act(() => {
       socketState.handlers.get('block')?.({ matchId: 1, team: 'radiant', type: 'playing' })
-      vi.advanceTimersByTime(4_000)
+      vi.advanceTimersByTime(4000)
       socketState.handlers.get('block')?.({ matchId: 2, team: 'dire', type: 'playing' })
-      vi.advanceTimersByTime(1_000)
+      vi.advanceTimersByTime(1000)
     })
 
     expect(setBlock).toHaveBeenCalledExactlyOnceWith({
@@ -256,9 +256,9 @@ describe(useSocket, () => {
 
     act(() => {
       socketState.handlers.get('block')?.({ matchId: 1, team: 'radiant', type: 'playing' })
-      vi.advanceTimersByTime(4_000)
+      vi.advanceTimersByTime(4000)
       socketState.handlers.get('block')?.({ matchId: 1, team: 'radiant', type: 'strategy' })
-      vi.advanceTimersByTime(1_000)
+      vi.advanceTimersByTime(1000)
     })
 
     expect(setBlock).toHaveBeenCalledExactlyOnceWith({

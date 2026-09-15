@@ -32,8 +32,9 @@ describe(HydratedContent, () => {
     let root: Root | undefined
 
     try {
-      await act(() => {
+      await act(async () => {
         root = hydrateRoot(container, content)
+        await Promise.resolve()
       })
 
       expect(container.querySelector('button')).toBe(button)
@@ -41,7 +42,9 @@ describe(HydratedContent, () => {
       expect(mount).toHaveBeenCalledOnce()
       expect(unmount).not.toHaveBeenCalled()
     } finally {
-      await act(() => root?.unmount())
+      act(() => {
+        root?.unmount()
+      })
       container.remove()
     }
 

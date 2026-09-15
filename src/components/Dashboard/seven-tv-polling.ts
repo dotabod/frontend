@@ -35,7 +35,7 @@ export const startSevenTvPolling = ({
     }
   }
 
-  async function runPoll() {
+  const runPoll = async function runPoll(): Promise<void> {
     if (
       stopped ||
       finished ||

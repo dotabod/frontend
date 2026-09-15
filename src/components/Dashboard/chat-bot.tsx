@@ -1,13 +1,11 @@
 import { Alert, Button, Divider, List, Spin, Tabs, Tooltip } from 'antd'
 import { clsx } from 'clsx'
 import { ExternalLinkIcon } from 'lucide-react'
-import { useSession } from 'next-auth/react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import useSWR from 'swr'
-import { z } from 'zod'
 
 import { TierBadge } from '@/components/Dashboard/Features/tier-badge'
 import { useFeatureAccess } from '@/hooks/use-subscription'
@@ -24,24 +22,9 @@ import { StepComponent } from '@/pages/dashboard/help'
 import { Card } from '@/ui/card'
 
 import MmrForm from './Features/mmr-form'
-import { startSevenTvPolling } from './seven-tv-polling'
+import { type SevenTvEmote, type SevenTvUser, useSevenTvSetup } from './use-seven-tv-setup'
 
 const SevenTVBaseEmoteURL = (id: string) => `https://cdn.7tv.app/emote/${id}/2x.webp`
-
-const sevenTvResponseSchema = z.object({
-  emote_set: z
-    .object({
-      emotes: z.array(z.object({ id: z.string(), name: z.string() })).nullish(),
-      id: z.string().nullish(),
-    })
-    .nullish(),
-  user: z
-    .object({
-      editors: z.array(z.object({ id: z.string().nullish() })).nullish(),
-      id: z.string().nullish(),
-    })
-    .nullish(),
-})
 
 export const emotesRequired = [
   { id: '01G4FZG870000487MWX9F93YF7', label: 'HECANT' },
@@ -61,55 +44,9 @@ export const emotesRequired = [
   { id: '01F6QWHR20000EB9BSAR8G1DKZ', label: 'PauseChamp' },
 ]
 
-// Add type at the top
-interface User {
-  id?: string
-  personalSet?: string
-  hasDotabodEditor: boolean
-  hasDotabodEmoteSet: boolean
-}
-
-interface Emote {
-  name: string
-  id: string
-}
-
-const EMPTY_EMOTES: Emote[] = []
-
-const areEmotesEqual = (current: Emote[], next: Emote[]) =>
-  current.length === next.length &&
-  current.every((emote, index) => emote.id === next[index]?.id && emote.name === next[index]?.name)
-
-const areUsersEqual = (current: User | null, next: User) => {
-  if (current === null) {
-    return false
-  }
-
-  return [
-    current.hasDotabodEditor === next.hasDotabodEditor,
-    current.hasDotabodEmoteSet === next.hasDotabodEmoteSet,
-    current.id === next.id,
-    current.personalSet === next.personalSet,
-  ].every(Boolean)
-}
-
-const getDisplayedUser = (
-  hasTwitchId: boolean,
-  updateEmoteSetError: Error | undefined,
-  user: User | null,
-) => {
-  if (!hasTwitchId) {
-    return null
-  }
-  if (updateEmoteSetError !== undefined && user !== null) {
-    return { ...user, hasDotabodEmoteSet: false }
-  }
-  return user
-}
-
 const EmoteList: React.FC<{
-  emotes: Emote[]
-  user: User | null
+  emotes: SevenTvEmote[]
+  user: SevenTvUser | null
 }> = ({ emotes, user }) => (
   <List
     grid={{
@@ -159,12 +96,6 @@ const EmoteList: React.FC<{
 
 const ChatBot = () => {
   const { data: accountData } = useUpdateAccount()
-  const session = useSession()
-  const [polledEmotes, setPolledEmotes] = useState<Emote[]>([])
-  const [polledUser, setPolledUser] = useState<User | null>(null)
-  const [pollingLoading, setPollingLoading] = useState(true)
-  const twitchId = session.data?.user?.twitchId?.trim()
-  const hasTwitchId = twitchId !== undefined && twitchId.length > 0
   const track = useTrack()
   const { hasAccess: hasAutoModeratorAccess } = useFeatureAccess('autoModerator')
   // Pro: fire-and-forget the POST that adds dotabod as a moderator. We don't read its
@@ -172,22 +103,7 @@ const ChatBot = () => {
   // POST still needs to run so the auto-mod action happens for Pro users.
   useSWR(hasAutoModeratorAccess ? '/api/make-dotabod-mod' : null, fetcher, SETTINGS_SWR_OPTIONS)
   const { data: modStatus } = useSetupModStatus()
-  const { hasAccess: hasAuto7TVAccess } = useFeatureAccess('auto7TV')
-  const updateEmoteSetKey =
-    hasAuto7TVAccess && polledUser?.id !== undefined ? '/api/update-emote-set' : null
-  const { error: updateEmoteSetError } = useSWR<void, Error>(
-    updateEmoteSetKey,
-    async (url) => {
-      track('updateEmoteSet called')
-      return fetcher(url)
-    },
-    SETTINGS_SWR_OPTIONS,
-  )
-  const emotes = hasTwitchId ? polledEmotes : EMPTY_EMOTES
-  const user = getDisplayedUser(hasTwitchId, updateEmoteSetError, polledUser)
-  const loading =
-    session.status === 'loading' ||
-    (hasTwitchId && updateEmoteSetError === undefined && pollingLoading)
+  const { emotes, loading, updateEmoteSetError, user } = useSevenTvSetup(emotesRequired)
   const [activeKey7TV, setActiveKey7TV] = useState('auto')
   const [activeKeyMod, setActiveKeyMod] = useState('auto')
   const router = useRouter()
@@ -225,75 +141,6 @@ const ChatBot = () => {
       { shallow: true },
     )
   }
-
-  useEffect(() => {
-    let active = true
-    let stopPolling: (() => void) | undefined
-
-    if (hasTwitchId && updateEmoteSetError === undefined) {
-      stopPolling = startSevenTvPolling({
-        onError: (error) => {
-          if (!active) {
-            return
-          }
-          console.error('Error fetching user data:', error)
-          setPollingLoading(false)
-        },
-        poll: async (signal) => {
-          const response = await fetch(
-            `https://7tv.io/v3/users/twitch/${encodeURIComponent(twitchId)}?cacheBust=${Date.now()}`,
-            { signal },
-          )
-
-          if (!response.ok) {
-            throw new Error(`Failed to fetch 7TV user: ${response.status} ${response.statusText}`)
-          }
-
-          const data = sevenTvResponseSchema.parse(await response.json())
-          if (!active) {
-            return false
-          }
-          if (signal.aborted) {
-            throw new DOMException('Aborted', 'AbortError')
-          }
-
-          const responseEmotes = data.emote_set?.emotes ?? []
-          const nextUser = {
-            hasDotabodEditor:
-              data.user?.editors?.some(
-                (editor) => editor.id?.toLowerCase() === '01GQZ0CEDR000AH5YBCSXQWR0V'.toLowerCase(),
-              ) ?? false,
-            hasDotabodEmoteSet: emotesRequired.every((requiredEmote) =>
-              responseEmotes.some((emote) => emote.name === requiredEmote.label),
-            ),
-            id: data.user?.id ?? undefined,
-            personalSet: data.emote_set?.id ?? undefined,
-          }
-
-          if (nextUser.id !== undefined) {
-            setPolledUser((currentUser) =>
-              areUsersEqual(currentUser, nextUser) ? currentUser : nextUser,
-            )
-            setPolledEmotes((currentEmotes) =>
-              areEmotesEqual(currentEmotes, responseEmotes) ? currentEmotes : responseEmotes,
-            )
-          }
-
-          setPollingLoading(false)
-          return !(
-            nextUser.id !== undefined &&
-            nextUser.hasDotabodEditor &&
-            nextUser.hasDotabodEmoteSet
-          )
-        },
-      })
-    }
-
-    return () => {
-      active = false
-      stopPolling?.()
-    }
-  }, [hasTwitchId, twitchId, updateEmoteSetError])
 
   const { data: mmr } = useUpdateSetting(Settings.mmr)
   const accountsWithMmr = accountData?.accounts as { mmr: number }[] | undefined
