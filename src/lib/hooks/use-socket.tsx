@@ -350,15 +350,16 @@ export const useSocket = ({
 
       if (normalizedData.type === 'playing') {
         pendingPlayingBlock = normalizedData
-        if (blockTimeout === null) {
-          blockTimeout = setTimeout(() => {
-            if (pendingPlayingBlock !== null) {
-              setBlock(pendingPlayingBlock)
-            }
-            pendingPlayingBlock = null
-            blockTimeout = null
-          }, 5000)
+        if (blockTimeout !== null) {
+          return
         }
+        blockTimeout = setTimeout(() => {
+          if (pendingPlayingBlock !== null) {
+            setBlock(pendingPlayingBlock)
+          }
+          pendingPlayingBlock = null
+          blockTimeout = null
+        }, 5000)
         return
       }
 

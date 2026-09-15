@@ -538,26 +538,6 @@
         "severity": "error"
       }
     },
-    "011860bd92408ea6596008892125a7866e11741cd6a602b0482f85726eb4a56b": {
-      "count": 1,
-      "summary": {
-        "code": "sonarjs(no-nested-functions)",
-        "file": "src/components/Dashboard/chat-bot.tsx",
-        "labels": [
-          {
-            "context": {
-              "current": "data.emote_set?.emotes?.find((e: { name: string }) => e.name === emote.label),",
-              "next": "),",
-              "previous": "Array.isArray(data.emote_set?.emotes) &&"
-            },
-            "span": "=>",
-            "text": ""
-          }
-        ],
-        "message": "Refactor this code to not nest functions more than 4 levels deep.",
-        "severity": "error"
-      }
-    },
     "01243c38e6c3cb23be59b1c552183c2393e9e43dd26f81f6841d1fa48925f07e": {
       "count": 1,
       "summary": {
@@ -6611,26 +6591,6 @@
           }
         ],
         "message": "Unexpected any value in conditional. Use a more specific type to ensure type safety.",
-        "severity": "error"
-      }
-    },
-    "0c8835e4d8193818f8dd7352554231778d082d9b09fafd3b655abc2808640631": {
-      "count": 1,
-      "summary": {
-        "code": "typescript(return-await)",
-        "file": "src/components/Dashboard/chat-bot.tsx",
-        "labels": [
-          {
-            "context": {
-              "current": "return fetcher(url)",
-              "next": "},",
-              "previous": "track('updateEmoteSet called')"
-            },
-            "span": "fetcher(url)",
-            "text": ""
-          }
-        ],
-        "message": "Returning an awaited promise is required in this context.",
         "severity": "error"
       }
     },
@@ -24106,26 +24066,6 @@
         "severity": "error"
       }
     },
-    "2deaeff0cf0cfc1782012670787aadd7fa165729b8681fafc9bfa4a44eea6e88": {
-      "count": 1,
-      "summary": {
-        "code": "node(callback-return)",
-        "file": "src/lib/hooks/use-socket.tsx",
-        "labels": [
-          {
-            "context": {
-              "current": "cb(data)",
-              "next": "} catch (error) {",
-              "previous": "console.log('[MMR] Match data fetched:', data)"
-            },
-            "span": "cb(data)",
-            "text": ""
-          }
-        ],
-        "message": "Expected return with your callback function.",
-        "severity": "error"
-      }
-    },
     "2def7d1d46f429a06f80691f243fc0da1bdc0ae66ec6b14465786d83e8d4b146": {
       "count": 1,
       "summary": {
@@ -36663,26 +36603,6 @@
         "severity": "error"
       }
     },
-    "46b79cf728d2da1eb87dcbcbe47414c0fcd5327e685f30805bb165718bcc77ca": {
-      "count": 1,
-      "summary": {
-        "code": "promise(prefer-await-to-callbacks)",
-        "file": "src/lib/hooks/use-socket.tsx",
-        "labels": [
-          {
-            "context": {
-              "current": "cb(null)",
-              "next": "}",
-              "previous": "console.log('[MMR] Error fetching match data', { error })"
-            },
-            "span": "cb(null)",
-            "text": ""
-          }
-        ],
-        "message": "Prefer `async`/`await` to the callback pattern",
-        "severity": "error"
-      }
-    },
     "46e073f8ff60e2767533539f3464cbaf3b1adf99576adec95a1f4f005fcc795f": {
       "count": 1,
       "summary": {
@@ -44607,26 +44527,6 @@
           }
         ],
         "message": "Plain <img> ships unoptimized, oversized images.",
-        "severity": "error"
-      }
-    },
-    "56e107c350b5dbe2133bd57ead25128dfea5e77fa2e61dd35e28c0e86c5a1a80": {
-      "count": 1,
-      "summary": {
-        "code": "promise(prefer-await-to-callbacks)",
-        "file": "src/lib/hooks/use-socket.tsx",
-        "labels": [
-          {
-            "context": {
-              "current": "cb(data)",
-              "next": "} catch (error) {",
-              "previous": "console.log('[MMR] Match data fetched:', data)"
-            },
-            "span": "cb(data)",
-            "text": ""
-          }
-        ],
-        "message": "Prefer `async`/`await` to the callback pattern",
         "severity": "error"
       }
     },
@@ -83716,26 +83616,6 @@
         "severity": "error"
       }
     },
-    "a545c25c97c081453674ebb7716057c3a29d0b0e0da21e1ce89d526d29128360": {
-      "count": 1,
-      "summary": {
-        "code": "typescript(no-unsafe-return)",
-        "file": "src/components/Dashboard/chat-bot.tsx",
-        "labels": [
-          {
-            "context": {
-              "current": "return fetcher(url)",
-              "next": "},",
-              "previous": "track('updateEmoteSet called')"
-            },
-            "span": "return fetcher(url)",
-            "text": ""
-          }
-        ],
-        "message": "Unsafe return of a value of type `Promise<any>`.",
-        "severity": "error"
-      }
-    },
     "a556064ad2656ec00c2528bef6bab49ccabe1b1b5821c88a39bd11c690b113ac": {
       "count": 1,
       "summary": {
@@ -99160,26 +99040,6 @@
           }
         ],
         "message": "Unsafe member access ._getJSONData on an `error` typed value.",
-        "severity": "error"
-      }
-    },
-    "c5b559ecfe5773fd9af0976b55471d731b5d12409f62e0e33675f2e89503b846": {
-      "count": 1,
-      "summary": {
-        "code": "node(callback-return)",
-        "file": "src/lib/hooks/use-socket.tsx",
-        "labels": [
-          {
-            "context": {
-              "current": "cb(null)",
-              "next": "}",
-              "previous": "console.log('[MMR] Error fetching match data', { error })"
-            },
-            "span": "cb(null)",
-            "text": ""
-          }
-        ],
-        "message": "Expected return with your callback function.",
         "severity": "error"
       }
     },
@@ -125115,26 +124975,6 @@
           }
         ],
         "message": "Use Array destructuring.",
-        "severity": "error"
-      }
-    },
-    "f84edb710a810ffbc4591742a05fc15734a916fe8715fdf082e28b3dcb0a1ed3": {
-      "count": 1,
-      "summary": {
-        "code": "eslint(require-await)",
-        "file": "src/components/Dashboard/chat-bot.tsx",
-        "labels": [
-          {
-            "context": {
-              "current": "async (url) => {",
-              "next": "track('updateEmoteSet called')",
-              "previous": "hasAuto7TVAccess && user?.id ? '/api/update-emote-set' : null,"
-            },
-            "span": "async (url) => {\n      track('updateEmoteSet called')\n      return fetcher(url)\n    }",
-            "text": ""
-          }
-        ],
-        "message": "Async function has no `await` expression.",
         "severity": "error"
       }
     },
