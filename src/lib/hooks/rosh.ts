@@ -1,5 +1,4 @@
-import { useCallback, useEffect, useState } from 'react'
-import type { Dispatch, SetStateAction } from 'react'
+import { useEffect, useState } from 'react'
 
 import { isDev } from '@/lib/dev-consts'
 
@@ -35,13 +34,7 @@ export const useRoshan = () => {
     })
   }, [])
 
-  const safeSetRoshan = useCallback<Dispatch<SetStateAction<RoshanState>>>((value) => {
-    if (value) {
-      setRoshan(value)
-    }
-  }, [])
-
-  return { roshan, setRoshan: safeSetRoshan }
+  return { roshan, setRoshan }
 }
 
 export const useAegis = () => {
@@ -61,11 +54,5 @@ export const useAegis = () => {
     })
   }, [])
 
-  const safeSetAegis = useCallback<Dispatch<SetStateAction<AegisState>>>((value) => {
-    if (value) {
-      setAegis(value)
-    }
-  }, [])
-
-  return { aegis, setAegis: safeSetAegis }
+  return { aegis, setAegis }
 }

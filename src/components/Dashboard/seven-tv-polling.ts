@@ -1,4 +1,4 @@
-const POLL_INTERVAL_MS = 5_000
+const POLL_INTERVAL_MS = 5000
 const INITIAL_ERROR_DELAY_MS = 10_000
 const MAX_ERROR_DELAY_MS = 60_000
 
@@ -10,11 +10,11 @@ interface VisibilityDocument {
 
 interface SevenTvPollingOptions {
   documentObject?: VisibilityDocument
-  onError?: (error: unknown) => void
+  onError?: (error: Error) => void
   poll: (signal: AbortSignal) => Promise<boolean>
 }
 
-const isAbortError = (error: unknown) => error instanceof Error && error.name === 'AbortError'
+const isAbortError = (error: Error) => error.name === 'AbortError'
 
 export const startSevenTvPolling = ({
   documentObject = document,
@@ -35,16 +35,13 @@ export const startSevenTvPolling = ({
     }
   }
 
-  const schedulePoll = (delay: number) => {
-    clearScheduledPoll()
-    timeoutId = setTimeout(() => {
-      timeoutId = null
-      void runPoll()
-    }, delay)
-  }
-
-  const runPoll = async () => {
-    if (stopped || finished || documentObject.visibilityState !== 'visible' || activeRequest) {
+  async function runPoll() {
+    if (
+      stopped ||
+      finished ||
+      documentObject.visibilityState !== 'visible' ||
+      activeRequest !== null
+    ) {
       return
     }
 
@@ -61,13 +58,14 @@ export const startSevenTvPolling = ({
         finished = true
       }
     } catch (error) {
-      if (!isAbortError(error)) {
+      const pollingError = error instanceof Error ? error : new Error('7TV polling failed')
+      if (!isAbortError(pollingError)) {
         consecutiveErrors += 1
         nextDelay = Math.min(
           INITIAL_ERROR_DELAY_MS * 2 ** (consecutiveErrors - 1),
           MAX_ERROR_DELAY_MS,
         )
-        onError?.(error)
+        onError?.(pollingError)
       }
     } finally {
       activeRequest = null
@@ -84,7 +82,11 @@ export const startSevenTvPolling = ({
     }
 
     if (nextDelay !== null) {
-      schedulePoll(nextDelay)
+      clearScheduledPoll()
+      timeoutId = setTimeout(() => {
+        timeoutId = null
+        void runPoll()
+      }, nextDelay)
     }
   }
 
@@ -97,7 +99,7 @@ export const startSevenTvPolling = ({
       return
     }
 
-    if (activeRequest) {
+    if (activeRequest !== null) {
       rerunWhenRequestSettles = true
       return
     }

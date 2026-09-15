@@ -40,8 +40,8 @@ describe('minimap collection subscriptions', () => {
           buildings: useSelector(selectBuildings),
           couriers: useSelector(selectCouriers),
           creeps: useSelector(selectCreeps),
-          heroes: useSelector(selectHeroes),
           heroUnits: useSelector(selectHeroUnits),
+          heroes: useSelector(selectHeroes),
         }
       },
       { wrapper },
@@ -53,7 +53,7 @@ describe('minimap collection subscriptions', () => {
     })
 
     expect(renders).toBe(initialRenders)
-    expect(Object.values(result.current)).toEqual([[], [], [], [], []])
+    expect(Object.values(result.current)).toStrictEqual([[], [], [], [], []])
 
     const hero = {
       image: 'hero',
@@ -61,14 +61,14 @@ describe('minimap collection subscriptions', () => {
       teamP: 'radiant',
       unitname: 'npc_dota_hero_axe',
       xposP: 10,
-      yposP: 20,
       yaw: 0,
+      yposP: 20,
     }
     act(() => {
       store.dispatch(setMinimapDataHeroes([hero]))
     })
 
     expect(renders).toBe(initialRenders + 1)
-    expect(result.current.heroes).toEqual([hero])
+    expect(result.current.heroes).toStrictEqual([hero])
   })
 })

@@ -1,19 +1,32 @@
-import axios, {
-  AxiosHeaders,
-  type AxiosAdapter,
-  type AxiosResponse,
-  type InternalAxiosRequestConfig,
-} from 'axios'
+import axios, { AxiosHeaders } from 'axios'
+import type { AxiosAdapter, AxiosResponse, InternalAxiosRequestConfig } from 'axios'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { getMatchData } from '@/lib/hooks/open-dota-api'
 
 const originalAdapter = axios.defaults.adapter
 
+interface OpenDotaFixture {
+  dire_score?: number
+  job?: {
+    jobId: number
+  }
+  lobby_type?: number
+  players?: Array<{
+    assists?: number
+    deaths?: number
+    hero_id: number
+    kills?: number
+  }> | null
+  radiant_score?: number
+  radiant_win?: boolean
+  status?: string
+}
+
 const createResponse = function createResponse(
   config: InternalAxiosRequestConfig,
-  data: unknown,
-): AxiosResponse {
+  data: OpenDotaFixture,
+): AxiosResponse<OpenDotaFixture> {
   return {
     config,
     data,
@@ -23,25 +36,20 @@ const createResponse = function createResponse(
   }
 }
 
-beforeEach(() => {
-  vi.useFakeTimers()
-})
-
-afterEach(() => {
-  vi.clearAllTimers()
-  vi.useRealTimers()
-  axios.defaults.adapter = originalAdapter
-})
-
 describe(getMatchData, () => {
+  beforeEach(() => {
+    vi.useFakeTimers()
+  })
+
+  afterEach(() => {
+    vi.clearAllTimers()
+    vi.useRealTimers()
+    axios.defaults.adapter = originalAdapter
+  })
+
   it('shares an in-flight match request while returning stats for each requested hero', async () => {
-    let resolveMatch: (value: AxiosResponse) => void = () => undefined
-    const adapter = vi.fn<AxiosAdapter>(
-      () =>
-        new Promise<AxiosResponse>((resolve) => {
-          resolveMatch = resolve
-        }),
-    )
+    const matchResponse = Promise.withResolvers<AxiosResponse<OpenDotaFixture>>()
+    const adapter = vi.fn<AxiosAdapter>(async () => await matchResponse.promise)
     axios.defaults.adapter = adapter
 
     const axeResult = getMatchData('deduplicated-match', 2)
@@ -49,8 +57,8 @@ describe(getMatchData, () => {
 
     expect(adapter).toHaveBeenCalledOnce()
 
-    const config = adapter.mock.calls[0][0]
-    resolveMatch(
+    const [[config]] = adapter.mock.calls
+    matchResponse.resolve(
       createResponse(config, {
         dire_score: 21,
         lobby_type: 7,
@@ -68,14 +76,15 @@ describe(getMatchData, () => {
   })
 
   it('reuses parsed match data when another hero is requested later', async () => {
-    const adapter = vi.fn<AxiosAdapter>(async (config) =>
-      createResponse(config, {
+    const adapter = vi.fn<AxiosAdapter>(async (config) => {
+      await Promise.resolve()
+      return createResponse(config, {
         players: [
           { hero_id: 4, kills: 1 },
           { hero_id: 5, kills: 9 },
         ],
-      }),
-    )
+      })
+    })
     axios.defaults.adapter = adapter
 
     await expect(getMatchData('cached-match', 4)).resolves.toMatchObject({ kills: 1 })
@@ -86,15 +95,17 @@ describe(getMatchData, () => {
 
   it('stops after one post-parse refetch when OpenDota still returns incomplete data', async () => {
     const adapter = vi.fn<AxiosAdapter>(async (config) => {
+      await Promise.resolve()
+
       if (config.method === 'post') {
         return createResponse(config, { job: { jobId: 42 } })
       }
 
-      if (config.url?.endsWith('/request/42')) {
+      if (config.url?.endsWith('/request/42') ?? false) {
         return createResponse(config, { status: 'completed' })
       }
 
-      return createResponse(config, {})
+      return createResponse(config, { players: null })
     })
     axios.defaults.adapter = adapter
 
@@ -102,8 +113,8 @@ describe(getMatchData, () => {
       'Failed to fetch match data for permanently-incomplete-match',
     )
 
-    const matchRequests = adapter.mock.calls.filter(([config]) =>
-      config.url?.includes('/matches/permanently-incomplete-match'),
+    const matchRequests = adapter.mock.calls.filter(
+      ([config]) => config.url?.includes('/matches/permanently-incomplete-match') ?? false,
     )
     expect(matchRequests).toHaveLength(2)
     expect(adapter).toHaveBeenCalledTimes(4)
@@ -113,11 +124,12 @@ describe(getMatchData, () => {
     const adapter = vi
       .fn<AxiosAdapter>()
       .mockRejectedValueOnce(new Error('OpenDota unavailable'))
-      .mockImplementationOnce(async (config) =>
-        createResponse(config, {
+      .mockImplementationOnce(async (config) => {
+        await Promise.resolve()
+        return createResponse(config, {
           players: [{ hero_id: 6, kills: 7 }],
-        }),
-      )
+        })
+      })
     axios.defaults.adapter = adapter
 
     await expect(getMatchData('retry-after-failure-match', 6)).rejects.toThrow(

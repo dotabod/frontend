@@ -136,6 +136,13 @@ type WireBlockType = blockType & {
   state?: string
 }
 
+interface MatchDataRequest {
+  heroSlot: number
+  matchId: string
+}
+
+type MatchDataCallback = (data: Awaited<ReturnType<typeof getMatchData>> | null) => void
+
 export const useSocket = ({
   setPollData,
   setBetData,
@@ -165,15 +172,16 @@ export const useSocket = ({
   // Ref to store timeout IDs for chat message cleanup
   const messageTimeoutsRef = useRef<Map<string, NodeJS.Timeout>>(new Map())
 
-  useEffect(
-    () => () => {
-      messageTimeoutsRef.current.forEach((timeoutId) => {
+  useEffect(() => {
+    const messageTimeouts = messageTimeoutsRef.current
+
+    return () => {
+      messageTimeouts.forEach((timeoutId) => {
         clearTimeout(timeoutId)
       })
-      messageTimeoutsRef.current.clear()
-    },
-    [],
-  )
+      messageTimeouts.clear()
+    }
+  }, [])
 
   useEffect(() => {
     if (!userId) {
@@ -181,6 +189,8 @@ export const useSocket = ({
     }
 
     let lastReceivedTime = Date.now()
+    let blockTimeout: NodeJS.Timeout | undefined
+    let pendingPlayingBlock: blockType | undefined
 
     console.log('Connecting to socket init...', { userId })
 
@@ -272,14 +282,17 @@ export const useSocket = ({
       cb(wl)
     })
 
-    socket.on('requestMatchData', async ({ matchId, heroSlot }, cb) => {
+    const handleRequestMatchData = async (
+      { matchId, heroSlot }: MatchDataRequest,
+      cb: MatchDataCallback,
+    ) => {
       updateLastReceived()
       console.log('[MMR] requestMatchData event received', {
         heroSlot,
         matchId,
       })
+      console.log('[MMR] Fetching match data for matchId:', matchId, 'and heroSlot:', heroSlot)
       try {
-        console.log('[MMR] Fetching match data for matchId:', matchId, 'and heroSlot:', heroSlot)
         const data = await getMatchData(matchId, heroSlot)
         console.log('[MMR] Match data fetched:', data)
         cb(data)
@@ -288,6 +301,10 @@ export const useSocket = ({
         console.log('[MMR] Error fetching match data', { error })
         cb(null)
       }
+    }
+
+    socket.on('requestMatchData', (payload: MatchDataRequest, cb: MatchDataCallback) => {
+      void handleRequestMatchData(payload, cb)
     })
 
     socket.on('block', (data: WireBlockType) => {
@@ -300,12 +317,23 @@ export const useSocket = ({
         data.type === 'empty' && isMainScreenState ? { ...data, type: null } : data
 
       if (normalizedData.type === 'playing') {
-        setTimeout(() => {
-          setBlock(normalizedData)
-        }, 5000)
-      } else {
-        setBlock(normalizedData)
+        pendingPlayingBlock = normalizedData
+        blockTimeout ??= setTimeout(() => {
+          if (pendingPlayingBlock !== undefined) {
+            setBlock(pendingPlayingBlock)
+          }
+          pendingPlayingBlock = undefined
+          blockTimeout = undefined
+        }, 5_000)
+        return
       }
+
+      if (blockTimeout !== undefined) {
+        clearTimeout(blockTimeout)
+        blockTimeout = undefined
+      }
+      pendingPlayingBlock = undefined
+      setBlock(normalizedData)
     })
     socket.on('paused', (data) => {
       updateLastReceived()
@@ -315,8 +343,11 @@ export const useSocket = ({
       updateLastReceived()
       setNotablePlayers(data)
     })
-    socket.on('aegis-picked-up', (data) => {
+    socket.on('aegis-picked-up', (data: AegisState | null | undefined) => {
       updateLastReceived()
+      if (data === null || data === undefined) {
+        return
+      }
       setAegis(data)
     })
     socket.on('chatMessage', (data: ChatMessage) => {
@@ -342,8 +373,11 @@ export const useSocket = ({
       // Store timeout ID for cleanup
       messageTimeoutsRef.current.set(messageId, timeoutId)
     })
-    socket.on('roshan-killed', (data) => {
+    socket.on('roshan-killed', (data: RoshanState | null | undefined) => {
       updateLastReceived()
+      if (data === null || data === undefined) {
+        return
+      }
       setRoshan(data)
     })
     socket.on('auth_error', (message) => {
@@ -422,6 +456,9 @@ export const useSocket = ({
     return () => {
       clearInterval(connectionMonitor)
       clearInterval(diagnosticHeartbeat)
+      if (blockTimeout !== undefined) {
+        clearTimeout(blockTimeout)
+      }
       activeSocket.io.off('ping', handlePing)
 
       // Don't disconnect the socket on every effect cleanup

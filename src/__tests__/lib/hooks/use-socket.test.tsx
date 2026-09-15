@@ -6,6 +6,7 @@ import { useAegis, useRoshan } from '@/lib/hooks/rosh'
 import { useSocket } from '@/lib/hooks/use-socket'
 
 type SocketHandler = (...args: unknown[]) => void
+type SocketProps = Parameters<typeof useSocket>[0]
 
 const socketState = vi.hoisted(() => {
   const handlers = new Map<string, SocketHandler>()
@@ -14,13 +15,13 @@ const socketState = vi.hoisted(() => {
     connect: vi.fn(),
     disconnect: vi.fn(),
     io: {
-      on: vi.fn((event: string, handler: SocketHandler) => {
-        const eventHandlers = ioHandlers.get(event) ?? new Set()
+      off: vi.fn<(event: string, handler: SocketHandler) => void>((event, handler) => {
+        ioHandlers.get(event)?.delete(handler)
+      }),
+      on: vi.fn<(event: string, handler: SocketHandler) => void>((event, handler) => {
+        const eventHandlers = ioHandlers.get(event) ?? new Set<SocketHandler>()
         eventHandlers.add(handler)
         ioHandlers.set(event, eventHandlers)
-      }),
-      off: vi.fn((event: string, handler: SocketHandler) => {
-        ioHandlers.get(event)?.delete(handler)
       }),
     },
     off: vi.fn(),
@@ -61,6 +62,22 @@ vi.mock('@/lib/hooks/use-update-setting', () => ({
   }),
 }))
 
+const createSocketProps = (overrides: Partial<SocketProps> = {}): SocketProps => ({
+  setAegis: vi.fn<SocketProps['setAegis']>(),
+  setBetData: vi.fn<SocketProps['setBetData']>(),
+  setBlock: vi.fn<SocketProps['setBlock']>(),
+  setChatMessages: vi.fn<SocketProps['setChatMessages']>(),
+  setConnected: vi.fn<SocketProps['setConnected']>(),
+  setNotablePlayers: vi.fn<SocketProps['setNotablePlayers']>(),
+  setPaused: vi.fn<SocketProps['setPaused']>(),
+  setPollData: vi.fn<SocketProps['setPollData']>(),
+  setRadiantWinChance: vi.fn<SocketProps['setRadiantWinChance']>(),
+  setRankImageDetails: vi.fn<SocketProps['setRankImageDetails']>(),
+  setRoshan: vi.fn<SocketProps['setRoshan']>(),
+  setWL: vi.fn<SocketProps['setWL']>(),
+  ...overrides,
+})
+
 describe(useSocket, () => {
   afterEach(() => {
     cleanup()
@@ -72,28 +89,12 @@ describe(useSocket, () => {
 
   it('refreshes settings on socket connect and refresh-settings events', () => {
     vi.useFakeTimers()
-    const setConnected = vi.fn()
+    const setConnected = vi.fn<SocketProps['setConnected']>()
+    const socketProps = createSocketProps({ setConnected })
 
-    const TestComponent = () => {
-      useSocket({
-        setAegis: vi.fn(),
-        setBetData: vi.fn(),
-        setBlock: vi.fn(),
-        setChatMessages: vi.fn(),
-        setConnected,
-        setNotablePlayers: vi.fn(),
-        setPaused: vi.fn(),
-        setPollData: vi.fn(),
-        setRadiantWinChance: vi.fn(),
-        setRankImageDetails: vi.fn(),
-        setRoshan: vi.fn(),
-        setWL: vi.fn(),
-      })
-
-      return null
-    }
-
-    render(<TestComponent />)
+    renderHook(() => {
+      useSocket(socketProps)
+    })
 
     expect(socketState.ioMock).toHaveBeenCalledWith(
       process.env.NEXT_PUBLIC_GSI_WEBSOCKET_URL,
@@ -115,28 +116,12 @@ describe(useSocket, () => {
   })
 
   it('stores the WL records with the stats window sent by the server', () => {
-    const setWL = vi.fn()
+    const setWL = vi.fn<SocketProps['setWL']>()
+    const socketProps = createSocketProps({ setWL })
 
-    const TestComponent = () => {
-      useSocket({
-        setAegis: vi.fn(),
-        setBetData: vi.fn(),
-        setBlock: vi.fn(),
-        setChatMessages: vi.fn(),
-        setConnected: vi.fn(),
-        setNotablePlayers: vi.fn(),
-        setPaused: vi.fn(),
-        setPollData: vi.fn(),
-        setRadiantWinChance: vi.fn(),
-        setRankImageDetails: vi.fn(),
-        setRoshan: vi.fn(),
-        setWL,
-      })
-
-      return null
-    }
-
-    render(<TestComponent />)
+    renderHook(() => {
+      useSocket(socketProps)
+    })
 
     const records = [{ lose: 5, type: 'R', win: 10 }]
     act(() => {
@@ -147,28 +132,12 @@ describe(useSocket, () => {
   })
 
   it('treats legacy WL socket updates without a window as this stream', () => {
-    const setWL = vi.fn()
+    const setWL = vi.fn<SocketProps['setWL']>()
+    const socketProps = createSocketProps({ setWL })
 
-    const TestComponent = () => {
-      useSocket({
-        setAegis: vi.fn(),
-        setBetData: vi.fn(),
-        setBlock: vi.fn(),
-        setChatMessages: vi.fn(),
-        setConnected: vi.fn(),
-        setNotablePlayers: vi.fn(),
-        setPaused: vi.fn(),
-        setPollData: vi.fn(),
-        setRadiantWinChance: vi.fn(),
-        setRankImageDetails: vi.fn(),
-        setRoshan: vi.fn(),
-        setWL,
-      })
-
-      return null
-    }
-
-    render(<TestComponent />)
+    renderHook(() => {
+      useSocket(socketProps)
+    })
 
     const records = [{ lose: 5, type: 'R', win: 10 }]
     act(() => {
@@ -179,28 +148,12 @@ describe(useSocket, () => {
   })
 
   it('normalizes the legacy empty block state to the main-screen state', () => {
-    const setBlock = vi.fn()
+    const setBlock = vi.fn<SocketProps['setBlock']>()
+    const socketProps = createSocketProps({ setBlock })
 
-    const TestComponent = () => {
-      useSocket({
-        setAegis: vi.fn(),
-        setBetData: vi.fn(),
-        setBlock,
-        setChatMessages: vi.fn(),
-        setConnected: vi.fn(),
-        setNotablePlayers: vi.fn(),
-        setPaused: vi.fn(),
-        setPollData: vi.fn(),
-        setRadiantWinChance: vi.fn(),
-        setRankImageDetails: vi.fn(),
-        setRoshan: vi.fn(),
-        setWL: vi.fn(),
-      })
-
-      return null
-    }
-
-    render(<TestComponent />)
+    renderHook(() => {
+      useSocket(socketProps)
+    })
 
     act(() => {
       socketState.handlers.get('block')?.({
@@ -220,28 +173,12 @@ describe(useSocket, () => {
   })
 
   it('normalizes a legacy main-menu init state after reconnecting', () => {
-    const setBlock = vi.fn()
+    const setBlock = vi.fn<SocketProps['setBlock']>()
+    const socketProps = createSocketProps({ setBlock })
 
-    const TestComponent = () => {
-      useSocket({
-        setAegis: vi.fn(),
-        setBetData: vi.fn(),
-        setBlock,
-        setChatMessages: vi.fn(),
-        setConnected: vi.fn(),
-        setNotablePlayers: vi.fn(),
-        setPaused: vi.fn(),
-        setPollData: vi.fn(),
-        setRadiantWinChance: vi.fn(),
-        setRankImageDetails: vi.fn(),
-        setRoshan: vi.fn(),
-        setWL: vi.fn(),
-      })
-
-      return null
-    }
-
-    render(<TestComponent />)
+    renderHook(() => {
+      useSocket(socketProps)
+    })
 
     act(() => {
       socketState.handlers.get('block')?.({
@@ -261,28 +198,12 @@ describe(useSocket, () => {
   })
 
   it('preserves empty block states while a match is still loading', () => {
-    const setBlock = vi.fn()
+    const setBlock = vi.fn<SocketProps['setBlock']>()
+    const socketProps = createSocketProps({ setBlock })
 
-    const TestComponent = () => {
-      useSocket({
-        setAegis: vi.fn(),
-        setBetData: vi.fn(),
-        setBlock,
-        setChatMessages: vi.fn(),
-        setConnected: vi.fn(),
-        setNotablePlayers: vi.fn(),
-        setPaused: vi.fn(),
-        setPollData: vi.fn(),
-        setRadiantWinChance: vi.fn(),
-        setRankImageDetails: vi.fn(),
-        setRoshan: vi.fn(),
-        setWL: vi.fn(),
-      })
-
-      return null
-    }
-
-    render(<TestComponent />)
+    renderHook(() => {
+      useSocket(socketProps)
+    })
 
     act(() => {
       socketState.handlers.get('block')?.({
@@ -301,28 +222,59 @@ describe(useSocket, () => {
     })
   })
 
-  it('reports the OBS overlay page once when diagnostics requests a probe', () => {
-    type SocketProps = Parameters<typeof useSocket>[0]
+  it('keeps the first playing deadline while updating its pending payload', () => {
+    vi.useFakeTimers()
+    const setBlock = vi.fn<SocketProps['setBlock']>()
+    const socketProps = createSocketProps({ setBlock })
 
+    renderHook(() => {
+      useSocket(socketProps)
+    })
+
+    act(() => {
+      socketState.handlers.get('block')?.({ matchId: 1, team: 'radiant', type: 'playing' })
+      vi.advanceTimersByTime(4_000)
+      socketState.handlers.get('block')?.({ matchId: 2, team: 'dire', type: 'playing' })
+      vi.advanceTimersByTime(1_000)
+    })
+
+    expect(setBlock).toHaveBeenCalledExactlyOnceWith({
+      matchId: 2,
+      team: 'dire',
+      type: 'playing',
+    })
+  })
+
+  it('cancels a pending playing state when a newer non-playing state arrives', () => {
+    vi.useFakeTimers()
+    const setBlock = vi.fn<SocketProps['setBlock']>()
+    const socketProps = createSocketProps({ setBlock })
+
+    renderHook(() => {
+      useSocket(socketProps)
+    })
+
+    act(() => {
+      socketState.handlers.get('block')?.({ matchId: 1, team: 'radiant', type: 'playing' })
+      vi.advanceTimersByTime(4_000)
+      socketState.handlers.get('block')?.({ matchId: 1, team: 'radiant', type: 'strategy' })
+      vi.advanceTimersByTime(1_000)
+    })
+
+    expect(setBlock).toHaveBeenCalledExactlyOnceWith({
+      matchId: 1,
+      team: 'radiant',
+      type: 'strategy',
+    })
+  })
+
+  it('reports the OBS overlay page once when diagnostics requests a probe', () => {
     Object.defineProperty(window, 'obsstudio', { configurable: true, value: {} })
     const fetchMock = vi.fn<typeof fetch>(
       async () => await Promise.resolve(new Response(null, { status: 204 })),
     )
     vi.stubGlobal('fetch', fetchMock)
-    const socketProps: SocketProps = {
-      setAegis: vi.fn<SocketProps['setAegis']>(),
-      setBetData: vi.fn<SocketProps['setBetData']>(),
-      setBlock: vi.fn<SocketProps['setBlock']>(),
-      setChatMessages: vi.fn<SocketProps['setChatMessages']>(),
-      setConnected: vi.fn<SocketProps['setConnected']>(),
-      setNotablePlayers: vi.fn<SocketProps['setNotablePlayers']>(),
-      setPaused: vi.fn<SocketProps['setPaused']>(),
-      setPollData: vi.fn<SocketProps['setPollData']>(),
-      setRadiantWinChance: vi.fn<SocketProps['setRadiantWinChance']>(),
-      setRankImageDetails: vi.fn<SocketProps['setRankImageDetails']>(),
-      setRoshan: vi.fn<SocketProps['setRoshan']>(),
-      setWL: vi.fn<SocketProps['setWL']>(),
-    }
+    const socketProps = createSocketProps()
 
     try {
       renderHook(() => {
@@ -348,22 +300,8 @@ describe(useSocket, () => {
 
   it('removes translated chat messages after ten seconds across rerenders', () => {
     vi.useFakeTimers()
-    type SocketProps = Parameters<typeof useSocket>[0]
     const setChatMessages = vi.fn<SocketProps['setChatMessages']>()
-    const socketProps: SocketProps = {
-      setAegis: vi.fn<SocketProps['setAegis']>(),
-      setBetData: vi.fn<SocketProps['setBetData']>(),
-      setBlock: vi.fn<SocketProps['setBlock']>(),
-      setChatMessages,
-      setConnected: vi.fn<SocketProps['setConnected']>(),
-      setNotablePlayers: vi.fn<SocketProps['setNotablePlayers']>(),
-      setPaused: vi.fn<SocketProps['setPaused']>(),
-      setPollData: vi.fn<SocketProps['setPollData']>(),
-      setRadiantWinChance: vi.fn<SocketProps['setRadiantWinChance']>(),
-      setRankImageDetails: vi.fn<SocketProps['setRankImageDetails']>(),
-      setRoshan: vi.fn<SocketProps['setRoshan']>(),
-      setWL: vi.fn<SocketProps['setWL']>(),
-    }
+    const socketProps = createSocketProps({ setChatMessages })
 
     const { rerender } = renderHook(
       ({ setRoshan }) => {
@@ -389,28 +327,21 @@ describe(useSocket, () => {
   })
 
   it('keeps real Roshan and Aegis setters stable across overlay rerenders', () => {
-    type SocketProps = Parameters<typeof useSocket>[0]
-    const stableProps: Omit<SocketProps, 'setAegis' | 'setRoshan'> = {
-      setBetData: vi.fn<SocketProps['setBetData']>(),
-      setBlock: vi.fn<SocketProps['setBlock']>(),
-      setChatMessages: vi.fn<SocketProps['setChatMessages']>(),
-      setConnected: vi.fn<SocketProps['setConnected']>(),
-      setNotablePlayers: vi.fn<SocketProps['setNotablePlayers']>(),
-      setPaused: vi.fn<SocketProps['setPaused']>(),
-      setPollData: vi.fn<SocketProps['setPollData']>(),
-      setRadiantWinChance: vi.fn<SocketProps['setRadiantWinChance']>(),
-      setRankImageDetails: vi.fn<SocketProps['setRankImageDetails']>(),
-      setWL: vi.fn<SocketProps['setWL']>(),
-    }
+    const socketProps = createSocketProps()
 
     const TestComponent = () => {
       const [, setRenderCount] = useState(0)
       const { setAegis } = useAegis()
       const { setRoshan } = useRoshan()
-      useSocket({ ...stableProps, setAegis, setRoshan })
+      useSocket({ ...socketProps, setAegis, setRoshan })
 
       return (
-        <button type='button' onClick={() => setRenderCount((count) => count + 1)}>
+        <button
+          type='button'
+          onClick={() => {
+            setRenderCount((count) => count + 1)
+          }}
+        >
           rerender
         </button>
       )
@@ -428,21 +359,7 @@ describe(useSocket, () => {
   })
 
   it('removes its ping listener when the overlay unmounts', () => {
-    type SocketProps = Parameters<typeof useSocket>[0]
-    const socketProps: SocketProps = {
-      setAegis: vi.fn<SocketProps['setAegis']>(),
-      setBetData: vi.fn<SocketProps['setBetData']>(),
-      setBlock: vi.fn<SocketProps['setBlock']>(),
-      setChatMessages: vi.fn<SocketProps['setChatMessages']>(),
-      setConnected: vi.fn<SocketProps['setConnected']>(),
-      setNotablePlayers: vi.fn<SocketProps['setNotablePlayers']>(),
-      setPaused: vi.fn<SocketProps['setPaused']>(),
-      setPollData: vi.fn<SocketProps['setPollData']>(),
-      setRadiantWinChance: vi.fn<SocketProps['setRadiantWinChance']>(),
-      setRankImageDetails: vi.fn<SocketProps['setRankImageDetails']>(),
-      setRoshan: vi.fn<SocketProps['setRoshan']>(),
-      setWL: vi.fn<SocketProps['setWL']>(),
-    }
+    const socketProps = createSocketProps()
 
     const { unmount } = renderHook(() => {
       useSocket(socketProps)

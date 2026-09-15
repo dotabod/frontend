@@ -9,8 +9,8 @@ import { HydratedContent } from '../hydrated-content'
 
 describe(HydratedContent, () => {
   it('reveals server-rendered content without remounting its effects or DOM', async () => {
-    const mount = vi.fn()
-    const unmount = vi.fn()
+    const mount = vi.fn<() => void>()
+    const unmount = vi.fn<() => void>()
     const Page = () => {
       useEffect(() => {
         mount()
@@ -32,7 +32,7 @@ describe(HydratedContent, () => {
     let root: Root | undefined
 
     try {
-      await act(async () => {
+      await act(() => {
         root = hydrateRoot(container, content)
       })
 
@@ -41,7 +41,7 @@ describe(HydratedContent, () => {
       expect(mount).toHaveBeenCalledOnce()
       expect(unmount).not.toHaveBeenCalled()
     } finally {
-      await act(async () => root?.unmount())
+      await act(() => root?.unmount())
       container.remove()
     }
 
