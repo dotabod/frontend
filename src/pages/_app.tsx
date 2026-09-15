@@ -18,12 +18,13 @@ import type { ReactElement, ReactNode } from 'react'
 
 import 'antd/dist/reset.css'
 import 'focus-visible'
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import { createRoot } from 'react-dom/client'
 import type { Root } from 'react-dom/client'
 import { Provider } from 'react-redux'
 
 import ErrorBoundary from '@/components/error-boundary'
+import { HydratedContent } from '@/components/hydrated-content'
 import SentrySession from '@/components/sentry-session'
 import { SubscriptionProvider } from '@/contexts/subscription-context'
 import { SubscriptionProviderMain } from '@/hooks/subscription-provider'
@@ -81,14 +82,8 @@ const App = ({ Component, pageProps: { session, ...pageProps } }: AppPropsWithLa
     }
   }, [router])
 
-  // Fix for hydration issues
-  const [mounted, setMounted] = useState(false)
   // Get cookie preferences
   const { preferences: cookieConsent, hasConsented } = useCookiePreferences()
-
-  useEffect(() => {
-    setMounted(true)
-  }, [])
 
   // Guard against undefined Component
   if (!Component) {
@@ -98,7 +93,6 @@ const App = ({ Component, pageProps: { session, ...pageProps } }: AppPropsWithLa
   // Use the layout defined at the page level, if available
   const getLayout = Component.getLayout ?? ((page) => page)
 
-  // Use a simple layout during SSR, and the full layout after mounting on the client
   const content = (
     <ConfigProvider theme={themeConfig}>
       {!isPublicOverlayRoute && <SentrySession />}
@@ -140,7 +134,6 @@ const App = ({ Component, pageProps: { session, ...pageProps } }: AppPropsWithLa
   if (isInvalidLocalCheck) {
     // If it's a known invalid overlay, render the InvalidOverlayPage directly
     // And bypass the main layout and providers that might make API calls.
-    // We also ensure it is mounted to avoid hydration issues with this conditional rendering path.
     return (
       <StyleProvider cache={clientCache} hashPriority='high'>
         <AntProvider>
@@ -154,7 +147,7 @@ const App = ({ Component, pageProps: { session, ...pageProps } }: AppPropsWithLa
     <SubscriptionProviderMain>
       <SubscriptionProvider>
         <StyleProvider cache={clientCache} hashPriority='high'>
-          {mounted ? content : <div style={{ visibility: 'hidden' }}>{content}</div>}
+          <HydratedContent>{content}</HydratedContent>
         </StyleProvider>
       </SubscriptionProvider>
     </SubscriptionProviderMain>

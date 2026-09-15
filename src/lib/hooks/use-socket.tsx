@@ -21,7 +21,7 @@ import { Settings } from '@/lib/default-settings'
 import type { blockType } from '@/lib/dev-consts'
 import { reportOverlayPage } from '@/lib/diagnostics/report-overlay-page'
 import { fetcher } from '@/lib/fetcher'
-import { getMatchData, matchDataCache } from '@/lib/hooks/open-dota-api'
+import { getMatchData } from '@/lib/hooks/open-dota-api'
 import type { AegisState, RoshanState } from '@/lib/hooks/rosh'
 import { useUpdateSetting } from '@/lib/hooks/use-update-setting'
 import { getRankImage } from '@/lib/ranks'
@@ -165,6 +165,16 @@ export const useSocket = ({
   // Ref to store timeout IDs for chat message cleanup
   const messageTimeoutsRef = useRef<Map<string, NodeJS.Timeout>>(new Map())
 
+  useEffect(
+    () => () => {
+      messageTimeoutsRef.current.forEach((timeoutId) => {
+        clearTimeout(timeoutId)
+      })
+      messageTimeoutsRef.current.clear()
+    },
+    [],
+  )
+
   useEffect(() => {
     if (!userId) {
       return
@@ -190,9 +200,10 @@ export const useSocket = ({
     const activeSocket = socket
 
     // Use socket.io's built-in ping event to track connection health
-    socket.io.on('ping', () => {
+    const handlePing = () => {
       lastReceivedTime = Date.now()
-    })
+    }
+    activeSocket.io.on('ping', handlePing)
 
     // Monitor for stale connections
     const connectionMonitor = setInterval(() => {
@@ -268,14 +279,6 @@ export const useSocket = ({
         matchId,
       })
       try {
-        // First check if we already have the match data cached
-        if (matchDataCache.has(matchId)) {
-          console.log('[MMR] Using cached match data for matchId:', matchId)
-          cb(matchDataCache.get(matchId))
-          return
-        }
-
-        // Try to get match data directly - the enhanced getMatchData will handle parsing if needed
         console.log('[MMR] Fetching match data for matchId:', matchId, 'and heroSlot:', heroSlot)
         const data = await getMatchData(matchId, heroSlot)
         console.log('[MMR] Match data fetched:', data)
@@ -419,11 +422,7 @@ export const useSocket = ({
     return () => {
       clearInterval(connectionMonitor)
       clearInterval(diagnosticHeartbeat)
-      // Clear all message timeouts
-      messageTimeoutsRef.current.forEach((timeoutId) => {
-        clearTimeout(timeoutId)
-      })
-      messageTimeoutsRef.current.clear()
+      activeSocket.io.off('ping', handlePing)
 
       // Don't disconnect the socket on every effect cleanup
       // Only clean up event handlers

@@ -1,19 +1,26 @@
 import { act, cleanup, render, renderHook } from '@testing-library/react'
+import { useState } from 'react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
+import { useAegis, useRoshan } from '@/lib/hooks/rosh'
 import { useSocket } from '@/lib/hooks/use-socket'
 
 type SocketHandler = (...args: unknown[]) => void
 
 const socketState = vi.hoisted(() => {
   const handlers = new Map<string, SocketHandler>()
-  const ioHandlers = new Map<string, SocketHandler>()
+  const ioHandlers = new Map<string, Set<SocketHandler>>()
   const socket = {
     connect: vi.fn(),
     disconnect: vi.fn(),
     io: {
       on: vi.fn((event: string, handler: SocketHandler) => {
-        ioHandlers.set(event, handler)
+        const eventHandlers = ioHandlers.get(event) ?? new Set()
+        eventHandlers.add(handler)
+        ioHandlers.set(event, eventHandlers)
+      }),
+      off: vi.fn((event: string, handler: SocketHandler) => {
+        ioHandlers.get(event)?.delete(handler)
       }),
     },
     off: vi.fn(),
@@ -358,22 +365,93 @@ describe(useSocket, () => {
       setWL: vi.fn<SocketProps['setWL']>(),
     }
 
-    const { rerender } = renderHook(() => {
-      useSocket(socketProps)
-    })
+    const { rerender } = renderHook(
+      ({ setRoshan }) => {
+        useSocket({ ...socketProps, setRoshan })
+      },
+      {
+        initialProps: { setRoshan: socketProps.setRoshan },
+      },
+    )
 
     act(() => {
       socketState.handlers.get('chatMessage')?.({ message: 'Translated message', timestamp: 1 })
     })
     expect(setChatMessages).toHaveBeenCalledOnce()
 
-    socketState.mutate = socketState.dispatch
-    rerender()
+    rerender({ setRoshan: vi.fn<SocketProps['setRoshan']>() })
 
     act(() => {
       vi.advanceTimersByTime(10_000)
     })
 
     expect(setChatMessages).toHaveBeenCalledTimes(2)
+  })
+
+  it('keeps real Roshan and Aegis setters stable across overlay rerenders', () => {
+    type SocketProps = Parameters<typeof useSocket>[0]
+    const stableProps: Omit<SocketProps, 'setAegis' | 'setRoshan'> = {
+      setBetData: vi.fn<SocketProps['setBetData']>(),
+      setBlock: vi.fn<SocketProps['setBlock']>(),
+      setChatMessages: vi.fn<SocketProps['setChatMessages']>(),
+      setConnected: vi.fn<SocketProps['setConnected']>(),
+      setNotablePlayers: vi.fn<SocketProps['setNotablePlayers']>(),
+      setPaused: vi.fn<SocketProps['setPaused']>(),
+      setPollData: vi.fn<SocketProps['setPollData']>(),
+      setRadiantWinChance: vi.fn<SocketProps['setRadiantWinChance']>(),
+      setRankImageDetails: vi.fn<SocketProps['setRankImageDetails']>(),
+      setWL: vi.fn<SocketProps['setWL']>(),
+    }
+
+    const TestComponent = () => {
+      const [, setRenderCount] = useState(0)
+      const { setAegis } = useAegis()
+      const { setRoshan } = useRoshan()
+      useSocket({ ...stableProps, setAegis, setRoshan })
+
+      return (
+        <button type='button' onClick={() => setRenderCount((count) => count + 1)}>
+          rerender
+        </button>
+      )
+    }
+
+    const { getByRole } = render(<TestComponent />)
+    const socketOnCalls = socketState.socket.on.mock.calls.length
+
+    act(() => {
+      getByRole('button').click()
+    })
+
+    expect(socketState.socket.on).toHaveBeenCalledTimes(socketOnCalls)
+    expect(socketState.ioHandlers.get('ping')?.size).toBe(1)
+  })
+
+  it('removes its ping listener when the overlay unmounts', () => {
+    type SocketProps = Parameters<typeof useSocket>[0]
+    const socketProps: SocketProps = {
+      setAegis: vi.fn<SocketProps['setAegis']>(),
+      setBetData: vi.fn<SocketProps['setBetData']>(),
+      setBlock: vi.fn<SocketProps['setBlock']>(),
+      setChatMessages: vi.fn<SocketProps['setChatMessages']>(),
+      setConnected: vi.fn<SocketProps['setConnected']>(),
+      setNotablePlayers: vi.fn<SocketProps['setNotablePlayers']>(),
+      setPaused: vi.fn<SocketProps['setPaused']>(),
+      setPollData: vi.fn<SocketProps['setPollData']>(),
+      setRadiantWinChance: vi.fn<SocketProps['setRadiantWinChance']>(),
+      setRankImageDetails: vi.fn<SocketProps['setRankImageDetails']>(),
+      setRoshan: vi.fn<SocketProps['setRoshan']>(),
+      setWL: vi.fn<SocketProps['setWL']>(),
+    }
+
+    const { unmount } = renderHook(() => {
+      useSocket(socketProps)
+    })
+
+    expect(socketState.ioHandlers.get('ping')?.size).toBe(1)
+
+    unmount()
+
+    expect(socketState.ioHandlers.get('ping')?.size).toBe(0)
   })
 })
