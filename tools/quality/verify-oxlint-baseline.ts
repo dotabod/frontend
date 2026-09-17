@@ -585,10 +585,10 @@ const reportChanges = ({ additions, improvements, removals }: Differences): void
   console.error(
     `Oxlint ratchet failed: ${additions.length} new, ${improvements.length} improved, and ${removals.length} stale diagnostic fingerprints.`,
   )
-  for (const entry of additions.slice(0, 20)) {
+  for (const entry of additions.slice(0, 250)) {
     console.error(`NEW (${entry.count}) ${JSON.stringify(entry.summary)}`)
   }
-  for (const entry of removals.slice(0, 20)) {
+  for (const entry of removals.slice(0, 250)) {
     console.error(`STALE (${entry.count}) ${JSON.stringify(entry.summary)}`)
   }
   for (const improvement of improvements.slice(0, 20)) {

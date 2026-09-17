@@ -90,14 +90,16 @@ export const selectSettings = (state: AppState) => state.settings
 export const selectMainHero = (state: AppState) =>
   state.status ? state.status.hero.replace('npc_dota_hero_', '') : ''
 
-export const selectHeroes = (state: AppState) => state.heroes ?? []
+const emptyEntities: readonly MinimapEntity[] = Object.freeze([])
 
-export const selectHeroUnits = (state: AppState) => state.hero_units ?? []
+export const selectHeroes = (state: AppState) => state.heroes ?? emptyEntities
 
-export const selectBuildings = (state: AppState) => state.buildings ?? []
+export const selectHeroUnits = (state: AppState) => state.hero_units ?? emptyEntities
 
-export const selectCreeps = (state: AppState) => state.creeps ?? []
+export const selectBuildings = (state: AppState) => state.buildings ?? emptyEntities
 
-export const selectCouriers = (state: AppState) => state.couriers ?? []
+export const selectCreeps = (state: AppState) => state.creeps ?? emptyEntities
+
+export const selectCouriers = (state: AppState) => state.couriers ?? emptyEntities
 
 export default store

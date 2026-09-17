@@ -21,7 +21,7 @@ import { Settings } from '@/lib/default-settings'
 import type { blockType } from '@/lib/dev-consts'
 import { reportOverlayPage } from '@/lib/diagnostics/report-overlay-page'
 import { fetcher } from '@/lib/fetcher'
-import { getMatchData, matchDataCache } from '@/lib/hooks/open-dota-api'
+import { getMatchData } from '@/lib/hooks/open-dota-api'
 import type { AegisState, RoshanState } from '@/lib/hooks/rosh'
 import { useUpdateSetting } from '@/lib/hooks/use-update-setting'
 import { getRankImage } from '@/lib/ranks'
@@ -136,6 +136,41 @@ type WireBlockType = blockType & {
   state?: string
 }
 
+interface MatchDataRequest {
+  heroSlot: number
+  matchId: string
+}
+
+type MatchDataAcknowledge = (data: Awaited<ReturnType<typeof getMatchData>> | null) => void
+
+const socketEventNames = [
+  'connect',
+  'connect_error',
+  'disconnect',
+  'DATA_buildings',
+  'DATA_heroes',
+  'DATA_couriers',
+  'DATA_creeps',
+  'DATA_hero_units',
+  'STATUS',
+  'requestHeroData',
+  'requestMatchData',
+  'block',
+  'paused',
+  'notable-players',
+  'aegis-picked-up',
+  'chatMessage',
+  'roshan-killed',
+  'auth_error',
+  'refresh-settings',
+  'diagnostic-overlay-probe',
+  'channelPollOrBet',
+  'update-medal',
+  'update-wl',
+  'update-radiant-win-chance',
+  'refresh',
+] as const
+
 export const useSocket = ({
   setPollData,
   setBetData,
@@ -166,11 +201,25 @@ export const useSocket = ({
   const messageTimeoutsRef = useRef<Map<string, NodeJS.Timeout>>(new Map())
 
   useEffect(() => {
+    const messageTimeouts = messageTimeoutsRef.current
+
+    return () => {
+      messageTimeouts.forEach((timeoutId) => {
+        clearTimeout(timeoutId)
+      })
+      messageTimeouts.clear()
+    }
+  }, [])
+
+  // oxlint-disable-next-line react-doctor/effect-needs-cleanup -- Chat timers are owned by the unmount-only effect above; this effect cleans its intervals, block timer, manager listener, and socket listeners below.
+  useEffect(() => {
     if (!userId) {
       return
     }
 
     let lastReceivedTime = Date.now()
+    let blockTimeout: NodeJS.Timeout | null = null
+    let pendingPlayingBlock: blockType | null = null
 
     console.log('Connecting to socket init...', { userId })
 
@@ -190,9 +239,10 @@ export const useSocket = ({
     const activeSocket = socket
 
     // Use socket.io's built-in ping event to track connection health
-    socket.io.on('ping', () => {
+    const handlePing = () => {
       lastReceivedTime = Date.now()
-    })
+    }
+    activeSocket.io.on('ping', handlePing)
 
     // Monitor for stale connections
     const connectionMonitor = setInterval(() => {
@@ -261,31 +311,33 @@ export const useSocket = ({
       cb(wl)
     })
 
-    socket.on('requestMatchData', async ({ matchId, heroSlot }, cb) => {
+    const handleRequestMatchData = async (
+      { matchId, heroSlot }: MatchDataRequest,
+      acknowledge: MatchDataAcknowledge,
+    ) => {
       updateLastReceived()
       console.log('[MMR] requestMatchData event received', {
         heroSlot,
         matchId,
       })
+      console.log('[MMR] Fetching match data for matchId:', matchId, 'and heroSlot:', heroSlot)
       try {
-        // First check if we already have the match data cached
-        if (matchDataCache.has(matchId)) {
-          console.log('[MMR] Using cached match data for matchId:', matchId)
-          cb(matchDataCache.get(matchId))
-          return
-        }
-
-        // Try to get match data directly - the enhanced getMatchData will handle parsing if needed
-        console.log('[MMR] Fetching match data for matchId:', matchId, 'and heroSlot:', heroSlot)
         const data = await getMatchData(matchId, heroSlot)
         console.log('[MMR] Match data fetched:', data)
-        cb(data)
+        acknowledge(data)
       } catch (error) {
         captureException(error)
         console.log('[MMR] Error fetching match data', { error })
-        cb(null)
+        acknowledge(null)
       }
-    })
+    }
+
+    socket.on(
+      'requestMatchData',
+      (payload: MatchDataRequest, acknowledge: MatchDataAcknowledge) => {
+        void handleRequestMatchData(payload, acknowledge)
+      },
+    )
 
     socket.on('block', (data: WireBlockType) => {
       updateLastReceived()
@@ -297,12 +349,26 @@ export const useSocket = ({
         data.type === 'empty' && isMainScreenState ? { ...data, type: null } : data
 
       if (normalizedData.type === 'playing') {
-        setTimeout(() => {
-          setBlock(normalizedData)
+        pendingPlayingBlock = normalizedData
+        if (blockTimeout !== null) {
+          return
+        }
+        blockTimeout = setTimeout(() => {
+          if (pendingPlayingBlock !== null) {
+            setBlock(pendingPlayingBlock)
+          }
+          pendingPlayingBlock = null
+          blockTimeout = null
         }, 5000)
-      } else {
-        setBlock(normalizedData)
+        return
       }
+
+      if (blockTimeout !== null) {
+        clearTimeout(blockTimeout)
+        blockTimeout = null
+      }
+      pendingPlayingBlock = null
+      setBlock(normalizedData)
     })
     socket.on('paused', (data) => {
       updateLastReceived()
@@ -312,8 +378,11 @@ export const useSocket = ({
       updateLastReceived()
       setNotablePlayers(data)
     })
-    socket.on('aegis-picked-up', (data) => {
+    socket.on('aegis-picked-up', (data: AegisState | null | undefined) => {
       updateLastReceived()
+      if (data === null || data === undefined) {
+        return
+      }
       setAegis(data)
     })
     socket.on('chatMessage', (data: ChatMessage) => {
@@ -339,8 +408,11 @@ export const useSocket = ({
       // Store timeout ID for cleanup
       messageTimeoutsRef.current.set(messageId, timeoutId)
     })
-    socket.on('roshan-killed', (data) => {
+    socket.on('roshan-killed', (data: RoshanState | null | undefined) => {
       updateLastReceived()
+      if (data === null || data === undefined) {
+        return
+      }
       setRoshan(data)
     })
     socket.on('auth_error', (message) => {
@@ -419,39 +491,14 @@ export const useSocket = ({
     return () => {
       clearInterval(connectionMonitor)
       clearInterval(diagnosticHeartbeat)
-      // Clear all message timeouts
-      messageTimeoutsRef.current.forEach((timeoutId) => {
-        clearTimeout(timeoutId)
-      })
-      messageTimeoutsRef.current.clear()
+      if (blockTimeout !== null) {
+        clearTimeout(blockTimeout)
+      }
+      activeSocket.io.off('ping', handlePing)
 
-      // Don't disconnect the socket on every effect cleanup
-      // Only clean up event handlers
-      socket?.off('connect')
-      socket?.off('connect_error')
-      socket?.off('disconnect')
-      socket?.off('DATA_buildings')
-      socket?.off('DATA_heroes')
-      socket?.off('DATA_couriers')
-      socket?.off('DATA_creeps')
-      socket?.off('DATA_hero_units')
-      socket?.off('STATUS')
-      socket?.off('requestHeroData')
-      socket?.off('requestMatchData')
-      socket?.off('block')
-      socket?.off('paused')
-      socket?.off('notable-players')
-      socket?.off('aegis-picked-up')
-      socket?.off('chatMessage')
-      socket?.off('roshan-killed')
-      socket?.off('auth_error')
-      socket?.off('refresh-settings')
-      activeSocket.off('diagnostic-overlay-probe')
-      socket?.off('channelPollOrBet')
-      socket?.off('update-medal')
-      socket?.off('update-wl')
-      socket?.off('update-radiant-win-chance')
-      socket?.off('refresh')
+      for (const eventName of socketEventNames) {
+        activeSocket.off(eventName)
+      }
     }
   }, [
     dispatch,

@@ -34,13 +34,7 @@ export const useRoshan = () => {
     })
   }, [])
 
-  const safeSetRoshan = (value: RoshanState | ((prev: RoshanState) => RoshanState)) => {
-    if (value) {
-      setRoshan(value)
-    }
-  }
-
-  return { roshan, setRoshan: safeSetRoshan }
+  return { roshan, setRoshan }
 }
 
 export const useAegis = () => {
@@ -60,11 +54,5 @@ export const useAegis = () => {
     })
   }, [])
 
-  const safeSetAegis = (value: AegisState | ((prev: AegisState) => AegisState)) => {
-    if (value) {
-      setAegis(value)
-    }
-  }
-
-  return { aegis, setAegis: safeSetAegis }
+  return { aegis, setAegis }
 }
