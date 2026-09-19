@@ -149,7 +149,11 @@ export const BillingPlans = ({ showTitle = true }: BillingPlansProps) => {
             <p className='mt-4 text-base text-purple-300'>
               <SubscriptionStatus />
             </p>
-          ) : null}
+          ) : (
+            <p className='mt-4 text-base text-pretty text-gray-400'>
+              Start on Free, no card needed. Move up to Pro when you want the full kit.
+            </p>
+          )}
 
           <ul className='mt-6 flex flex-wrap items-center justify-center gap-x-3 gap-y-2 text-sm text-gray-500'>
             <li>Free plan, no card needed</li>

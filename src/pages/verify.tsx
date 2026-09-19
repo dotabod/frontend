@@ -586,6 +586,7 @@ const VerifyPage: NextPageWithLayout = () => {
                           onClick={async () => setPrimaryAccount(account.steam32Id)}
                           loading={actionLoading[`setPrimary_${account.steam32Id}`]}
                           disabled={actionLoading[`setPrimary_${account.steam32Id}`]}
+                          title='Set as primary account'
                         >
                           Set as Primary
                         </Button>
@@ -600,6 +601,7 @@ const VerifyPage: NextPageWithLayout = () => {
                         }}
                         loading={actionLoading[`unlink_${account.steam32Id}`]}
                         disabled={actionLoading[`unlink_${account.steam32Id}`]}
+                        title='Unlink this account'
                       >
                         Unlink
                       </Button>,

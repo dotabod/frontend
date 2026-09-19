@@ -238,7 +238,8 @@ const Plan = ({
     } catch (error) {
       console.error('Error registering crypto interest:', error)
       notification.error({
-        message: 'Could not register your interest. Try again later.',
+        description: 'Failed to register your interest. Please try again later.',
+        message: 'Error',
       })
     }
   }
@@ -272,7 +273,8 @@ const Plan = ({
     } catch (error) {
       console.error('Error removing crypto interest:', error)
       notification.error({
-        message: 'Could not update your preference. Try again later.',
+        description: 'Failed to update your interest status. Please try again later.',
+        message: 'Error',
       })
     }
   }

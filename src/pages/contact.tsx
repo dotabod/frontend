@@ -73,7 +73,9 @@ const ContactPage: React.FC = () => {
 
       // Optional: Check for specific errors like network errors
       if (axios.isAxiosError(error) && error.message?.includes('Network Error')) {
-        message.warning('Check your network connection or ad blocker.')
+        message.warning(
+          'This might be due to network issues or ad blockers preventing the submission.',
+        )
       } else if (axios.isAxiosError(error) && error.response) {
         // Log more specific HubSpot API errors if available
         console.error('HubSpot API Error Response:', error.response.data)

@@ -277,7 +277,8 @@ const UserButton = ({ user, className }: UserButtonProps) => {
                             </div>
                           </div>
                           <p className='mt-1 text-gray-300'>
-                            New features are enabled automatically. Change the default anytime.
+                            Dotabod now turns on new features automatically. Don&apos;t want new
+                            stuff on by default? You can opt out anytime.
                           </p>
                           <div className='mt-2 flex gap-2'>
                             <Link href='/dashboard/whats-new'>
