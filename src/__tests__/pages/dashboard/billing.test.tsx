@@ -131,6 +131,7 @@ describe('Dashboard Billing Page', () => {
     render(<BillingPage />)
 
     expect(screen.getByRole('heading', { name: 'Billing' })).toBeInTheDocument()
+    expect(screen.queryByText(/your current plan, renewal date/iu)).not.toBeInTheDocument()
     expect(screen.getByTestId('billing-overview')).toBeInTheDocument()
     expect(screen.getByTestId('subscription-alerts')).toHaveTextContent('hideManageButton:true')
     expect(screen.getByRole('heading', { name: 'Compare plans' })).toBeInTheDocument()
