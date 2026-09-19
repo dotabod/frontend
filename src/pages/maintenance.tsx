@@ -8,8 +8,8 @@ import type { NextPageWithLayout } from '@/pages/_app'
 const Maintenance: NextPageWithLayout = () => (
   <Container className='py-24'>
     <Alert
-      description='Dotabod is temporarily offline for everyone. We are currently undergoing scheduled maintenance. Please check back later.'
-      message='Scheduled Maintenance'
+      description='Dotabod is temporarily offline. Check back soon.'
+      message='Scheduled maintenance'
       type='warning'
       showIcon
     />

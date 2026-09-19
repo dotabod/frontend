@@ -65,11 +65,11 @@ const ContactPage: React.FC = () => {
       await axios.post(hubspotEndpoint, data)
 
       // Show success message
-      message.success('Your message has been sent! We will get back to you soon.')
+      message.success("Message sent. We'll reply soon.")
       form.resetFields()
     } catch (error) {
       console.error('Error submitting contact form:', error)
-      message.error('There was an error submitting your message. Please try again later.')
+      message.error('Could not send your message. Try again later.')
 
       // Optional: Check for specific errors like network errors
       if (axios.isAxiosError(error) && error.message?.includes('Network Error')) {
@@ -139,7 +139,7 @@ const ContactPage: React.FC = () => {
     >
       <div className='container mx-auto px-4 py-8 md:py-16'>
         <div className='mx-auto max-w-2xl'>
-          <h1 className='mb-8 text-center text-3xl font-bold text-white'>Contact Us</h1>
+          <h1 className='mb-8 text-center text-3xl font-bold text-white'>Contact us</h1>
           <Card className='border border-gray-600 bg-gray-700 p-6 md:p-8'>
             <Form
               form={form}
@@ -164,12 +164,11 @@ const ContactPage: React.FC = () => {
                 label={<span className='text-gray-200'>Message</span>}
                 rules={[
                   {
-                    message: 'Please enter your message - we need details to help you effectively',
+                    message: 'Enter a message.',
                     required: true,
                   },
                   {
-                    message:
-                      'Please provide more details about your issue (at least 80 characters)',
+                    message: 'Add more detail (at least 80 characters).',
                     min: 80,
                   },
                   {
@@ -189,13 +188,13 @@ const ContactPage: React.FC = () => {
                   },
                 ]}
               >
-                <Input.TextArea placeholder='Describe your inquiry here...' rows={5} size='large' />
+                <Input.TextArea rows={5} size='large' />
               </Form.Item>
 
               <Form.Item>
                 <div className='flex flex-wrap items-center justify-center gap-3 sm:justify-start'>
                   <Button type='primary' htmlType='submit' loading={submitting} size='large'>
-                    Send Message
+                    Send message
                   </Button>
                   <Divider type='vertical' className='hidden sm:inline-block' />
                   <Button
@@ -204,7 +203,7 @@ const ContactPage: React.FC = () => {
                     type='default'
                     size='large'
                   >
-                    Live Chat Support
+                    Live chat
                   </Button>
                 </div>
               </Form.Item>

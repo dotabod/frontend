@@ -24,7 +24,7 @@ const FeaturesPage: NextPageWithLayout = () => (
       <title>Dotabod | Overlay features</title>
     </Head>
 
-    <Header subtitle='Enhance your stream with these overlay features' title='Overlay' />
+    <Header title='Overlay' />
 
     <div className='grid grid-cols-1 gap-6 md:grid-cols-1 lg:grid-cols-2'>
       <div id='minimap'>

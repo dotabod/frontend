@@ -57,18 +57,18 @@ const MinimapCard = (): React.ReactNode => {
   // Get description text based on opacity value
   const getOpacityDescription = () => {
     if (localOpacity >= 0.95) {
-      return 'Maximum protection: Minimap completely hidden from viewers'
+      return 'Minimap hidden'
     }
     if (localOpacity >= 0.8) {
-      return 'High protection: Most minimap details are hidden from viewers'
+      return 'Most minimap details hidden'
     }
     if (localOpacity >= 0.7) {
-      return "Optimal setting: Chat can see hero positions but snipers can't see wards"
+      return 'Hero positions visible; wards hidden'
     }
     if (localOpacity >= 0.5) {
-      return 'Medium protection: Some minimap details visible but wards are hidden'
+      return 'Some minimap details visible; wards hidden'
     }
-    return 'Low protection: Minimap is mostly visible to viewers'
+    return 'Most of the minimap visible'
   }
 
   return (
@@ -77,8 +77,7 @@ const MinimapCard = (): React.ReactNode => {
         <h3>Minimap</h3>
       </div>
       <div className='subtitle'>
-        Semi-transparent blocker that auto places itself over your minimap to deter people from
-        farming your wards.
+        Places a semi-transparent blocker over the minimap to hide wards from stream snipers.
       </div>
       <div className={clsx('pt-4 pb-12 transition-all')}>
         <div className='flex flex-col items-start space-y-2 md:space-y-3'>

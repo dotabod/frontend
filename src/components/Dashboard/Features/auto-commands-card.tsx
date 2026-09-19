@@ -1,4 +1,4 @@
-import { Alert, Checkbox, Collapse, Spin, Tag } from 'antd'
+import { Alert, Checkbox, Collapse, Spin } from 'antd'
 import { clsx } from 'clsx'
 import { useEffect, useState } from 'react'
 
@@ -58,14 +58,8 @@ export const AutoCommandsCard = () => {
   const rowsDisabled = !isEnabled || isSaving
 
   return (
-    <Card title='Auto Commands on Match Start' feature='autoCommandsOnMatchStart'>
-      <div className='subtitle'>
-        Automatically sends the commands you select below as soon as your match actually begins.
-      </div>
-      <div>
-        Once your hero loads into the match, right after picks lock in, Dotabod sends each selected
-        command to chat for you, no need to type them yourself.
-      </div>
+    <Card title='Auto commands on match start' feature='autoCommandsOnMatchStart'>
+      <div>Send selected commands to chat when your hero loads into the match.</div>
 
       <div className='mt-5 flex items-center space-x-2'>
         <TierSwitch
@@ -76,23 +70,14 @@ export const AutoCommandsCard = () => {
           disabled={isSaving}
           label='Enable auto commands'
         />
-        <Tag color={isEnabled ? 'green' : 'default'}>{isEnabled ? 'Enabled' : 'Disabled'}</Tag>
       </div>
 
       {isEnabled && localSelected.length === 0 && (
-        <Alert
-          className='mt-4'
-          type='info'
-          showIcon
-          message='Nothing selected yet. Check at least one command below to activate auto commands.'
-        />
+        <Alert className='mt-4' type='info' showIcon message='Select at least one command.' />
       )}
 
       <div className={clsx(!isEnabled && 'opacity-40', 'mt-6')}>
         <Spin spinning={loading} tip='Loading'>
-          <div className='mb-3 text-sm font-medium text-gray-300'>
-            Select commands to auto-send:
-          </div>
           <Collapse bordered={false} className='bg-transparent'>
             {AUTO_COMMAND_KEYS.map((key) => {
               const command = CommandDetail[key]
@@ -128,15 +113,6 @@ export const AutoCommandsCard = () => {
             })}
           </Collapse>
         </Spin>
-      </div>
-
-      <div className='mt-4 rounded-md bg-gray-800 p-3'>
-        <p className='text-xs text-gray-400'>
-          <strong>How it works:</strong> Dotabod detects your match has started once your hero has
-          loaded in with starting items, a few seconds after picks lock in. It then sends each
-          selected command to chat exactly as if typed manually, with a short pause between each to
-          avoid Twitch rate limits. This runs once per match.
-        </p>
       </div>
     </Card>
   )

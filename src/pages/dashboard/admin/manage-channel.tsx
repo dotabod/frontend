@@ -5,7 +5,6 @@ import { Card } from '@/ui/card'
 
 const ManageChannel = () => (
   <Card title='Manage Channel'>
-    <p className='text-sm text-gray-500'>Search for a channel to manage.</p>
     <ModeratedChannels />
   </Card>
 )

@@ -8,6 +8,8 @@ import { GRACE_PERIOD_END, isInGracePeriod } from '@/utils/subscription'
 
 import type { GiftInfo, GiftSubInfo, StatusInfo } from './types'
 
+const applyCreditsErrorMessage = 'Could not apply credits. Try again or contact support.'
+
 interface SubscriptionAlertsProps {
   giftInfo: GiftInfo
   statusInfo: StatusInfo | null
@@ -62,7 +64,7 @@ export const SubscriptionAlerts = ({
         const body = await response.json().catch(() => null)
         console.error('Failed to apply credits:', body?.error ?? response.statusText)
         message.error({
-          content: 'There was an issue applying your credits. Please try again or contact support.',
+          content: applyCreditsErrorMessage,
           duration: 5,
           key: 'applyCredits',
         })
@@ -73,7 +75,7 @@ export const SubscriptionAlerts = ({
 
       if (result.success) {
         message.success({
-          content: 'Credits applied successfully!',
+          content: 'Credits applied',
           duration: 2,
           key: 'applyCredits',
         })
@@ -81,7 +83,7 @@ export const SubscriptionAlerts = ({
       } else {
         console.error('Failed to apply credits:', result.error ?? result.message)
         message.error({
-          content: 'There was an issue applying your credits. Please try again or contact support.',
+          content: applyCreditsErrorMessage,
           duration: 5,
           key: 'applyCredits',
         })
@@ -89,7 +91,7 @@ export const SubscriptionAlerts = ({
     } catch (error) {
       console.error('Error applying credits:', error)
       message.error({
-        content: 'There was an issue applying your credits. Please try again or contact support.',
+        content: applyCreditsErrorMessage,
         duration: 5,
         key: 'applyCredits',
       })

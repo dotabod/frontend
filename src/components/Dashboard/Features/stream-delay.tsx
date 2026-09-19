@@ -58,7 +58,7 @@ const StreamDelayCard = () => {
       feature='streamDelay'
       title='Stream delay'
     >
-      <div className='subtitle mb-2'>Increase the delay that Dotabod responds to game events.</div>
+      <div className='subtitle mb-2'>Delay Dotabod&apos;s responses to game events.</div>
 
       <Form layout='vertical'>
         <div className='flex items-end gap-4'>
@@ -96,9 +96,7 @@ const StreamDelayCard = () => {
           </Form.Item>
         </div>
 
-        <div className='mt-2 text-xs text-gray-500'>
-          Maximum: 50 minutes • Current: {minutes}m {seconds}s
-        </div>
+        <div className='mt-2 text-xs text-gray-500'>Maximum: 50 minutes</div>
       </Form>
     </Card>
   )

@@ -1,5 +1,5 @@
 import { InfoCircleOutlined } from '@ant-design/icons'
-import { Alert, Tag } from 'antd'
+import { Alert } from 'antd'
 
 import { Settings } from '@/lib/default-settings'
 import { useUpdateSetting } from '@/lib/hooks/use-update-setting'
@@ -35,7 +35,7 @@ const ClippingCard = (): React.ReactNode => {
   const { data: isDisabled, updateSetting } = useUpdateSetting(Settings.disableAutoClipping)
 
   return (
-    <Card title='High-MMR Match Detection' feature='disableAutoClipping'>
+    <Card title='High-MMR match detection' feature='disableAutoClipping'>
       <div className='subtitle'>
         Dotabod&apos;s only way to see who&apos;s in your match once your tracked MMR hits 8500+ or
         Immortal — Valve&apos;s live API stops sending roster data at that bracket.
@@ -51,49 +51,6 @@ const ClippingCard = (): React.ReactNode => {
           }}
           label='High-MMR match detection'
         />
-        <Tag color={isDisabled ? 'red' : 'green'}>
-          {isDisabled ? 'Detection Off' : 'Detection Active'}
-        </Tag>
-      </div>
-
-      <div className='mb-4'>
-        <p className='mb-2 text-sm font-medium text-gray-300'>Powers these commands:</p>
-        <div className='space-y-3'>
-          <div>
-            <p className='mb-1 text-xs text-gray-400'>
-              Shows a &quot;no data&quot; message when off:
-            </p>
-            <div className='flex flex-wrap gap-2'>
-              {EXPLICIT_NOTE_COMMANDS.map(({ cmd, desc }) => (
-                <span key={cmd} className='rounded bg-gray-800 px-2 py-0.5 text-xs'>
-                  <code>{cmd}</code> <span className='text-gray-400'>· {desc}</span>
-                </span>
-              ))}
-            </div>
-          </div>
-          <div>
-            <p className='mb-1 text-xs text-gray-400'>Roster silently comes back empty:</p>
-            <div className='flex flex-wrap gap-2'>
-              {SILENT_COMMANDS.map(({ cmd, desc }) => (
-                <span key={cmd} className='rounded bg-gray-800 px-2 py-0.5 text-xs'>
-                  <code>{cmd}</code> <span className='text-gray-400'>· {desc}</span>
-                </span>
-              ))}
-            </div>
-          </div>
-          <div>
-            <p className='mb-1 text-xs text-gray-400'>
-              Only when asked about a teammate or opponent (asking about yourself always works):
-            </p>
-            <div className='flex flex-wrap gap-2'>
-              {LOOKUP_COMMANDS.map((cmd) => (
-                <code key={cmd} className='rounded bg-gray-800 px-2 py-0.5 text-xs'>
-                  {cmd}
-                </code>
-              ))}
-            </div>
-          </div>
-        </div>
       </div>
 
       {isDisabled && (
@@ -127,9 +84,8 @@ const ClippingCard = (): React.ReactNode => {
 
       <div className='mt-4 rounded-md bg-gray-800 p-3'>
         <p className='text-xs text-gray-400'>
-          <strong>How it works:</strong> since Valve won&apos;t hand over the data directly, Dotabod
-          grabs a 5-second Twitch clip of the draft/hero bar and reads it with vision AI. The clip
-          is created from your account and will show up in your Twitch clips as a side effect.
+          Dotabod reads a 5-second Twitch clip of the draft or hero bar. The clip is created from
+          your account and appears in your Twitch clips.
         </p>
       </div>
     </Card>

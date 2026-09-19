@@ -274,16 +274,11 @@ export const GiftSubscriptionForm = ({
 
       {/* Hero */}
       <motion.header {...fadeUp(0)} className='pt-12 md:pt-16'>
-        <p className='text-xs font-medium tracking-[0.2em] text-gray-500 uppercase'>
-          A gift that keeps streaming
-        </p>
-        <h1 className='mt-3 text-4xl leading-tight font-semibold tracking-tight text-balance text-gray-100 sm:text-5xl'>
+        <h1 className='text-4xl leading-tight font-semibold tracking-tight text-balance text-gray-100 sm:text-5xl'>
           {recipientLink ? <>Gift Dotabod Pro to {recipientLink}</> : 'Gift Dotabod Pro'}
         </h1>
         <p className='mt-4 max-w-2xl text-lg text-pretty text-gray-400'>
-          {validRecipientUsername === null
-            ? 'Hand your favorite Dota 2 streamer the full Dotabod kit: auto predictions, advanced overlays, and every pro command. You pay once, they get the months.'
-            : `Hand ${displayName} the full Dotabod kit: auto predictions, advanced overlays, and every pro command. You pay once, they get the months.`}
+          Includes auto predictions, advanced overlays, and every Pro command.
         </p>
         <ul className='mt-6 flex flex-wrap items-center gap-x-3 gap-y-2 text-sm text-gray-500'>
           <li className='flex items-center gap-1.5'>
@@ -321,9 +316,6 @@ export const GiftSubscriptionForm = ({
               {/* Duration */}
               <div className='mb-6'>
                 <span className='block text-sm font-medium text-gray-200'>How long?</span>
-                <p className='mt-0.5 text-xs text-gray-500'>
-                  Each month is one month of Dotabod Pro for the recipient.
-                </p>
                 <div className='mt-3 flex flex-wrap gap-2'>
                   {DURATION_PRESETS.map((months) => {
                     const selected = quantity === months
@@ -372,7 +364,6 @@ export const GiftSubscriptionForm = ({
                 help={usernameError}
               >
                 <Input
-                  placeholder='Enter Twitch username'
                   disabled={Boolean(recipientUsername)}
                   onChange={handleUsernameChange}
                   className='w-full'
@@ -394,17 +385,12 @@ export const GiftSubscriptionForm = ({
                   },
                 ]}
               >
-                <Input
-                  placeholder='Your name, or leave blank to gift anonymously'
-                  onChange={handleSenderNameChange}
-                  className='w-full'
-                />
+                <Input onChange={handleSenderNameChange} className='w-full' />
               </Form.Item>
 
               <Form.Item
                 name='giftMessage'
                 label='Gift message (optional)'
-                tooltip='A personal note shown with your gift.'
                 rules={[
                   {
                     validator: async (_, value) => {
@@ -462,11 +448,6 @@ export const GiftSubscriptionForm = ({
               >
                 Continue to payment · {formatPrice(total)}
               </Button>
-              {usernameError && (
-                <p className='mt-2 text-center text-xs text-gray-500'>
-                  Update the recipient username above to continue.
-                </p>
-              )}
             </Form>
           </Card>
         </motion.div>
@@ -485,9 +466,6 @@ export const GiftSubscriptionForm = ({
             <SparklesIcon className='h-5 w-5 text-purple-300' aria-hidden />
             <h2 className='text-lg font-medium text-gray-100'>What you&apos;re unlocking</h2>
           </div>
-          <p className='mt-1 text-sm text-gray-400'>
-            Everything in Free, plus the tools streamers actually feel on air.
-          </p>
           <ul className='mt-4 space-y-2.5'>
             {PRO_HIGHLIGHTS.map((feature) => (
               <li key={feature} className='flex items-start gap-2.5 text-sm text-gray-300'>

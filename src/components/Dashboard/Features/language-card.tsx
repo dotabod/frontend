@@ -1,6 +1,5 @@
-import { Button, Progress, Select, Spin } from 'antd'
+import { Button, Progress, Select } from 'antd'
 import { clsx } from 'clsx'
-import Image from 'next/image'
 import { forwardRef } from 'react'
 
 import NumberTicker from '@/components/magicui/number-ticker'
@@ -105,29 +104,6 @@ const LanguageCard = () => {
     return 0
   })
 
-  const UsedBy = () => (
-    <div className='mb-2 flex flex-row items-center space-x-1'>
-      <span>Used by</span>
-      {isLoading ? (
-        <Spin size='small' />
-      ) : (
-        <>
-          <NumberTicker value={data?.total ?? data?.percentage ?? 0} />
-          {!data?.total && data?.percentage && <span>% of</span>}
-        </>
-      )}
-      <span>dotabods</span>
-      <Image
-        className='inline align-bottom'
-        src='/images/emotes/peepofat.gif'
-        height={28}
-        width={28}
-        unoptimized
-        alt='peepofat'
-      />
-    </div>
-  )
-
   return (
     <Card>
       <div className='title'>
@@ -141,24 +117,9 @@ const LanguageCard = () => {
               <NumberTicker value={languageProgress?.data?.translationProgress || 0} />
               <span>% translated</span>
             </span>
-            {data?.total === 1 && (
-              <span>
-                You&apos;re the only one using this language
-                <Image
-                  className='inline align-bottom'
-                  src='https://cdn.7tv.app/emote/6293b16a3fae4eb13f5e5f60/2x.webp'
-                  height={28}
-                  width={28}
-                  alt='lonely'
-                />
-              </span>
-            )}
-            {data?.total !== 1 && <UsedBy />}
           </div>
         </div>
-      ) : (
-        <UsedBy />
-      )}
+      ) : null}
       <div>
         <Select
           showSearch

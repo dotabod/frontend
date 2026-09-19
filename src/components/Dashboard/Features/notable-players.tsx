@@ -33,14 +33,14 @@ const NotablePlayersCard = () => {
             <TierSwitch
               hideTierBadge
               settingKey={Settings.notablePlayersOverlayFlagsCmd}
-              label='Show country flags in !np twitch chat command'
+              label='Show country flags in !np'
             />
           </div>
           <div className='flex items-center'>
             <TierSwitch
               hideTierBadge
               settingKey={Settings.streamersNpSuffix}
-              label='Append count of other Dotabod streamers to !np (anonymized, no names)'
+              label='Add an anonymous streamer count to !np'
             />
           </div>
           <div className='flex items-center'>
@@ -53,10 +53,7 @@ const NotablePlayersCard = () => {
         </div>
       </div>
       <div
-        className={clsx(
-          'flex flex-col items-center space-y-4 transition-all',
-          !isEnabled && 'opacity-40',
-        )}
+        className={clsx('flex flex-col items-center transition-all', !isEnabled && 'opacity-40')}
       >
         <Image
           className={clsx('rounded-xl border-2 border-transparent transition-all')}
@@ -65,7 +62,6 @@ const NotablePlayersCard = () => {
           height={50}
           src='/images/dashboard/notable-players.png'
         />
-        <span>Players with their country flags</span>
       </div>
     </Card>
   )

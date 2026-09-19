@@ -14,7 +14,7 @@ export const Footer = () => (
             <Logomark className='h-10 w-auto flex-none fill-cyan-500' />
             <div className='ml-4'>
               <p className='text-base font-semibold'>Dotabod</p>
-              <p className='mt-1 text-sm'>Enhance Your Dota 2 Streaming Experience</p>
+              <p className='mt-1 text-sm'>Tools for Dota 2 streamers</p>
             </div>
           </div>
           <nav className='mt-11'>
@@ -32,10 +32,9 @@ export const Footer = () => (
             <p className='text-base font-semibold'>
               <Link href='/dashboard' prefetch={false} className='text-gray-200!'>
                 <span className='absolute inset-0 sm:rounded-2xl' />
-                <span>Be a better streamer</span>
+                <span>Open dashboard</span>
               </Link>
             </p>
-            <p className='mt-1 text-sm text-gray-300'>Login to our dashboard to get started.</p>
           </div>
         </div>
       </div>

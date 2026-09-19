@@ -78,10 +78,7 @@ const CommandsPage = () => {
       <Head>
         <title>Dotabod | Commands</title>
       </Head>
-      <Header
-        subtitle='An exhaustive list of all commands available using Twitch chat.'
-        title='Commands'
-      />
+      <Header title='Commands' />
 
       <div className='flex max-w-full flex-wrap items-baseline gap-y-2 sm:gap-x-6'>
         <Segmented

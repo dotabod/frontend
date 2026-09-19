@@ -19,10 +19,7 @@ const WhatsNewPage: NextPageWithLayout = () => {
       <Head>
         <title>Dotabod | What&apos;s new</title>
       </Head>
-      <Header
-        title="What's new"
-        subtitle='See what changed, try real examples, and choose which optional features run on your stream.'
-      />
+      <Header title="What's new" />
 
       <section
         aria-labelledby='new-feature-defaults'

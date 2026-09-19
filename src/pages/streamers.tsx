@@ -135,11 +135,6 @@ const StreamersPage: NextPageWithLayout<StreamersPageProps> = ({ live, roster })
 
       <header className='mb-8'>
         <h1 className='text-3xl font-bold text-gray-100 sm:text-4xl'>Dota 2 streamers</h1>
-        <p className='mt-2 max-w-2xl text-sm text-gray-400'>
-          Dota 2 streamers running Dotabod, grouped by rank. Jump to your bracket to find someone at
-          your level, or start at the top with the pros. The Live now section refreshes as streamers
-          go live.
-        </p>
         <p className='mt-3 text-sm text-gray-500'>
           {liveCount === 0
             ? 'No one is playing right now'

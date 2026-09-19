@@ -26,7 +26,7 @@ export const plans = [
       href: `/dashboard/billing?plan=${SUBSCRIPTION_TIERS.FREE}`,
       label: 'Get started for free',
     },
-    description: 'The core overlay, MMR tracking, and basic chat commands. No card required.',
+    description: 'Core overlays, MMR tracking, and basic chat commands.',
     featured: false,
     features: [
       'Automated setup (Dota 2)',
@@ -79,7 +79,6 @@ export const plans = [
       <span key='beta-features' className='flex items-center gap-1'>
         <StarOutlined className='text-yellow-500' /> Early access to beta features and updates
       </span>,
-      'And more! Browse the full list of features in the dashboard',
     ],
     hasTrial: true,
     logo: (
@@ -161,7 +160,7 @@ export const BillingPlans = ({ showTitle = true }: BillingPlansProps) => {
             <li aria-hidden className='text-gray-700'>
               ·
             </li>
-            <li>14 day free trial on Pro</li>
+            <li>14-day free trial on Pro</li>
             <li aria-hidden className='text-gray-700'>
               ·
             </li>

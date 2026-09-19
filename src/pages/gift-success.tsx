@@ -13,7 +13,6 @@ import type { NextPageWithLayout } from '@/pages/_app'
 import { Card } from '@/ui/card'
 
 const NEXT_STEPS = [
-  'The recipient gets a notification in their Twitch chat.',
   "New to Pro? They set up a subscription and your credits cover the gifted months, so they aren't charged until those run out.",
   'Already a Pro subscriber? Your credits stack onto their account and extend how long they keep Pro.',
 ]
@@ -163,7 +162,7 @@ const GiftSuccessPage: NextPageWithLayout<GiftSuccessProps> = ({
 
       <motion.div {...fadeUp(0.24)} className='mt-6'>
         <Card>
-          <h2 className='text-lg font-medium text-gray-100'>What happens next</h2>
+          <h2 className='text-lg font-medium text-gray-100'>How credits apply</h2>
           <ol className='mt-4 space-y-3'>
             {NEXT_STEPS.map((step, index) => (
               <li key={step} className='flex items-start gap-3 text-sm text-gray-300'>

@@ -53,8 +53,7 @@ export const chatterInfo = {
     message: (
       <span>Match data found !np · !smurfs · !gm · !lg · !avg · !items commands activated.</span>
     ),
-    tooltip:
-      'At the beginning of every match, once !np etc are ready. Usually when you first spawn in fountain.',
+    tooltip: 'When match commands become available.',
   },
   dotapatch: {
     category: CATEGORIES.Event,
@@ -193,8 +192,7 @@ export const chatterInfo = {
         />
       </span>
     ),
-    tooltip:
-      "Depending on whether you're playing turbo or normal, neutral items will be available at different times.",
+    tooltip: '',
   },
   noTp: {
     category: CATEGORIES.Item,
@@ -223,7 +221,7 @@ export const chatterInfo = {
         </div>
       </>
     ),
-    tooltip: 'If you dont have a tp within 30 seconds, you get a message',
+    tooltip: 'After 30 seconds without a TP.',
   },
   passiveDeath: {
     category: CATEGORIES.Item,
@@ -239,7 +237,7 @@ export const chatterInfo = {
         />
       </span>
     ),
-    tooltip: 'Whenever you die with passive stick / faerie / etc',
+    tooltip: 'When you die with an unused consumable.',
   },
   pause: {
     category: CATEGORIES.Item,
@@ -303,7 +301,7 @@ export const chatterInfo = {
         <span>Pudge is smoked!</span>
       </span>
     ),
-    tooltip: 'Whenever your hero has smoke debuff',
+    tooltip: 'When your hero is smoked.',
   },
   tip: {
     category: CATEGORIES.Event,

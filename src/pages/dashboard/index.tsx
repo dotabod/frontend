@@ -3,7 +3,6 @@ import confetti from 'canvas-confetti'
 import { Bitcoin } from 'lucide-react'
 import { useSession } from 'next-auth/react'
 import Head from 'next/head'
-import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useCallback, useEffect, useMemo } from 'react'
@@ -369,22 +368,7 @@ const SetupPage = () => {
       <Head>
         <title>Dotabod | Setup</title>
       </Head>
-      <Header
-        subtitle={
-          <div>
-            Let&apos;s get Dotabod working for you right away{' '}
-            <Image
-              src='/images/emotes/peepoclap.webp'
-              width={30}
-              unoptimized
-              className='inline'
-              height={30}
-              alt='peepo clap'
-            />
-          </div>
-        }
-        title='Setup'
-      />
+      <Header title='Setup' />
 
       <div className='mb-4'>
         <Progress

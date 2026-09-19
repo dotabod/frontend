@@ -2730,26 +2730,6 @@
         "severity": "error"
       }
     },
-    "055488e927c0bf69fd4039ca489125ce88cafeb17e61eb8d184b79c981659fee": {
-      "count": 1,
-      "summary": {
-        "code": "sonarjs(no-duplicate-string)",
-        "file": "src/components/Subscription/subscription-alerts.tsx",
-        "labels": [
-          {
-            "context": {
-              "current": "content: 'There was an issue applying your credits. Please try again or contact support.',",
-              "next": "duration: 5,",
-              "previous": "message.error({"
-            },
-            "span": "'There was an issue applying your credits. Please try again or contact support.'",
-            "text": ""
-          }
-        ],
-        "message": "Define a constant instead of duplicating this literal 3 times.",
-        "severity": "error"
-      }
-    },
     "05626222f284b2acf8191a1889f7add2af37e019fd7b7bac5d4f77bcc2b99bb5": {
       "count": 1,
       "summary": {
@@ -5006,26 +4986,6 @@
           }
         ],
         "message": "Unexpected nullable string value in conditional. Please handle the nullish and empty string cases explicitly.",
-        "severity": "error"
-      }
-    },
-    "09cf852bb3437bcaf308d99da31530adbfc3746740f58923a40ed8798373aeda": {
-      "count": 1,
-      "summary": {
-        "code": "eslint(no-nested-ternary)",
-        "file": "src/components/Dashboard/Features/auto-translate-card.tsx",
-        "labels": [
-          {
-            "context": {
-              "current": "{isChatTranslateEnabled && isOverlayTranslateEnabled",
-              "next": "? ' and displayed in chat and on your overlay.'",
-              "previous": "</strong>"
-            },
-            "span": "isChatTranslateEnabled && isOverlayTranslateEnabled\n                  ? ' and displayed in chat and on your overlay.'\n                  : isChatTranslateEnabled\n                    ? ' and displayed in chat.'\n                    : ' and displayed on your overlay.'",
-            "text": ""
-          }
-        ],
-        "message": "Do not nest ternary expressions.",
         "severity": "error"
       }
     },
@@ -10832,35 +10792,6 @@
           }
         ],
         "message": "Unsafe type assertion: type 'Response' is more narrow than the original type.",
-        "severity": "error"
-      }
-    },
-    "141861e042445d5f02e33e66a2391f47606cedb5c9cf4eb37987815dc6ba1e9d": {
-      "count": 1,
-      "summary": {
-        "code": "react(static-components)",
-        "file": "src/components/Dashboard/Features/language-card.tsx",
-        "labels": [
-          {
-            "context": {
-              "current": "{data?.total !== 1 && <UsedBy />}",
-              "next": "</div>",
-              "previous": ")}"
-            },
-            "span": "UsedBy",
-            "text": "This component is created during render"
-          },
-          {
-            "context": {
-              "current": "const UsedBy = () => (",
-              "next": "<div className='mb-2 flex flex-row items-center space-x-1'>",
-              "previous": ""
-            },
-            "span": "()",
-            "text": "The component is created during render here"
-          }
-        ],
-        "message": "Cannot create components during render",
         "severity": "error"
       }
     },
@@ -41609,26 +41540,6 @@
         "severity": "error"
       }
     },
-    "509d0260f1687c40142bcc991b7f245696a8fd61927da750568ddf08304a43b7": {
-      "count": 1,
-      "summary": {
-        "code": "sonarjs(no-nested-conditional)",
-        "file": "src/components/Dashboard/Features/auto-translate-card.tsx",
-        "labels": [
-          {
-            "context": {
-              "current": ": isChatTranslateEnabled",
-              "next": "? ' and displayed in chat.'",
-              "previous": "? ' and displayed in chat and on your overlay.'"
-            },
-            "span": "isChatTranslateEnabled\n                    ? ' and displayed in chat.'\n                    : ' and displayed on your overlay.'",
-            "text": ""
-          }
-        ],
-        "message": "Extract this nested ternary operation into an independent statement.",
-        "severity": "error"
-      }
-    },
     "50a3dffc312d0c37a8796d03150aa9fc23a51364c232d59361521e8a6d53eb03": {
       "count": 1,
       "summary": {
@@ -52288,26 +52199,6 @@
         "severity": "error"
       }
     },
-    "67ed91ca62470a2a59a2f22553a21dd8dedda22e839e2a5bfb38f7d53ef08abb": {
-      "count": 1,
-      "summary": {
-        "code": "typescript(strict-boolean-expressions)",
-        "file": "src/pages/dashboard/managers.tsx",
-        "labels": [
-          {
-            "context": {
-              "current": "if (session?.data?.user?.isImpersonating) {",
-              "next": "return <Tag color='green'>You are managing as a Mod</Tag>",
-              "previous": "const getUserRoleTag = () => {"
-            },
-            "span": "session?.data?.user?.isImpersonating",
-            "text": ""
-          }
-        ],
-        "message": "Unexpected nullable boolean value in conditional. Please handle the nullish case explicitly.",
-        "severity": "error"
-      }
-    },
     "67ef073c42ec438b3ac38fd5efec16e83136ac09d629c181701759ef5638c9e6": {
       "count": 1,
       "summary": {
@@ -58745,6 +58636,26 @@
           }
         ],
         "message": "Enforces a maximum number assertion calls in a test body.",
+        "severity": "error"
+      }
+    },
+    "74fad4c9adf9cd9e22948366d7ea0f6d9a9d2e303d211b592e5f6d32283cea76": {
+      "count": 1,
+      "summary": {
+        "code": "eslint(complexity)",
+        "file": "src/components/Dashboard/Features/language-card.tsx",
+        "labels": [
+          {
+            "context": {
+              "current": "const LanguageCard = () => {",
+              "next": "const { data: localeOption, loading: loadingLocale, update: updateLocale } = useUpdateLocale()",
+              "previous": ""
+            },
+            "span": "() => {\n  const { data: localeOption, loading: loadingLocale, update: updateLocale } = useUpdateLocale()\n\n  const languageId = localeOption?.locale ?? 'en-US'\n  const { isLoading, data } = useLanguageTranslations({\n    languageId,\n  })\n  const languageProgress = getLanguageProgress(\n    data && {\n      ...data,\n      // Provide default value of 0 for undefined total\n      total: data.total ?? 0,\n    },\n    languageId,\n  )\n\n  const arr = (data?.languageProgress ? Object.values(data.languageProgress) : []).map((x) => {\n    const fullLanguage = data?.project?.targetLanguages?.find((t) => t.id === x.data.languageId)\n\n    if (!fullLanguage) {\n      return {\n        id: 'en-US',\n        label: 'English',\n        value: 'en',\n      }\n    }\n\n    return {\n      id: fullLanguage.id,\n      label: data?.project?.targetLanguages ? fullLanguage.name : 'Unknown',\n      value: fullLanguage.locale,\n    }\n  })\n\n  arr.push({\n    id: 'en-US',\n    label: 'English',\n    value: 'en',\n  })\n\n  arr.sort((a, b) => {\n    // Ignore upper and lowercase\n    const nameA = a.label.toUpperCase()\n    // Ignore upper and lowercase\n    const nameB = b.label.toUpperCase()\n    if (nameA < nameB) {\n      return -1\n    }\n    if (nameA > nameB) {\n      return 1\n    }\n    return 0\n  })\n\n  return (\n    <Card>\n      <div className='title'>\n        <h3>Language</h3>\n      </div>\n      <div className='subtitle mb-2'>The @dotabod Twitch chat bot will speak in this language.</div>\n      {languageProgress?.data ? (\n        <div className='mt-4'>\n          <div className='flex flex-col sm:flex-row sm:items-center sm:justify-between'>\n            <span>\n              <NumberTicker value={languageProgress?.data?.translationProgress || 0} />\n              <span>% translated</span>\n            </span>\n          </div>\n        </div>\n      ) : null}\n      <div>\n        <Select\n          showSearch\n          filterOption={(input, option) =>\n            option\n              ? (arr.find((a) => a.value === option.value)?.label ?? '')\n                  .toLowerCase()\n                  .includes(input?.toLowerCase() ?? '')\n              : false\n          }\n          loading={loadingLocale || isLoading}\n          placeholder='Language selector'\n          className='w-full transition-all'\n          options={arr.map((x) => ({\n            label: (\n              <SelectItem\n                label={x.label}\n                code={x.id}\n                translation={getLanguageProgress(\n                  data && {\n                    ...data,\n                    total: data.total ?? 0,\n                  },\n                  x.value,\n                )}\n              />\n            ),\n            value: x.value,\n          }))}\n          value={localeOption?.locale}\n          onChange={(value) => {\n            updateLocale(value)\n          }}\n        />\n      </div>\n\n      <div className='mt-2'>\n        <Button\n          loading={isLoading}\n          href='https://crowdin.com/project/dotabod'\n          target='_blank'\n          type='link'\n        >\n          {languageProgress?.data?.translationProgress !== null &&\n          languageProgress?.data?.translationProgress !== undefined &&\n          languageProgress.data.translationProgress < 100\n            ? 'Help complete on Crowdin'\n            : 'Fix locale issues on Crowdin'}\n        </Button>\n      </div>\n    </Card>\n  )\n}",
+            "text": ""
+          }
+        ],
+        "message": "function has a complexity of 21. Maximum allowed is 20.",
         "severity": "error"
       }
     },
@@ -80484,26 +80395,6 @@
         "severity": "error"
       }
     },
-    "9fc44b70cebc350d0081f4390612065befa311de0021f68767a7e3de75ad23cd": {
-      "count": 1,
-      "summary": {
-        "code": "typescript(strict-boolean-expressions)",
-        "file": "src/components/Dashboard/Features/language-card.tsx",
-        "labels": [
-          {
-            "context": {
-              "current": "{!data?.total && data?.percentage && <span>% of</span>}",
-              "next": "</>",
-              "previous": "<NumberTicker value={data?.total ?? data?.percentage ?? 0} />"
-            },
-            "span": "data?.percentage",
-            "text": ""
-          }
-        ],
-        "message": "Unexpected nullable number value in conditional. Please handle the nullish and zero cases explicitly.",
-        "severity": "error"
-      }
-    },
     "9fc5a8641cde06c0f7847586b67367362c2c193231b5836d95466335ab33c929": {
       "count": 1,
       "summary": {
@@ -89729,26 +89620,6 @@
         "severity": "error"
       }
     },
-    "b2ca34720da4022ef6f20849c2ac463a20dc855ed75de08f531c8d815b4162ab": {
-      "count": 1,
-      "summary": {
-        "code": "react(no-unstable-nested-components)",
-        "file": "src/components/Dashboard/Features/language-card.tsx",
-        "labels": [
-          {
-            "context": {
-              "current": "const UsedBy = () => (",
-              "next": "<div className='mb-2 flex flex-row items-center space-x-1'>",
-              "previous": ""
-            },
-            "span": "() => (\n    <div className='mb-2 flex flex-row items-center space-x-1'>\n      <span>Used by</span>\n      {isLoading ? (\n        <Spin size='small' />\n      ) : (\n        <>\n          <NumberTicker value={data?.total ?? data?.percentage ?? 0} />\n          {!data?.total && data?.percentage && <span>% of</span>}\n        </>\n      )}\n      <span>dotabods</span>\n      <Image\n        className='inline align-bottom'\n        src='/images/emotes/peepofat.gif'\n        height={28}\n        width={28}\n        unoptimized\n        alt='peepofat'\n      />\n    </div>\n  )",
-            "text": ""
-          }
-        ],
-        "message": "Do not define components during render.",
-        "severity": "error"
-      }
-    },
     "b2e079267233a874a4b01593631bcd24218a4d3056aa9178a21fe8045d6467f9": {
       "count": 1,
       "summary": {
@@ -91285,35 +91156,6 @@
         "severity": "error"
       }
     },
-    "b662ee9d108c656009f22658912e7ee6a157c13f8806f25a37ba29be502af4dd": {
-      "count": 1,
-      "summary": {
-        "code": "react(static-components)",
-        "file": "src/components/Dashboard/Features/language-card.tsx",
-        "labels": [
-          {
-            "context": {
-              "current": "<UsedBy />",
-              "next": ")}",
-              "previous": ") : ("
-            },
-            "span": "UsedBy",
-            "text": "This component is created during render"
-          },
-          {
-            "context": {
-              "current": "const UsedBy = () => (",
-              "next": "<div className='mb-2 flex flex-row items-center space-x-1'>",
-              "previous": ""
-            },
-            "span": "()",
-            "text": "The component is created during render here"
-          }
-        ],
-        "message": "Cannot create components during render",
-        "severity": "error"
-      }
-    },
     "b6695b6f2e8bdd5eff120d4be1d2896089feb1820853a6005f60636172d73a55": {
       "count": 1,
       "summary": {
@@ -91560,26 +91402,6 @@
           }
         ],
         "message": "Unsafe assertion from `any` detected: consider using type guards or a safer assertion.",
-        "severity": "error"
-      }
-    },
-    "b6f9b05839da363a95a476a53b88af4768548a9c504769442da16e00f6fe971c": {
-      "count": 1,
-      "summary": {
-        "code": "typescript(strict-boolean-expressions)",
-        "file": "src/pages/dashboard/managers.tsx",
-        "labels": [
-          {
-            "context": {
-              "current": "if (session?.data?.user?.isImpersonating) {",
-              "next": "return \"You are currently managing a streamer's dashboard.\"",
-              "previous": "const getSubtitleText = () => {"
-            },
-            "span": "session?.data?.user?.isImpersonating",
-            "text": ""
-          }
-        ],
-        "message": "Unexpected nullable boolean value in conditional. Please handle the nullish case explicitly.",
         "severity": "error"
       }
     },
@@ -92192,26 +92014,6 @@
         "severity": "error"
       }
     },
-    "b87abc27556428d2f5c6ca11fdae2fcbf8ad5bfbca2eb6a34a4f2a71f8f13606": {
-      "count": 1,
-      "summary": {
-        "code": "typescript(strict-boolean-expressions)",
-        "file": "src/components/Dashboard/Features/language-card.tsx",
-        "labels": [
-          {
-            "context": {
-              "current": "{!data?.total && data?.percentage && <span>% of</span>}",
-              "next": "</>",
-              "previous": "<NumberTicker value={data?.total ?? data?.percentage ?? 0} />"
-            },
-            "span": "data?.total",
-            "text": ""
-          }
-        ],
-        "message": "Unexpected nullable number value in conditional. Please handle the nullish and zero cases explicitly.",
-        "severity": "error"
-      }
-    },
     "b87bedc9cdc954d5d7a9449538281d30c5581fc9e1850d51d80b73ff87feb668": {
       "count": 1,
       "summary": {
@@ -92529,26 +92331,6 @@
           }
         ],
         "message": "Unsafe member access ._getJSONData on an `error` typed value.",
-        "severity": "error"
-      }
-    },
-    "b9bdd05190f73427fc2ef748175be4426a0731720fd5770c339531359ee42790": {
-      "count": 1,
-      "summary": {
-        "code": "typescript(strict-boolean-expressions)",
-        "file": "src/components/Gift/GiftSubscriptionForm/gift-subscription-form.tsx",
-        "labels": [
-          {
-            "context": {
-              "current": "{usernameError && (",
-              "next": "<p className='mt-2 text-center text-xs text-gray-500'>",
-              "previous": "</Button>"
-            },
-            "span": "usernameError",
-            "text": ""
-          }
-        ],
-        "message": "Unexpected nullable string value in conditional. Please handle the nullish and empty string cases explicitly.",
         "severity": "error"
       }
     },
@@ -97342,26 +97124,6 @@
           }
         ],
         "message": "Unexpected nullable boolean value in conditional. Please handle the nullish case explicitly.",
-        "severity": "error"
-      }
-    },
-    "c365d4618514bdfe0f35caebb8c0374e8b3beff26d3ddda4b78b9c1d2ef5ae77": {
-      "count": 1,
-      "summary": {
-        "code": "eslint(complexity)",
-        "file": "src/components/Dashboard/Features/language-card.tsx",
-        "labels": [
-          {
-            "context": {
-              "current": "const LanguageCard = () => {",
-              "next": "const { data: localeOption, loading: loadingLocale, update: updateLocale } = useUpdateLocale()",
-              "previous": ""
-            },
-            "span": "() => {\n  const { data: localeOption, loading: loadingLocale, update: updateLocale } = useUpdateLocale()\n\n  const languageId = localeOption?.locale ?? 'en-US'\n  const { isLoading, data } = useLanguageTranslations({\n    languageId,\n  })\n  const languageProgress = getLanguageProgress(\n    data && {\n      ...data,\n      // Provide default value of 0 for undefined total\n      total: data.total ?? 0,\n    },\n    languageId,\n  )\n\n  const arr = (data?.languageProgress ? Object.values(data.languageProgress) : []).map((x) => {\n    const fullLanguage = data?.project?.targetLanguages?.find((t) => t.id === x.data.languageId)\n\n    if (!fullLanguage) {\n      return {\n        id: 'en-US',\n        label: 'English',\n        value: 'en',\n      }\n    }\n\n    return {\n      id: fullLanguage.id,\n      label: data?.project?.targetLanguages ? fullLanguage.name : 'Unknown',\n      value: fullLanguage.locale,\n    }\n  })\n\n  arr.push({\n    id: 'en-US',\n    label: 'English',\n    value: 'en',\n  })\n\n  arr.sort((a, b) => {\n    // Ignore upper and lowercase\n    const nameA = a.label.toUpperCase()\n    // Ignore upper and lowercase\n    const nameB = b.label.toUpperCase()\n    if (nameA < nameB) {\n      return -1\n    }\n    if (nameA > nameB) {\n      return 1\n    }\n    return 0\n  })\n\n  const UsedBy = () => (\n    <div className='mb-2 flex flex-row items-center space-x-1'>\n      <span>Used by</span>\n      {isLoading ? (\n        <Spin size='small' />\n      ) : (\n        <>\n          <NumberTicker value={data?.total ?? data?.percentage ?? 0} />\n          {!data?.total && data?.percentage && <span>% of</span>}\n        </>\n      )}\n      <span>dotabods</span>\n      <Image\n        className='inline align-bottom'\n        src='/images/emotes/peepofat.gif'\n        height={28}\n        width={28}\n        unoptimized\n        alt='peepofat'\n      />\n    </div>\n  )\n\n  return (\n    <Card>\n      <div className='title'>\n        <h3>Language</h3>\n      </div>\n      <div className='subtitle mb-2'>The @dotabod Twitch chat bot will speak in this language.</div>\n      {languageProgress?.data ? (\n        <div className='mt-4'>\n          <div className='flex flex-col sm:flex-row sm:items-center sm:justify-between'>\n            <span>\n              <NumberTicker value={languageProgress?.data?.translationProgress || 0} />\n              <span>% translated</span>\n            </span>\n            {data?.total === 1 && (\n              <span>\n                You&apos;re the only one using this language\n                <Image\n                  className='inline align-bottom'\n                  src='https://cdn.7tv.app/emote/6293b16a3fae4eb13f5e5f60/2x.webp'\n                  height={28}\n                  width={28}\n                  alt='lonely'\n                />\n              </span>\n            )}\n            {data?.total !== 1 && <UsedBy />}\n          </div>\n        </div>\n      ) : (\n        <UsedBy />\n      )}\n      <div>\n        <Select\n          showSearch\n          filterOption={(input, option) =>\n            option\n              ? (arr.find((a) => a.value === option.value)?.label ?? '')\n                  .toLowerCase()\n                  .includes(input?.toLowerCase() ?? '')\n              : false\n          }\n          loading={loadingLocale || isLoading}\n          placeholder='Language selector'\n          className='w-full transition-all'\n          options={arr.map((x) => ({\n            label: (\n              <SelectItem\n                label={x.label}\n                code={x.id}\n                translation={getLanguageProgress(\n                  data && {\n                    ...data,\n                    total: data.total ?? 0,\n                  },\n                  x.value,\n                )}\n              />\n            ),\n            value: x.value,\n          }))}\n          value={localeOption?.locale}\n          onChange={(value) => {\n            updateLocale(value)\n          }}\n        />\n      </div>\n\n      <div className='mt-2'>\n        <Button\n          loading={isLoading}\n          href='https://crowdin.com/project/dotabod'\n          target='_blank'\n          type='link'\n        >\n          {languageProgress?.data?.translationProgress !== null &&\n          languageProgress?.data?.translationProgress !== undefined &&\n          languageProgress.data.translationProgress < 100\n            ? 'Help complete on Crowdin'\n            : 'Fix locale issues on Crowdin'}\n        </Button>\n      </div>\n    </Card>\n  )\n}",
-            "text": ""
-          }
-        ],
-        "message": "function has a complexity of 25. Maximum allowed is 20.",
         "severity": "error"
       }
     },
@@ -120625,26 +120387,6 @@
           }
         ],
         "message": "Unsafe argument of type any assigned to a parameter of type { expires: string; user: { name: string; email?: string | null | undefined; image: string; isImpersonating: boolean; twitchId: string; role?: \"admin\" | \"bot\" | \"chatter\" | \"user\" | undefined; locale: string; scope: string; id: string; }; } | null.",
-        "severity": "error"
-      }
-    },
-    "ef9372829accd28c0e8ccd0b2b359b7a9611500460f629f4c76740365f6ecea1": {
-      "count": 1,
-      "summary": {
-        "code": "react-doctor(no-nested-component-definition)",
-        "file": "src/components/Dashboard/Features/language-card.tsx",
-        "labels": [
-          {
-            "context": {
-              "current": "const UsedBy = () => (",
-              "next": "<div className='mb-2 flex flex-row items-center space-x-1'>",
-              "previous": ""
-            },
-            "span": "UsedBy",
-            "text": ""
-          }
-        ],
-        "message": "Your users lose all state in \"UsedBy\" on every render because it's defined inside \"LanguageCard\", so move it out to the top of the file.",
         "severity": "error"
       }
     },

@@ -130,16 +130,13 @@ const Login: NextPageWithLayout = () => {
         <div style={{ maxWidth: '32rem', width: '100%' }}>
           <div style={{ marginBottom: '2rem', textAlign: 'center' }}>
             <Typography.Title level={2}>Sign in</Typography.Title>
-            <Typography.Paragraph style={{ color: 'var(--color-dark-300)', fontSize: '1.125rem' }}>
-              You can begin using Dotabod right away!
-            </Typography.Paragraph>
           </div>
           <div>
             <UserAuthForm />
             <Typography.Paragraph style={{ marginTop: '1rem', textAlign: 'center' }}>
-              Not a streamer? If you just want to become Dotabod Verified to show your rank in chat,{' '}
+              Only linking Steam for rank commands?{' '}
               <Link href='/verify' prefetch={false}>
-                login here
+                Verify your account
               </Link>
             </Typography.Paragraph>
           </div>

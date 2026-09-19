@@ -29,10 +29,6 @@ export const GiftPreview = ({ senderName, giftMessage }: GiftPreviewProps) => {
   return (
     <Card className='h-full'>
       <h2 className='text-lg font-medium text-gray-100'>How it lands in their chat</h2>
-      <p className='mt-1 text-sm text-gray-400'>
-        This updates live as you fill out the form. Here&apos;s the message your gift posts in the
-        streamer&apos;s Twitch chat.
-      </p>
 
       <div className='mt-5'>
         <span className='mb-2 block text-xs font-medium tracking-[0.2em] text-gray-500 uppercase'>

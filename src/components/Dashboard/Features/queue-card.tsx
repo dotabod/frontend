@@ -25,7 +25,7 @@ const QueueCard = () => {
   return (
     <Card title='Queue blocker' feature='queueBlockerFindMatchText'>
       <div className='subtitle'>
-        Stream snipers won&apos;t know what your queue time is to be able to snipe you.
+        Hides the Play Dota and Finding Match indicators so viewers cannot infer your queue time.
       </div>
       <div className='mt-5 flex items-center space-x-2'>
         <TierSwitch
@@ -76,11 +76,6 @@ const QueueCard = () => {
           </Form.Item>
         </Form>
       </Spin>
-
-      <div>
-        Both the &quot;PLAY DOTA&quot; in the bottom right, and the &quot;Finding match&quot; at the
-        top left while in main menu will be blocked.
-      </div>
       <div
         className={clsx(
           'mt-2 flex flex-col items-center space-y-12 transition-all',

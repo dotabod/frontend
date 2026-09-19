@@ -31,11 +31,7 @@ const BetsCard = () => {
 
   return (
     <Card title='Twitch predictions' feature='bets'>
-      <div className='subtitle'>Let your chatters bet on your matches.</div>
-      <div>
-        Chatters can use their native Twitch channel points to bet on whether you win or lose a
-        match.
-      </div>
+      <div>Viewers use Twitch channel points to predict whether you win or lose.</div>
       <div className='mt-5 flex items-center space-x-2'>
         <TierSwitch hideTierBadge settingKey={Settings.bets} label='Enable auto gamba' />
       </div>
@@ -112,7 +108,7 @@ const BetsCard = () => {
             </Form.Item>
           </Form>
         </Spin>
-        <div className='flex flex-col items-center space-y-4'>
+        <div className='flex flex-col items-center'>
           <Image
             alt='bets image'
             width={425}
@@ -120,7 +116,6 @@ const BetsCard = () => {
             src='https://i.imgur.com/8ZsUxJR.png'
             className='bg-gray-500'
           />
-          <span>Customize the prediction title and answers.</span>
         </div>
       </div>
     </Card>

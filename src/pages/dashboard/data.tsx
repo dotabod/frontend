@@ -117,10 +117,7 @@ const DataPage = () => {
       <Head>
         <title>Dotabod | Your data</title>
       </Head>
-      <Header
-        subtitle='Download a copy of everything we have about your account, or delete it for good. Both are one-click and you stay in control.'
-        title='Your data'
-      />
+      <Header title='Your data' />
 
       <div className='grid grid-cols-1 gap-6 md:grid-cols-1 lg:grid-cols-2'>
         <Card title={<span>Export your data</span>}>
@@ -151,16 +148,6 @@ const DataPage = () => {
             Permanently removes everything we have about your account. You can&apos;t undo this.
           </div>
           <Space direction='vertical' className='w-full' size='large'>
-            <Text>This will:</Text>
-            <ul className='list-disc pl-4'>
-              <li>Erase your profile and settings</li>
-              <li>Disconnect Twitch and Steam</li>
-              <li>Cancel any active Dotabod subscription</li>
-              <li>Delete your saved Dota 2 match history</li>
-              <li>Remove approved team managers</li>
-              <li>Invalidate your overlay URL and Dota 2 token</li>
-              <li>Delete your Stripe customer record</li>
-            </ul>
             <Button
               key='delete'
               danger

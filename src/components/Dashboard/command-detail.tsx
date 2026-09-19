@@ -90,8 +90,7 @@ const CommandDetail: Record<
     alias: [],
     allowed: 'all',
     cmd: '!commands',
-    description:
-      'All available commands with Dotabod. This list is filtered to only the commands you enabled. If a mod uses !commands, it will show mod only commands as well.',
+    description: 'Lists enabled commands. Moderators also see moderator-only commands.',
     key: 'commandCommands',
     response: (props) => (
       <TwitchChat
@@ -137,7 +136,7 @@ const CommandDetail: Record<
         {...props}
         modOnly
         command='!toggle'
-        response='Dotabod is now disabled. Will no longer respond to commands nor watch game events. Type !toggle again to enable.'
+        response='Dotabod is disabled and will not respond to commands or game events. Type !toggle again to enable it.'
       />
     ),
     title: 'Disable Dotabod',
@@ -236,8 +235,7 @@ const CommandDetail: Record<
     alias: [],
     allowed: 'all',
     cmd: '!gpm',
-    description:
-      'At any time, chatters can request your live gold per minute with !gpm. Playing alch or anti-mage? Show off your gpm!',
+    description: 'Shows your live gold per minute.',
     key: 'commandGPM',
     response: (props) => (
       <TwitchChat
@@ -396,8 +394,7 @@ const CommandDetail: Record<
     alias: ['rank', 'medal'],
     allowed: 'all',
     cmd: '!mmr',
-    description:
-      'Using chat command !mmr, viewers can get an accurate mmr update in chat. Auto updates immediately with every match!',
+    description: 'Shows your current MMR and updates after each match.',
     key: 'commandMmr',
     response: (props) => (
       <TwitchChat
@@ -602,8 +599,7 @@ const CommandDetail: Record<
     alias: [],
     allowed: 'mods',
     cmd: '!pleb',
-    description:
-      'When you have sub only mode turned on, use !pleb to let one non-sub send a message. Then all your subs can point and laugh 😂.',
+    description: 'Lets one non-subscriber send a message while subscriber-only mode is active.',
     key: 'commandPleb',
     response: (props) => (
       <TwitchChat {...props} modOnly command='!pleb' response='One pleb IN 👇' />
@@ -697,7 +693,7 @@ const CommandDetail: Record<
     allowed: 'all',
     cmd: '!set',
     description:
-      "Shows your current hero's equipped cosmetics with a link to your public collection page, on demand. This is separate from the automatic hero-pick announcement — turn that on or off under Chat features → New features (the “Cosmetic set announcements” toggle).",
+      "Shows your current hero's cosmetics and links to your public collection. The automatic hero-pick announcement has a separate toggle under Chat features.",
     key: 'commandSet',
     response: (props) => (
       <TwitchChat
@@ -810,8 +806,7 @@ const CommandDetail: Record<
     alias: [],
     allowed: 'all',
     cmd: '!streamers',
-    description:
-      'Anonymously tells chat how many other Dotabod streamers are in your current match. No names are shown to avoid cross-chat drama.',
+    description: 'Shows how many other Dotabod streamers are in the match without naming them.',
     key: 'commandStreamers',
     response: (props) => (
       <TwitchChat

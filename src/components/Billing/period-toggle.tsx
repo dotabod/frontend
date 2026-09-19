@@ -29,9 +29,6 @@ export const PeriodToggle = ({ activePeriod, onChange }: PeriodToggleProps) => {
 
   return (
     <div className='flex w-full max-w-sm flex-col items-center sm:w-auto sm:max-w-none'>
-      <span aria-hidden className='mb-2 text-xs text-gray-500'>
-        Billing
-      </span>
       <LayoutGroup id={groupId}>
         <fieldset className='relative grid w-full grid-cols-3 gap-1 rounded-lg border border-gray-800 bg-gray-900/60 p-1 sm:w-auto'>
           <legend className='sr-only'>Billing</legend>

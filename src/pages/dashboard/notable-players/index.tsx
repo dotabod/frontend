@@ -115,7 +115,7 @@ const NotablePlayersPage: NextPageWithLayout = () => {
         if (!response.ok) {
           throw new Error('Failed to update notable player')
         }
-        messageApi.success('Player updated successfully')
+        messageApi.success('Player updated')
       } else {
         // Create new player
         const response = await fetch('/api/notable-players', {
@@ -132,7 +132,7 @@ const NotablePlayersPage: NextPageWithLayout = () => {
           }
           throw new Error(errorData.error ?? 'Failed to create notable player')
         }
-        messageApi.success('Player added successfully')
+        messageApi.success('Player added')
       }
 
       setIsModalOpen(false)
@@ -163,7 +163,7 @@ const NotablePlayersPage: NextPageWithLayout = () => {
         throw new Error('Failed to delete notable player')
       }
 
-      messageApi.success('Player deleted successfully')
+      messageApi.success('Player deleted')
       void fetchNotablePlayers()
     } catch (error) {
       console.error('Error deleting notable player:', error)
@@ -338,18 +338,18 @@ const NotablePlayersPage: NextPageWithLayout = () => {
         >
           <Form.Item
             name='account_id'
-            label='Account ID*'
+            label='Account ID'
             rules={[{ message: 'Account ID is required', required: true }]}
           >
-            <Input type='number' placeholder='Enter Dota 2 account ID' disabled={isEditMode} />
+            <Input type='number' disabled={isEditMode} />
           </Form.Item>
 
           <Form.Item
             name='name'
-            label='Player Name*'
+            label='Player name'
             rules={[{ message: 'Player name is required', required: true }]}
           >
-            <Input placeholder='Enter player name' maxLength={50} showCount />
+            <Input maxLength={50} showCount />
           </Form.Item>
 
           <Form.Item
@@ -358,21 +358,20 @@ const NotablePlayersPage: NextPageWithLayout = () => {
             help={
               <div>
                 <Text type='secondary'>
-                  Enter the 2-letter ISO country code (e.g., us, ru, cn). This will display the
-                  country flag next to the player&apos;s name.
+                  Adds the player&apos;s country flag.{' '}
                   <a
                     href='https://www.iban.com/country-codes'
                     target='_blank'
                     rel='noopener noreferrer'
                     className='ml-1'
                   >
-                    View all country codes
+                    View ISO country codes
                   </a>
                 </Text>
               </div>
             }
           >
-            <Input placeholder='e.g. us, ru, cn' maxLength={2} />
+            <Input placeholder='e.g. us' maxLength={2} />
           </Form.Item>
 
           <div className='flex justify-end gap-4 pt-4'>
