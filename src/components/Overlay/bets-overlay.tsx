@@ -12,11 +12,7 @@ const BetsOverlay = () => {
 
   return (
     <Card title='Twitch predictions' feature='livePolls'>
-      <div className='subtitle'>Let your chatters bet on your matches.</div>
-      <div>
-        Chatters can use their native Twitch channel points to bet on whether you win or lose a
-        match.
-      </div>
+      <div>Viewers use Twitch channel points to predict whether you win or lose.</div>
       <div className='mt-5 flex items-center space-x-2'>
         <TierSwitch
           hideTierBadge

@@ -82,15 +82,13 @@ const ModeratorsPage = () => {
       // Re-fetch approved moderators
       void mutate()
       notification.success({
-        description: 'Managers updated successfully!',
-        message: 'Success',
+        message: 'Managers updated',
       })
       track('approve_moderators_success')
     } catch (error) {
       console.error('Failed to approve moderators:', error)
       notification.error({
-        description: 'Failed to approve moderators.',
-        message: 'Error',
+        message: 'Could not update managers',
       })
       track('approve_moderators_failure', {
         error: error instanceof Error ? error.message : String(error),
@@ -106,36 +104,12 @@ const ModeratorsPage = () => {
     return null
   }
 
-  // Helper function to determine user role for UI display
-  const getUserRoleTag = () => {
-    if (session?.data?.user?.isImpersonating) {
-      return <Tag color='green'>You are managing as a Mod</Tag>
-    }
-    return null
-  }
-
-  // Helper function to get appropriate subtitle based on user role
-  const getSubtitleText = () => {
-    if (session?.data?.user?.isImpersonating) {
-      return "You are currently managing a streamer's dashboard."
-    }
-    return 'Below is a list of moderators for your channel. You can approve them to manage your Dotabod settings.'
-  }
-
   return (
     <>
       <Head>
         <title>Dotabod | Managers</title>
       </Head>
-      <Header
-        subtitle={
-          <div className='flex items-center gap-2'>
-            <span>{getSubtitleText()}</span>
-            {getUserRoleTag()}
-          </div>
-        }
-        title='Managers'
-      />
+      <Header title='Managers' />
 
       {/* Show the mod card for mods who haven't selected a streamer yet */}
       {!session?.data?.user?.isImpersonating && (
@@ -160,22 +134,13 @@ const ModeratorsPage = () => {
       {!session?.data?.user?.isImpersonating && (
         <ErrorBoundary>
           <Card
-            title={
-              <div className='flex items-center gap-2'>
-                Approve Managers <Tag color='red'>For Streamer</Tag>
-              </div>
-            }
+            title={<div className='flex items-center gap-2'>Approve managers</div>}
             feature='managers'
           >
             <div className='subtitle'>
               <p>
-                By approving a user, you&apos;re allowing them to access and modify your Dotabod
-                dashboard. Approved managers can manage features, toggle commands, and update
-                settings on your behalf.
-              </p>
-              <p>
-                Note: They will not have access to your setup page, downloading the GSI cfg, nor
-                overlay URL.
+                Managers can change features, commands, and settings. They cannot access setup,
+                download the GSI config, or view your overlay URL.
               </p>
             </div>
 
@@ -213,40 +178,12 @@ const ModeratorsPage = () => {
                 loading={loading}
                 disabled={!tierAccess.hasAccess}
               >
-                Submit
+                Save managers
               </Button>
             </div>
           </Card>
         </ErrorBoundary>
       )}
-
-      <ErrorBoundary>
-        <Card>
-          <div className='title'>
-            <h3>What is this?</h3>
-          </div>
-          <div className=''>
-            <p className='mb-4'>
-              <Tag color='red'>For Streamer</Tag> Once you approve a user, they will login to
-              dotabod.com and be able to access your dashboard by using the selectbox at the top of
-              this page. Approved managers can view and modify your settings, commands, and other
-              dashboard features. This is useful for streamers who want to delegate some of their
-              Dotabod management to trusted moderators or team members. You can revoke access at any
-              time by removing them from the approved list above.
-            </p>
-            <p className='mb-4'>
-              <Tag color='blue'>For Mods</Tag> As a mod, you can manage streamers who have approved
-              you. Use the selector above to choose which streamer&apos;s dashboard you want to
-              manage.
-            </p>
-            <p>
-              <Tag color='green'>For Managing Mods</Tag> When managing a streamer&apos;s account,
-              you&apos;ll see a badge indicating you&apos;re accessing the streamer&apos;s account,
-              and any changes you make will be applied to the streamer&apos;s Dotabod configuration.
-            </p>
-          </div>
-        </Card>
-      </ErrorBoundary>
     </>
   )
 }

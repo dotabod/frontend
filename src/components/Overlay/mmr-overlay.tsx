@@ -15,10 +15,6 @@ const MmrOverlay = () => {
 
   return (
     <Card title='Rank and mmr'>
-      <div className='subtitle'>
-        Wouldn&apos;t it be nice to show your friends how good you are?
-      </div>
-
       <div className={clsx('py-4 transition-all')}>
         <div className='flex flex-col items-start space-y-2 md:space-y-3'>
           <div className='flex items-center space-x-2'>
@@ -49,14 +45,13 @@ const MmrOverlay = () => {
       </div>
 
       <div className={clsx('transition-all')}>
-        <div className='flex flex-col items-center space-y-4'>
+        <div className='flex flex-col items-center'>
           <Image
             alt='mmr tracker'
             width={534}
             height={82}
             src='/images/dashboard/mmr-tracker.png'
           />
-          <span>Correct badge and MMR shown next to shop button</span>
         </div>
       </div>
     </Card>

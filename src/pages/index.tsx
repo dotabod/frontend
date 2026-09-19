@@ -24,13 +24,13 @@ Index.getLayout = function getLayout(page: ReactElement) {
       seo={{
         canonicalUrl: 'https://dotabod.com',
         description:
-          'Dotabod provides Dota 2 streamers with a suite of tools, including automatic Twitch predictions, minimap & hero blocker, OBS scene switcher, chat commands, MMR tracking, live stats, and more to elevate your streaming experience!',
-        title: 'Enhance Your Dota 2 Streaming Experience',
+          'Tools for Dota 2 streamers: Twitch predictions, anti-snipe overlays, chat commands, MMR tracking, and live stats.',
+        title: 'Dotabod — Tools for Dota 2 streamers',
       }}
       ogImage={{
         subtitle:
-          'Dotabod provides Dota 2 streamers with a suite of tools, including automatic Twitch predictions, minimap & hero blocker, OBS scene switcher, chat commands, MMR tracking, live stats, and more to elevate your streaming experience!',
-        title: 'Enhance Your Dota 2 Streaming Experience',
+          'Twitch predictions, anti-snipe overlays, chat commands, MMR tracking, and live stats.',
+        title: 'Tools for Dota 2 streamers',
       }}
     >
       {page}

@@ -1,5 +1,4 @@
 import Head from 'next/head'
-import Image from 'next/image'
 import type { ReactElement } from 'react'
 
 import DashboardShell from '@/components/Dashboard/dashboard-shell'
@@ -17,20 +16,7 @@ const FeaturesPage: NextPageWithLayout = () => (
       <title>Dotabod | Advanced features</title>
     </Head>
 
-    <Header
-      subtitle={
-        <div className='flex flex-row items-center space-x-2'>
-          <span>Looking for even more? They&apos;ll be here</span>
-          <Image
-            src='https://cdn.7tv.app/emote/63071b80942ffb69e13d700f/1x.webp'
-            width={24}
-            height={24}
-            alt='Krappa'
-          />
-        </div>
-      }
-      title='Advanced features'
-    />
+    <Header title='Advanced features' />
 
     <ErrorBoundary>
       <ClippingCard />

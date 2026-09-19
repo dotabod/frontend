@@ -83,10 +83,7 @@ const BillingPage = () => {
         <title>Dotabod | Billing</title>
       </Head>
 
-      <Header
-        title='Billing'
-        subtitle='Your current plan, renewal date, and a shortcut to Stripe for payment details and invoices.'
-      />
+      <Header title='Billing' />
 
       <div className='space-y-4'>
         <PaymentStatusAlert />

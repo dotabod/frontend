@@ -379,9 +379,6 @@ const MatchHistoryPage = ({
                     <h1 className='text-3xl font-semibold tracking-tight text-gray-100 sm:text-4xl'>
                       Match history
                     </h1>
-                    <p className='mt-2 max-w-2xl text-sm leading-6 text-gray-400'>
-                      Streamed matches, results, and hero performance tracked by Dotabod.
-                    </p>
                   </div>
                   {oldestTrackedLabel && (
                     <p className='text-xs text-gray-400 tabular-nums sm:pb-1'>

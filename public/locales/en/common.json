@@ -1,8 +1,8 @@
 {
   "hero": {
-    "watch": "Watch me make Dotabod",
-    "title": "Welcome, streamer",
-    "description": "Dotabod is the all-in-one toolkit that transforms your Dota 2 stream, providing real-time stats, automated Twitch predictions, and intelligent overlays that engage your audience effortlessly."
+    "watch": "Watch Dotabod being built",
+    "title": "Tools for Dota 2 streamers",
+    "description": "Twitch predictions, anti-snipe overlays, chat commands, MMR tracking, and live stats."
   },
   "live": "Live"
 }

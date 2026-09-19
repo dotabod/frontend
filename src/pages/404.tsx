@@ -90,7 +90,7 @@ const NotFound: NextPageWithLayout = () => {
             <span className='text-7xl font-bold'>404</span>
           </div>
           <h1 className='mt-4 text-3xl font-bold tracking-tight text-white sm:text-5xl'>
-            Oops! Page not found
+            Page not found
           </h1>
           <p className='mt-6 text-base leading-7 text-gray-300'>
             The page you&apos;re looking for doesn&apos;t exist or has been moved.

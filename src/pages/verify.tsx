@@ -211,9 +211,7 @@ const VerifyPage: NextPageWithLayout = () => {
           if (steam32Id) {
             // Show success notification
             notification.success({
-              description:
-                'Your Steam account has been successfully verified and linked to your profile',
-              message: 'Dotabod Verified!',
+              message: 'Steam account linked',
             })
 
             // Track successful verification
@@ -249,8 +247,7 @@ const VerifyPage: NextPageWithLayout = () => {
           captureException(error)
           console.error('Error processing Steam authentication:', error)
           notification.error({
-            description: 'There was an error verifying your Steam account. Please try again.',
-            message: 'Steam Verification Failed',
+            message: 'Could not verify your Steam account. Try again.',
           })
           track('steam_verification_error')
           void router.replace('/verify', undefined, { shallow: true })
@@ -306,9 +303,7 @@ const VerifyPage: NextPageWithLayout = () => {
       )
 
       notification.warning({
-        description:
-          "We couldn't retrieve complete Dota 2 profile data for one of your accounts. Some information may be missing.",
-        message: 'Profile Data Incomplete',
+        message: 'Some Dota 2 profile details are unavailable.',
       })
     }
   }
@@ -340,14 +335,12 @@ const VerifyPage: NextPageWithLayout = () => {
       )
 
       notification.success({
-        description: 'Your primary Steam account has been updated successfully.',
-        message: 'Primary Account Updated',
+        message: 'Primary Steam account updated',
       })
     } catch (error) {
       console.error('Error setting primary account:', error)
       notification.error({
-        description: 'Failed to update your primary Steam account. Please try again.',
-        message: 'Update Failed',
+        message: 'Could not update the primary account. Try again.',
       })
     } finally {
       // Clear loading state
@@ -436,14 +429,12 @@ const VerifyPage: NextPageWithLayout = () => {
       }
 
       notification.success({
-        description: 'Your Steam account has been successfully unlinked.',
-        message: 'Account Unlinked',
+        message: 'Steam account unlinked',
       })
     } catch (error) {
       console.error('Error unlinking account:', error)
       notification.error({
-        description: 'Failed to unlink your Steam account. Please try again.',
-        message: 'Unlink Failed',
+        message: 'Could not unlink the Steam account. Try again.',
       })
     } finally {
       // Clear loading state if not handled by modal
@@ -554,13 +545,7 @@ const VerifyPage: NextPageWithLayout = () => {
         )}
 
         {linkedAccounts.length > 0 && (
-          <Alert
-            type='success'
-            message="You're Dotabod Verified!"
-            description='Your Steam account has been successfully linked to Dotabod.'
-            showIcon
-            className='mb-4!'
-          />
+          <Alert type='success' message="You're Dotabod Verified!" showIcon className='mb-4!' />
         )}
 
         {/* Step 2: Steam Authentication */}
@@ -568,11 +553,9 @@ const VerifyPage: NextPageWithLayout = () => {
           title='Steam Authentication'
           className='w-full shadow-sm transition-shadow hover:shadow-md'
         >
-          <p>
-            {linkedAccounts.length > 0
-              ? 'You have successfully linked your Steam account to Dotabod. Now Dotabod will respond with your rank.'
-              : 'Link your Steam account to become Dotabod Verified.'}
-          </p>
+          {linkedAccounts.length === 0 && (
+            <p>Link your Steam account to become Dotabod Verified.</p>
+          )}
 
           <TwitchChat
             command={`!rank ${session?.user?.name}`}
@@ -603,7 +586,6 @@ const VerifyPage: NextPageWithLayout = () => {
                           onClick={async () => setPrimaryAccount(account.steam32Id)}
                           loading={actionLoading[`setPrimary_${account.steam32Id}`]}
                           disabled={actionLoading[`setPrimary_${account.steam32Id}`]}
-                          title='Set as primary account'
                         >
                           Set as Primary
                         </Button>
@@ -618,7 +600,6 @@ const VerifyPage: NextPageWithLayout = () => {
                         }}
                         loading={actionLoading[`unlink_${account.steam32Id}`]}
                         disabled={actionLoading[`unlink_${account.steam32Id}`]}
-                        title='Unlink this account'
                       >
                         Unlink
                       </Button>,
@@ -752,7 +733,7 @@ const VerifyPage: NextPageWithLayout = () => {
 
         {/* Unlink Confirmation Modal */}
         <Modal
-          title='Unlink Steam Account'
+          title='Unlink Steam account?'
           open={unlinkModalVisible}
           onOk={handleUnlinkConfirm}
           onCancel={() => {
@@ -769,7 +750,6 @@ const VerifyPage: NextPageWithLayout = () => {
             disabled: actionLoading.unlinkModal,
           }}
         >
-          <p>Are you sure you want to unlink this Steam account?</p>
           {accountToUnlink &&
             linkedAccounts.find((a) => a.steam32Id === accountToUnlink)?.isPrimary && (
               <Alert

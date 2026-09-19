@@ -67,12 +67,8 @@ export const RankOnlyCard = () => {
   const ranks = Object.keys(rankToTier) as (keyof typeof rankToTier)[]
 
   return (
-    <Card title='Rank Only' feature='rankOnly'>
-      <div className='subtitle'>Restrict chat to users with a specific rank or higher.</div>
-      <div>
-        Only allow users who have linked their Dota 2 account and have achieved the minimum rank to
-        chat in your channel.
-      </div>
+    <Card title='Rank-only chat' feature='rankOnly'>
+      <div>Only viewers with a linked Dota 2 account at or above the selected rank can chat.</div>
       <div className='mt-5 flex items-center space-x-2'>
         <TierSwitch
           hideTierBadge

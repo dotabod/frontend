@@ -85,7 +85,7 @@ const TestGiftPage: NextPageWithLayout = () => {
         throw new Error(data.message ?? 'Failed to create test notification')
       }
 
-      messageApi.success('Test gift notification created successfully!')
+      messageApi.success('Test gift notification created')
       console.log('Created notification:', data)
     } catch (error) {
       console.error('Error creating test notification:', error)

@@ -1,6 +1,5 @@
 import { Typography } from 'antd'
 import { useSession } from 'next-auth/react'
-import Image from 'next/image'
 import { useEffect, useState } from 'react'
 
 import { buildGsiConfig } from '@/lib/gsi-config'
@@ -27,20 +26,6 @@ const UnixInstaller = () => {
 
   return (
     <>
-      <div className='mb-4 space-x-2'>
-        <span>
-          <b>Why?</b> This step is necessary to ensure that Dota 2 knows which data Dotabod
-          requires. It&apos;s a Valve approved way of getting game data.
-        </span>
-        <Image
-          className='inline'
-          alt='ok emote'
-          unoptimized
-          src='https://cdn.7tv.app/emote/6268904f4f54759b7184fa72/1x.webp'
-          width={28}
-          height={28}
-        />
-      </div>
       <div className='space-y-4'>
         <div className='flex flex-col items-center space-y-4'>
           <ol className='ml-4 list-decimal space-y-2'>

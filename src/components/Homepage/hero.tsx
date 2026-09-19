@@ -40,7 +40,7 @@ const TwitchUser = ({
 
   const popoverContent = (
     <div className='flex flex-col items-center px-4 py-2'>
-      <p className='mb-4 text-center'>Sign in to get started with your own Dotabod experience!</p>
+      <p className='mb-4 text-center'>Sign in with Twitch to set up Dotabod.</p>
       <Button type='primary' onClick={handleSignIn}>
         Sign in with Twitch
       </Button>
@@ -50,13 +50,7 @@ const TwitchUser = ({
   if (userName === 'You?') {
     return (
       <li className='relative'>
-        <Popover
-          content={popoverContent}
-          title='Join the community!'
-          trigger='click'
-          open={open}
-          onOpenChange={setOpen}
-        >
+        <Popover content={popoverContent} trigger='click' open={open} onOpenChange={setOpen}>
           <button
             type='button'
             className='hover:bg-primary-100 flex w-full cursor-pointer flex-col items-center space-y-1 rounded-lg px-4 py-4 transition-all duration-300 ease-in-out hover:scale-105 hover:shadow-xl'
@@ -134,10 +128,10 @@ export const Hero = () => {
           <div className='relative z-10 mx-auto max-w-2xl lg:col-span-7 lg:max-w-none lg:pt-6 xl:col-span-6'>
             <div className='space-y-4'>
               <h1 className='text-4xl font-bold tracking-tight text-gray-200 sm:text-5xl'>
-                The greatest tool for Dota 2 streamers
+                Tools built for Dota 2 streamers
               </h1>
               <h2 className='flex items-center gap-2 text-2xl font-medium tracking-tight text-gray-200'>
-                Smart Predictions • MMR Tracking • Interactive Chat
+                Predictions • MMR tracking • Interactive chat
                 <Image
                   src='/images/emotes/peepoclap.webp'
                   unoptimized
@@ -147,11 +141,6 @@ export const Hero = () => {
                   className='inline-block'
                 />
               </h2>
-              <p className='text-lg text-gray-300'>
-                Join thousands of streamers using Dotabod to enhance their streams with automated
-                predictions, real-time stats, and dynamic overlays that keep viewers engaged and
-                coming back for more.
-              </p>
             </div>
             <div className='mt-8 flex flex-wrap gap-x-6 gap-y-4'>
               <Link href='/dashboard' prefetch={false}>

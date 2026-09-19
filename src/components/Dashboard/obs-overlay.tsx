@@ -179,20 +179,10 @@ const OBSOverlay = () => {
 
   return (
     <Card>
-      <div className='mb-4 flex items-center gap-2'>
-        <span>
-          <b>Why?</b> Dotabod can show game related overlays on your stream. Your medal, the
-          blockers, prediction polls, and more. Some commands like !hero require the overlay.
-        </span>
-        <Image
-          className='inline'
-          alt='ok emote'
-          unoptimized
-          src='https://cdn.7tv.app/emote/6268904f4f54759b7184fa72/1x.webp'
-          width={28}
-          height={28}
-        />
-      </div>
+      <p className='mb-4'>
+        The overlay shows rank, blockers, predictions, and other game data. Commands such as !hero
+        also require it.
+      </p>
       <div className='space-y-4 px-8 pb-8 text-sm text-gray-300'>
         <RegionalBlockingNote />
         <Tabs

@@ -24,10 +24,7 @@ export const TierBadge: React.FC<{
           !isSubscriptionActive({ status: subscription?.status }) &&
           tooltip && (
             <>
-              <span>
-                To use this feature, upgrade your plan and access the most powerful features of
-                Dotabod for your stream
-              </span>
+              <span>Upgrade to use this feature.</span>
 
               <Link href='/dashboard/billing'>
                 <Button type='primary' className='mt-2'>
@@ -35,7 +32,7 @@ export const TierBadge: React.FC<{
                     color={tierToShow === SUBSCRIPTION_TIERS.PRO ? 'gold' : undefined}
                     className='h-4 w-4'
                   />{' '}
-                  Upgrade your stream
+                  Upgrade
                 </Button>
               </Link>
             </>

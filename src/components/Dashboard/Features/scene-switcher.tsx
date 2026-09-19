@@ -62,8 +62,7 @@ const SceneSwitcher = (): React.ReactNode => {
   return (
     <Card title='OBS scene switcher' feature='obs-scene-switcher'>
       <div className='subtitle'>
-        Auto switch scenes in OBS depending on game state. Your blockers will still work without
-        this.
+        Switch OBS scenes automatically as the game state changes.
         <p className='mt-2 text-xs'>
           <Tag color='purple'>Note</Tag>Does not work with Streamlabs
         </p>
@@ -75,11 +74,6 @@ const SceneSwitcher = (): React.ReactNode => {
           hideTierBadge
           settingKey={Settings['obs-scene-switcher']}
         />
-      </div>
-
-      <div className='mb-4'>
-        This is optional but useful if you want to make your stream look unique for different game
-        states!
       </div>
 
       {isEnabled && (

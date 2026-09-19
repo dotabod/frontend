@@ -13,10 +13,6 @@ const RoshCard = () => {
 
   return (
     <Card title='Roshan timers' feature='rosh'>
-      <div className='subtitle'>
-        Dotabod can detect when roshan is killed or aegis is picked up.
-      </div>
-
       <div className={clsx('py-4 transition-all')}>
         <div className='flex flex-col items-start space-y-2 md:space-y-3'>
           <div className='flex items-center'>
@@ -37,12 +33,11 @@ const RoshCard = () => {
 
       <div className='space-y-2 text-sm text-gray-300'>
         <p>
-          Sadly the data does not tell us when someone dies with aegis, so the aegis icon will
-          remain for the full 5 minutes.
+          The Aegis timer always runs for 5 minutes because Dota does not report its holder dying.
         </p>
         <p>
-          The rosh timer starts red for 8 minutes (min rosh spawn), then turns yellow for 3 minutes
-          (max rosh spawn).
+          The Roshan timer is red for the 8-minute minimum respawn, then yellow for the remaining
+          3-minute window.
         </p>
       </div>
       <div className='my-2 flex items-center justify-center space-x-4'>

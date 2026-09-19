@@ -12,8 +12,7 @@ const WinProbabilityOverlay = () => {
 
   return (
     <Card title='Win probability' feature='winProbabilityOverlay'>
-      <div className='subtitle'>Dotabod can display the current win percent chance.</div>
-      <div>For top 100 immortal games, Dotabod can display the current win percent chance.</div>
+      <div>Available for top-100 Immortal matches.</div>
       <div className='mt-5'>
         <TierSwitch
           hideTierBadge

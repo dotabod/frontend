@@ -90,7 +90,7 @@ const AdminPage = () => {
       }
 
       await axios.post('/api/admin/scheduled-messages', payload)
-      message.success('Message scheduled successfully')
+      message.success('Message scheduled')
       form.resetFields()
       void fetchMessages()
     } catch (error) {
@@ -141,7 +141,7 @@ const AdminPage = () => {
       }
 
       await axios.put(`/api/admin/scheduled-messages/${editingMessage?.id}`, payload)
-      message.success('Message updated successfully')
+      message.success('Message updated')
       setOpenDialog(false)
       void fetchMessages()
     } catch (error) {
@@ -275,27 +275,15 @@ const AdminPage = () => {
               label='Message'
               rules={[{ message: 'Please enter a message', required: true }]}
             >
-              <Input.TextArea rows={4} placeholder='Enter your message' />
+              <Input.TextArea rows={4} />
             </Form.Item>
 
-            <Form.Item
-              name='userId'
-              label='Select User (empty to send to all users)'
-              tooltip="This selector returns the user's provider account ID (e.g., Twitch ID), which will be mapped to the internal user ID in the API. If left empty, the message will be sent to all users."
-            >
+            <Form.Item name='userId' label='Recipient' tooltip='Leave blank to send to all users.'>
               <UserSelector placeholder='Search for a user' />
             </Form.Item>
 
-            <Form.Item
-              name='scheduledDate'
-              label='Scheduled Date (defaults to now)'
-              initialValue={dayjs()}
-            >
-              <DatePicker
-                showTime
-                format='YYYY-MM-DD HH:mm:ss'
-                placeholder='Select date and time'
-              />
+            <Form.Item name='scheduledDate' label='Send at' initialValue={dayjs()}>
+              <DatePicker showTime format='YYYY-MM-DD HH:mm:ss' />
             </Form.Item>
 
             <Form.Item>
@@ -349,27 +337,19 @@ const AdminPage = () => {
                 label='Message'
                 rules={[{ message: 'Please enter a message', required: true }]}
               >
-                <Input.TextArea rows={4} placeholder='Enter your message' />
+                <Input.TextArea rows={4} />
               </Form.Item>
 
               <Form.Item
                 name='userId'
-                label='Select User (empty to send to all users)'
-                tooltip="This selector returns the user's provider account ID (e.g., Twitch ID), which will be mapped to the internal user ID in the API. If left empty, the message will be sent to all users."
+                label='Recipient'
+                tooltip='Leave blank to send to all users.'
               >
                 <UserSelector placeholder='Search for a user' />
               </Form.Item>
 
-              <Form.Item
-                name='scheduledDate'
-                label='Scheduled Date (Defaults to now if empty)'
-                initialValue={dayjs()}
-              >
-                <DatePicker
-                  showTime
-                  format='YYYY-MM-DD HH:mm:ss'
-                  placeholder='Select date and time'
-                />
+              <Form.Item name='scheduledDate' label='Send at' initialValue={dayjs()}>
+                <DatePicker showTime format='YYYY-MM-DD HH:mm:ss' />
               </Form.Item>
 
               <Form.Item>

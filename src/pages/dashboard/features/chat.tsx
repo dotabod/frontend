@@ -15,10 +15,7 @@ const FeaturesPage: NextPageWithLayout = () => (
       <title>Dotabod | Chat features</title>
     </Head>
 
-    <Header
-      subtitle='The bot reacts with chat messages to your game events as you play your match.'
-      title='Chatter'
-    />
+    <Header title='Chatter' />
 
     <div id='new-features' className='mb-6'>
       <ErrorBoundary>

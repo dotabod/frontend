@@ -1,4 +1,3 @@
-import Link from 'next/link'
 import type { ReactNode } from 'react'
 
 import { Settings } from '@/lib/default-settings'
@@ -45,21 +44,12 @@ const NewFeatureChatToggles = () => (
       <MasterFollowingToggle
         settingKey={Settings.cosmeticsAnnounce}
         label='Cosmetic set announcements'
-        description={
-          <>
-            When you pick a hero, Dotabod posts your equipped cosmetic set in chat with a link to
-            your collection. This is separate from the{' '}
-            <Link href='/dashboard/commands' className='text-purple-400 hover:text-purple-300'>
-              <code>!set</code> command
-            </Link>
-            , which only replies on demand.
-          </>
-        }
+        description='Posts your equipped cosmetic set in chat when you pick a hero.'
       />
       <MasterFollowingToggle
         settingKey={Settings.smokeActivated}
         label='Team smoke alerts'
-        description='When your team pops Smoke of Deceit without you, Dotabod ribs you in chat a few seconds later for getting left behind. Separate from the Smoke alert (when your own hero is smoked) in the chatter list below.'
+        description='Posts in chat when your team uses Smoke of Deceit without you.'
       />
     </div>
   </Card>

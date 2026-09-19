@@ -62,7 +62,7 @@ export const SubscriptionAlerts = ({
         const body = await response.json().catch(() => null)
         console.error('Failed to apply credits:', body?.error ?? response.statusText)
         message.error({
-          content: 'There was an issue applying your credits. Please try again or contact support.',
+          content: 'Could not apply credits. Try again or contact support.',
           duration: 5,
           key: 'applyCredits',
         })
@@ -73,7 +73,7 @@ export const SubscriptionAlerts = ({
 
       if (result.success) {
         message.success({
-          content: 'Credits applied successfully!',
+          content: 'Credits applied',
           duration: 2,
           key: 'applyCredits',
         })
@@ -81,7 +81,7 @@ export const SubscriptionAlerts = ({
       } else {
         console.error('Failed to apply credits:', result.error ?? result.message)
         message.error({
-          content: 'There was an issue applying your credits. Please try again or contact support.',
+          content: 'Could not apply credits. Try again or contact support.',
           duration: 5,
           key: 'applyCredits',
         })
@@ -89,7 +89,7 @@ export const SubscriptionAlerts = ({
     } catch (error) {
       console.error('Error applying credits:', error)
       message.error({
-        content: 'There was an issue applying your credits. Please try again or contact support.',
+        content: 'Could not apply credits. Try again or contact support.',
         duration: 5,
         key: 'applyCredits',
       })

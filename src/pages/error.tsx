@@ -31,13 +31,11 @@ const AuthErrorPage: NextPageWithLayout = () => {
         return
       }
       if (decodedError === 'ACCESS_DENIED') {
-        setErrorMessage('Something went wrong. You do not have permission to view this page.')
+        setErrorMessage('You do not have permission to view this page.')
         return
       }
       if (decodedError === 'MODERATOR_ACCESS_DENIED') {
-        setErrorMessage(
-          'You do not have permission to view this page. Only approved moderators for this streamer can access this page.',
-        )
+        setErrorMessage('Only approved moderators for this streamer can access this page.')
         return
       }
       if (decodedError === 'NOT_APPROVED') {
