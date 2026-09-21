@@ -84,7 +84,7 @@ jobs:
           TWITCH_CLIENT_SECRET: dummy-client-secret
           VERCEL_ENV: production
       - name: Validate Cloudflare Worker bundle
-        run: pnpm exec wrangler deploy --dry-run --config dist/server/wrangler.json
+        run: pnpm exec wrangler deploy --dry-run
       - name: Smoke test Cloudflare Worker runtime
         shell: bash
         run: |
@@ -92,7 +92,6 @@ jobs:
 
           log_file="${RUNNER_TEMP}/wrangler.log"
           pnpm exec wrangler dev \
-            --config dist/server/wrangler.json \
             --port 8787 \
             --var DATABASE_URL:postgresql://postgres@127.0.0.1:5432/postgres \
             --var DIRECT_URL:postgresql://postgres@127.0.0.1:5432/postgres \
