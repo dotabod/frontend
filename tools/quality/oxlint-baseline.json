@@ -71879,26 +71879,6 @@
         "severity": "error"
       }
     },
-    "8f1f57e244ccaac3c676c9492f542c5a891ed555ed03918a5357ebd8ae37ac22": {
-      "count": 1,
-      "summary": {
-        "code": "sonarjs(no-nested-conditional)",
-        "file": "src/lib/blog.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "? data.date instanceof Date",
-              "next": "? data.date.toISOString()",
-              "previous": "const date = data.date"
-            },
-            "span": "data.date instanceof Date\n          ? data.date.toISOString()\n          : String(data.date)",
-            "text": ""
-          }
-        ],
-        "message": "Extract this nested ternary operation into an independent statement.",
-        "severity": "error"
-      }
-    },
     "8f2bda49655f57d5f5e25d33373d237ecb9bc5886dfca083411939aeb69ae5d5": {
       "count": 1,
       "summary": {
@@ -104240,26 +104220,6 @@
         "severity": "error"
       }
     },
-    "d0f33c7c6cf556a2fc1042d8df85ff415a6a14f8b1ace0bf183bc2c670f8f27f": {
-      "count": 1,
-      "summary": {
-        "code": "eslint(no-nested-ternary)",
-        "file": "src/lib/blog.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "const date = data.date",
-              "next": "? data.date instanceof Date",
-              "previous": ""
-            },
-            "span": "data.date\n        ? data.date instanceof Date\n          ? data.date.toISOString()\n          : String(data.date)\n        : new Date().toISOString()",
-            "text": ""
-          }
-        ],
-        "message": "Do not nest ternary expressions.",
-        "severity": "error"
-      }
-    },
     "d111cc732286bbc787e34cea5d8a1163d262fdb3e7ea91f3479e72a34fad2546": {
       "count": 1,
       "summary": {
@@ -121156,26 +121116,6 @@
           }
         ],
         "message": "Unexpected nullable string value in conditional. Please handle the nullish and empty string cases explicitly.",
-        "severity": "error"
-      }
-    },
-    "f0d46d7f067d64fb179bc10729640894a43f531ca8b244ac7f96d94d7865a5e5": {
-      "count": 1,
-      "summary": {
-        "code": "typescript(strict-boolean-expressions)",
-        "file": "src/lib/blog.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "const date = data.date",
-              "next": "? data.date instanceof Date",
-              "previous": ""
-            },
-            "span": "data.date",
-            "text": ""
-          }
-        ],
-        "message": "Unexpected any value in conditional. Use a more specific type to ensure type safety.",
         "severity": "error"
       }
     },

@@ -11,17 +11,25 @@ export interface Post {
   draft: boolean
 }
 
+const normalizePostDate = function normalizePostDate(value: unknown): string {
+  if (value instanceof Date) {
+    return value.toISOString()
+  }
+
+  if (value === null || value === undefined) {
+    return new Date().toISOString()
+  }
+
+  return String(value)
+}
+
 export const getAllPosts = function getAllPosts(): Post[] {
   const posts: Post[] = []
 
   for (const { slug, source } of blogPostSources) {
     const { data } = matter(source)
 
-    const date = data.date
-      ? data.date instanceof Date
-        ? data.date.toISOString()
-        : String(data.date)
-      : new Date().toISOString()
+    const date = normalizePostDate(data.date)
 
     const post = {
       author: data.author ?? null,

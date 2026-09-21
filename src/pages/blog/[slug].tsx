@@ -109,7 +109,7 @@ export const getStaticPaths: GetStaticPaths = () => {
   }
 }
 
-export const getStaticProps: GetStaticProps = async ({ params }) => {
+export const getStaticProps: GetStaticProps = ({ params }) => {
   const { slug } = params as { slug: string }
   const fileContents = getPostSource(slug)
 
