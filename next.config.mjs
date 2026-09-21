@@ -61,8 +61,8 @@ const nextConfig = {
   // (Next 16) it breaks the build: `onBuildComplete` chmods `.next/output/static/404.html`,
   // which standalone relocates, so the deploy fails with ENOENT. Vercel already traces the
   // Prisma engines via outputFileTracingIncludes below, so standalone isn't needed there —
-  // only emit it outside Vercel and the vinext Cloudflare Workers build.
-  output: process.env.VERCEL || process.env.VINEXT_CLOUDFLARE ? undefined : 'standalone',
+  // only emit it off-Vercel (this repo has no Docker self-host today, but keep it safe).
+  output: process.env.VERCEL ? undefined : 'standalone',
   // Tell Next.js to copy the Prisma engines to the standalone output
   outputFileTracingExcludes: {
     '*': [
