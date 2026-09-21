@@ -14,7 +14,6 @@ const nextConfig = {
   productionBrowserSourceMaps: true,
   reactStrictMode: true,
   env: {
-    DOTABOD_RUNTIME: process.env.VINEXT === '1' ? 'cloudflare' : 'node',
     NEXT_PUBLIC_IS_IN_MAINTENANCE_MODE: process.env.IS_IN_MAINTENANCE_MODE,
     NEXT_PUBLIC_LASTFM_API_KEY: process.env.LASTFM_API_KEY,
   },

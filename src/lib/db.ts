@@ -6,6 +6,7 @@ import { PrismaClient as PrismaMongo } from '.prisma-mongo/client'
 declare global {
   var prismaGlobal: PrismaClient | undefined
   var prismaMongoGlobal: PrismaMongo | undefined
+  var hyperdriveGlobal: DotabodHyperdriveBinding | undefined
   var cloudflarePrismaAdapterFactory: ((connectionString: string) => PrismaAdapter) | undefined
 }
 
@@ -26,9 +27,9 @@ const createCloudflarePrismaClient = () => {
   return new PrismaClient({ adapter })
 }
 
-const createCloudflarePrismaProxy = () => {
+const createCloudflarePrismaProxy = () =>
   // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- SAFETY: The Proxy forwards every requested member to a real per-request PrismaClient instance.
-  return new Proxy({} as PrismaClient, {
+  new Proxy({} as PrismaClient, {
     get(_target, property) {
       const client = createCloudflarePrismaClient()
       // oxlint-disable-next-line anti-slop/no-reflect-get, typescript/no-unsafe-assignment -- PrismaClient's generated members are only addressable here by the Proxy trap key.
@@ -38,16 +39,14 @@ const createCloudflarePrismaProxy = () => {
       return typeof value === 'function' ? value.bind(client) : value
     },
   })
-}
 
-const createUnavailableMongoProxy = () => {
+const createUnavailableMongoProxy = () =>
   // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- SAFETY: The Proxy deliberately rejects every MongoDB client member on the unsupported Workers runtime.
-  return new Proxy({} as PrismaMongo, {
+  new Proxy({} as PrismaMongo, {
     get() {
       throw new Error('MongoDB Prisma is not supported on Cloudflare Workers')
     },
   })
-}
 
 const prisma = isCloudflareRuntime
   ? createCloudflarePrismaProxy()

@@ -5,5 +5,3 @@ interface DotabodHyperdriveBinding {
 interface DotabodCloudflareEnv {
   HYPERDRIVE: DotabodHyperdriveBinding
 }
-
-declare var hyperdriveGlobal: DotabodHyperdriveBinding | undefined
