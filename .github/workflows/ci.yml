@@ -88,7 +88,7 @@ jobs:
       - name: Smoke test Cloudflare Worker runtime
         shell: bash
         env:
-          CLOUDFLARE_HYPERDRIVE_LOCAL_CONNECTION_STRING_HYPERDRIVE: postgresql://postgres@127.0.0.1:5432/postgres
+          CLOUDFLARE_HYPERDRIVE_LOCAL_CONNECTION_STRING_HYPERDRIVE: postgresql://postgres:postgres@127.0.0.1:5432/dotabod_test
         run: |
           set -euo pipefail
 
