@@ -117,13 +117,16 @@ export const getLanguageProgress = (
   return progress
 }
 
+export const getLanguageProgressUrl = (languageId: string) =>
+  languageId ? `/api/get-language-progress?${new URLSearchParams({ languageId }).toString()}` : null
+
 const useLanguageTranslations = ({ languageId }: { languageId: string }) => {
   const { data, isLoading } = useSWR<{
     languageProgress: CrowdinLanguage[]
     project: Project
     total: number | undefined
     percentage: number
-  }>(languageId ? `/api/getLanguageProgress?languageId=${languageId}` : null, fetcher)
+  }>(getLanguageProgressUrl(languageId), fetcher)
 
   return { data, isLoading }
 }
