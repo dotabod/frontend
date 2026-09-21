@@ -1,6 +1,3 @@
-import fs from 'node:fs'
-import path from 'node:path'
-
 import { Button, Space, Typography } from 'antd'
 import matter from 'gray-matter'
 import type { GetStaticPaths, GetStaticProps } from 'next'
@@ -15,6 +12,7 @@ import remarkGfm from 'remark-gfm'
 
 import { Container } from '@/components/container'
 import HomepageShell from '@/components/Homepage/homepage-shell'
+import { getAllPosts, getPostSource } from '@/lib/blog'
 import type { NextPageWithLayout } from '@/pages/_app'
 import { formatDate } from '@/utils/format-date'
 
@@ -99,23 +97,11 @@ BlogPost.getLayout = function getLayout(page: ReactElement) {
 }
 
 export const getStaticPaths: GetStaticPaths = async () => {
-  const postsDirectory = path.join(process.cwd(), 'src/pages/blog')
-  const filenames = fs.readdirSync(postsDirectory)
-
-  const paths = filenames
-    .filter((filename) => filename.endsWith('.md'))
-    .filter((filename) => {
-      // Filter out draft posts
-      const filePath = path.join(postsDirectory, filename)
-      const fileContents = fs.readFileSync(filePath, 'utf-8')
-      const { data } = matter(fileContents)
-      return !data.draft
-    })
-    .map((filename) => ({
-      params: {
-        slug: filename.replace(/\.md$/u, ''),
-      },
-    }))
+  const paths = getAllPosts().map((post) => ({
+    params: {
+      slug: post.slug,
+    },
+  }))
 
   return {
     fallback: false,
@@ -125,8 +111,13 @@ export const getStaticPaths: GetStaticPaths = async () => {
 
 export const getStaticProps: GetStaticProps = async ({ params }) => {
   const { slug } = params as { slug: string }
-  const filePath = path.join(process.cwd(), 'src/pages/blog', `${slug}.md`)
-  const fileContents = fs.readFileSync(filePath, 'utf-8')
+  const fileContents = getPostSource(slug)
+
+  if (fileContents === null) {
+    return {
+      notFound: true,
+    }
+  }
 
   const { content, data } = matter(fileContents)
 

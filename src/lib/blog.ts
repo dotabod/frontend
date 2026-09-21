@@ -1,7 +1,6 @@
-import fs from 'node:fs'
-import path from 'node:path'
-
 import matter from 'gray-matter'
+
+import blogPostSources from '@/generated/blog-posts.json'
 
 export interface Post {
   slug: string
@@ -12,16 +11,10 @@ export interface Post {
   draft: boolean
 }
 
-const postsDirectory = path.join(process.cwd(), 'src/pages/blog')
-
 export const getAllPosts = function getAllPosts(): Post[] {
-  const filenames = fs.readdirSync(postsDirectory)
-
-  return filenames
-    .filter((filename) => filename.endsWith('.md'))
-    .map((filename) => {
-      const fileContents = fs.readFileSync(path.join(postsDirectory, filename), 'utf-8')
-      const { data } = matter(fileContents)
+  return blogPostSources
+    .map(({ slug, source }) => {
+      const { data } = matter(source)
 
       const date = data.date
         ? data.date instanceof Date
@@ -34,12 +27,16 @@ export const getAllPosts = function getAllPosts(): Post[] {
         date,
         description: data.description ?? '',
         draft: Boolean(data.draft),
-        slug: filename.replace(/\.md$/u, ''),
+        slug,
         title: data.title ?? 'Untitled',
       }
     })
     .filter((post) => !post.draft)
     .toSorted((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+}
+
+export const getPostSource = function getPostSource(slug: string): string | null {
+  return blogPostSources.find((post) => post.slug === slug)?.source ?? null
 }
 
 export const getLatestPost = function getLatestPost(): Post | null {
