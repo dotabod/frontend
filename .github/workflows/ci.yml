@@ -87,6 +87,8 @@ jobs:
         run: pnpm exec wrangler deploy --dry-run
       - name: Smoke test Cloudflare Worker runtime
         shell: bash
+        env:
+          CLOUDFLARE_HYPERDRIVE_LOCAL_CONNECTION_STRING_HYPERDRIVE: postgresql://postgres@127.0.0.1:5432/postgres
         run: |
           set -euo pipefail
 
