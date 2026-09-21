@@ -180,7 +180,13 @@ async function chooseSelect(index, label) {
     `Boolean(${optionExpression})`,
     `${label} select option`,
   )
-  await clickElement(optionExpression, `${label} select option`)
+  const clicked = await evaluate(`(() => {
+    const option = ${optionExpression}
+    if (!option) return false
+    option.click()
+    return true
+  })()`)
+  if (!clicked) throw new Error(`${label} select option not found`)
   await waitFor(
     `[...document.querySelectorAll('.ant-select-selection-item')][${index}]?.textContent.trim() === ${JSON.stringify(label)}`,
     `${label} selection`,
