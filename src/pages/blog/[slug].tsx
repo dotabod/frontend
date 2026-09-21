@@ -1,11 +1,9 @@
 import { Button, Space, Typography } from 'antd'
 import matter from 'gray-matter'
 import type { GetStaticPaths, GetStaticProps } from 'next'
-import { MDXRemote } from 'next-mdx-remote'
-import type { MDXRemoteSerializeResult } from 'next-mdx-remote'
-import { serialize } from 'next-mdx-remote/serialize'
 import Link from 'next/link'
 import type { ReactElement } from 'react'
+import Markdown from 'react-markdown'
 import rehypeHighlight from 'rehype-highlight'
 import rehypeSlug from 'rehype-slug'
 import remarkGfm from 'remark-gfm'
@@ -19,7 +17,7 @@ import { formatDate } from '@/utils/format-date'
 const { Title, Text } = Typography
 
 interface BlogPostProps {
-  source: MDXRemoteSerializeResult
+  source: string
   meta: {
     title: string
     description: string
@@ -66,7 +64,9 @@ const BlogPost: NextPageWithLayout<BlogPostProps> = ({ source, meta }) => (
           {meta.title}
         </Title>
         <div className='prose prose-invert prose-headings:font-bold prose-headings:text-gray-300 prose-h1:text-3xl prose-h2:text-2xl prose-h3:text-xl prose-h4:text-lg prose-p:text-gray-300 prose-a:text-blue-400 hover:prose-a:text-blue-300 prose-ul:list-disc prose-ol:list-decimal prose-li:marker:text-gray-500 prose-li:text-gray-300 prose-ul:ml-5 prose-ol:ml-5 prose-li:pl-0 prose-code:bg-gray-800 prose-code:text-gray-200 prose-pre:bg-gray-800 prose-pre:text-gray-200 prose-blockquote:text-gray-400 prose-blockquote:border-gray-600 max-w-none'>
-          <MDXRemote {...source} />
+          <Markdown rehypePlugins={[rehypeSlug, rehypeHighlight]} remarkPlugins={[remarkGfm]}>
+            {source}
+          </Markdown>
         </div>
       </article>
     </div>
@@ -145,15 +145,6 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
     }
   }
 
-  const mdxSource = await serialize(content, {
-    mdxOptions: {
-      rehypePlugins: [rehypeSlug, rehypeHighlight],
-      remarkPlugins: [remarkGfm],
-    },
-    // Use the processed data
-    scope: processedData,
-  })
-
   // Ensure date is a string for serialization
   const date = processedData.date ?? new Date().toISOString()
 
@@ -171,7 +162,7 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
         slug,
         title: processedData.title ?? 'Untitled',
       },
-      source: mdxSource,
+      source: content,
     },
   }
 }

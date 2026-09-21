@@ -126,3 +126,15 @@ jobs:
             cat "${log_file}"
             exit 1
           fi
+
+          for smoke_path in \
+            /api/latest-post \
+            /blog \
+            /blog/crypto-payments-nowpayments; do
+            if ! curl --fail --silent --show-error \
+              "http://127.0.0.1:8787${smoke_path}" \
+              >/dev/null; then
+              cat "${log_file}"
+              exit 1
+            fi
+          done
