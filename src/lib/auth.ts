@@ -3,8 +3,8 @@ import { captureException, captureMessage } from '@sentry/nextjs'
 import type { NextAuthOptions } from 'next-auth'
 import { decode, encode } from 'next-auth/jwt'
 import type { JWT } from 'next-auth/jwt'
-import CredentialsProviderImport from 'next-auth/providers/credentials'
-import TwitchProviderImport from 'next-auth/providers/twitch'
+import CredentialsProvider from 'next-auth/providers/credentials'
+import TwitchProvider from 'next-auth/providers/twitch'
 
 import prisma from '@/lib/db'
 import { getTwitchTokens } from '@/lib/get-twitch-tokens'
@@ -15,15 +15,6 @@ import { parseTwitchProfile } from '@/types/twitch'
 import type { TwitchProfile, TwitchUser } from '@/types/twitch'
 
 import { chatBotScopes, chatVerifyScopes, defaultScopes } from './auth-scopes'
-
-function unwrapDefault<T>(module: T | { default: T }): T {
-  return typeof module === 'object' && module !== null && 'default' in module
-    ? module.default
-    : module
-}
-
-const CredentialsProvider = unwrapDefault(CredentialsProviderImport)
-const TwitchProvider = unwrapDefault(TwitchProviderImport)
 
 const extractCookieValue = (cookieHeader: string | string[] | undefined, name: string) => {
   if (!cookieHeader) {
