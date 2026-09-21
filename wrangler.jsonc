@@ -3,6 +3,9 @@
   "name": "dotabod-frontend",
   "compatibility_date": "2026-09-21",
   "compatibility_flags": ["nodejs_compat"],
+  "vars": {
+    "DOTABOD_RUNTIME": "cloudflare",
+  },
   "main": "src/cloudflare-worker.ts",
   "assets": {
     "directory": "dist/client",
