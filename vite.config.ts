@@ -4,8 +4,10 @@ import { defineConfig } from 'vite'
 
 import nextConfig from './next.config.mjs'
 
+const { output: _standaloneOutput, ...vinextNextConfig } = nextConfig
+
 export default defineConfig({
-  plugins: [vinext({ nextConfig: { ...nextConfig, output: undefined } }), cloudflare()],
+  plugins: [vinext({ nextConfig: vinextNextConfig }), cloudflare()],
   resolve: {
     alias: {
       '@ant-design/cssinjs': '@ant-design/cssinjs/lib',
