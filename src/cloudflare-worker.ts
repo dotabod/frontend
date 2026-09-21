@@ -22,6 +22,6 @@ export default {
     context: ExecutionContextLike,
   ): Promise<Response> {
     globalThis.hyperdriveGlobal = env.HYPERDRIVE
-    return worker.fetch(request, env, context)
+    return await worker.fetch(request, env, context)
   },
 }
