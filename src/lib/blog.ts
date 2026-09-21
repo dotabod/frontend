@@ -1,4 +1,5 @@
 import matter from 'gray-matter'
+import { z } from 'zod'
 
 import blogPostSources from '@/generated/blog-posts.json'
 
@@ -11,18 +12,21 @@ export interface Post {
   draft: boolean
 }
 
+const blogPostDateSchema = z.union([z.date(), z.string(), z.number()]).nullable().optional()
+
 export const getAllPosts = function getAllPosts(): Post[] {
   const posts: Post[] = []
 
   for (const { slug, source } of blogPostSources) {
     const { data } = matter(source)
+    const dateValue = blogPostDateSchema.parse(data.date)
 
     let date = new Date().toISOString()
 
-    if (data.date instanceof Date) {
-      date = data.date.toISOString()
-    } else if (typeof data.date === 'string' || typeof data.date === 'number') {
-      date = String(data.date)
+    if (dateValue instanceof Date) {
+      date = dateValue.toISOString()
+    } else if (dateValue !== null && dateValue !== undefined) {
+      date = String(dateValue)
     }
 
     const post = {
