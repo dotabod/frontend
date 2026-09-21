@@ -40,7 +40,11 @@
     "generate:all": "npm run generate:postgres && npm run generate:mongo",
     "mongo:pull": "doppler run -- npx prisma db pull --schema=./prisma-mongo/schema.prisma",
     "mongo:push": "doppler run -- npx prisma db push --schema=./prisma-mongo/schema.prisma",
-    "mongo:studio": "doppler run -- npx prisma studio --schema=./prisma-mongo/schema.prisma"
+    "mongo:studio": "doppler run -- npx prisma studio --schema=./prisma-mongo/schema.prisma",
+    "dev:vinext": "doppler run -- vinext dev --port 3001",
+    "build:vinext": "prisma generate && prisma generate --schema=./prisma-mongo/schema.prisma && vinext build",
+    "start:vinext": "wrangler dev --config dist/server/wrangler.json",
+    "deploy:vinext": "vinext-cloudflare deploy --config dist/server/wrangler.json"
   },
   "dependencies": {
     "@ant-design/cssinjs": "^1.24.0",
@@ -62,6 +66,7 @@
     "@twurple/eventsub-base": "7.2.1",
     "@vercel/analytics": "^2.0.1",
     "@vercel/functions": "^3.6.0",
+    "@vinext/cloudflare": "1.0.0-beta.8",
     "antd": "^5.29.1",
     "axios": "^1.18.0",
     "canvas-confetti": "^1.9.4",
@@ -99,9 +104,11 @@
     "tailwindcss": "^4.3.3",
     "twitch-fetcher": "https://github.com/dotabod/twitch-fetcher.git",
     "use-debounce": "^10.0.6",
+    "vinext": "1.0.0-beta.10",
     "zod": "^3.25.76"
   },
   "devDependencies": {
+    "@cloudflare/vite-plugin": "1.56.0",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.3",
     "@types/canvas-confetti": "^1.9.0",
@@ -128,7 +135,8 @@
     "typescript": "7.0.2",
     "ultracite": "7.10.8",
     "vite": "8.2.2",
-    "vitest": "5.0.0"
+    "vitest": "5.0.0",
+    "wrangler": "4.135.0"
   },
   "browserslist": "defaults, not ie <= 11",
   "packageManager": "pnpm@11.2.2"

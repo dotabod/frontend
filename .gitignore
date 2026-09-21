@@ -64,3 +64,6 @@ public/install.ps1
 !.agents/skills/verify-dotabod/**
 .playwright-mcp/
 artifacts/
+/dist/
+.vinext/
+.wrangler/
