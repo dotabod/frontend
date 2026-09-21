@@ -9,4 +9,10 @@
     "not_found_handling": "none",
     "binding": "ASSETS",
   },
+  "hyperdrive": [
+    {
+      "binding": "HYPERDRIVE",
+      "id": "764dd78253334cca9da8576f2ea5a537",
+    },
+  ],
 }
