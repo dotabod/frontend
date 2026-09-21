@@ -4,8 +4,8 @@ The streamer profile gives a viewer a compact summary of the streamer's most-pla
 
 ## Sub-features
 
-- `overview-heroes` renders one to five rows in `Most played heroes`.
-- `overview-matches` renders one to five rows in `Latest matches`, newest first.
+- `overview-heroes` renders up to five rows in `Most played heroes` or its explicit empty state.
+- `overview-matches` renders up to five rows in `Latest matches`, newest first, or its explicit empty state.
 - `overview-all-matches` links to the complete match-history route.
 - `overview-hero-rates` links to the hero-win-rates view.
 - `overview-responsive` avoids horizontal document overflow at desktop and mobile sizes.
