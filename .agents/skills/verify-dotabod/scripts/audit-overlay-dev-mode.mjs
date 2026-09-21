@@ -24,6 +24,7 @@ const axeScriptPath = option('axe-script', process.env.FRONTEND_AXE_SCRIPT || nu
 const outputDir = path.resolve(
   option('output-dir', process.env.FRONTEND_OUTPUT_DIR ?? 'artifacts/verify-dotabod'),
 )
+const expectedSocketOrigin = option('expected-socket-origin', null)
 
 await fs.mkdir(outputDir, { recursive: true })
 const fixture = JSON.parse(await fs.readFile(fixturePath, 'utf8'))
@@ -47,6 +48,8 @@ const socket = new WebSocket(tab.webSocketDebuggerUrl)
 const pending = new Map()
 const browserExceptions = []
 const failedAssets = []
+const failedResponses = []
+const socketRequests = []
 let commandId = 0
 
 await new Promise((resolve, reject) => {
@@ -65,6 +68,23 @@ socket.addEventListener('message', (event) => {
     !message.params.canceled
   ) {
     failedAssets.push({ errorText: message.params.errorText, type: message.params.type })
+  }
+  if (message.method === 'Network.requestWillBeSent') {
+    const requestUrl = message.params.request.url
+    if (requestUrl.includes('/socket.io')) {
+      socketRequests.push(requestUrl)
+    }
+  }
+  if (
+    message.method === 'Network.responseReceived' &&
+    ['Document', 'Font', 'Image', 'Script', 'Stylesheet'].includes(message.params.type) &&
+    message.params.response.status >= 400
+  ) {
+    failedResponses.push({
+      status: message.params.response.status,
+      type: message.params.type,
+      url: message.params.response.url,
+    })
   }
 
   const request = pending.get(message.id)
@@ -116,10 +136,17 @@ async function clickElement(expression, label) {
   const point = await evaluate(`(() => {
     const element = ${expression}
     if (!element) return null
+    element.scrollIntoView({ block: 'center', inline: 'center' })
     const bounds = element.getBoundingClientRect()
+    if (bounds.width <= 0 || bounds.height <= 0) return null
     return { x: bounds.left + bounds.width / 2, y: bounds.top + bounds.height / 2 }
   })()`)
   if (!point) throw new Error(`${label} not found`)
+  await send('Input.dispatchMouseEvent', {
+    type: 'mouseMoved',
+    x: point.x,
+    y: point.y,
+  })
   await send('Input.dispatchMouseEvent', {
     button: 'left',
     clickCount: 1,
@@ -141,19 +168,23 @@ async function chooseSelect(index, label) {
     `[...document.querySelectorAll('.ant-select')][${index}]?.querySelector('.ant-select-selector')`,
     `Overlay select ${index}`,
   )
+  const optionExpression = `[...document.querySelectorAll('.ant-select-item-option-content')]
+    .find((node) => {
+      const option = node.closest('.ant-select-item-option')
+      if (node.textContent.trim() !== ${JSON.stringify(label)} || !option) return false
+      const bounds = option.getBoundingClientRect()
+      return bounds.width > 0 && bounds.height > 0
+    })
+    ?.closest('.ant-select-item-option')`
   await waitFor(
-    `[...document.querySelectorAll('.ant-select-item-option-content')].some((node) => node.textContent.trim() === ${JSON.stringify(label)})`,
+    `Boolean(${optionExpression})`,
     `${label} select option`,
   )
-  await clickElement(
-    `[...document.querySelectorAll('.ant-select-item-option-content')]
-      .find((node) => node.textContent.trim() === ${JSON.stringify(label)})
-      ?.closest('.ant-select-item-option')`,
-    `${label} select option`,
+  await clickElement(optionExpression, `${label} select option`)
+  await waitFor(
+    `[...document.querySelectorAll('.ant-select-selection-item')][${index}]?.textContent.trim() === ${JSON.stringify(label)}`,
+    `${label} selection`,
   )
-  await delay(100)
-  await send('Input.dispatchKeyEvent', { key: 'Escape', type: 'keyDown' })
-  await send('Input.dispatchKeyEvent', { key: 'Escape', type: 'keyUp' })
 }
 
 await send('Page.enable')
@@ -223,7 +254,9 @@ for (const viewport of viewports) {
         src: image.getAttribute('src'),
       } : null,
       ingameCard: Boolean(document.querySelector('#ingame-wl-mmr-card')),
+      rankCard: Boolean(document.querySelector('#rank-card')),
       title: document.title,
+      winLossText: document.querySelector('#win-loss-card')?.textContent.trim() ?? '',
     }
   })()`)
 
@@ -249,6 +282,12 @@ for (const viewport of viewports) {
 
   assert(dom.title === 'Dotabod | Stream overlays', `${viewport.name}: overlay title changed`, failures)
   assert(dom.ingameCard, `${viewport.name}: playing overlay card missing`, failures)
+  assert(
+    dom.winLossText.includes('W') && dom.winLossText.includes('L'),
+    `${viewport.name}: visible win/loss content missing`,
+    failures,
+  )
+  assert(dom.rankCard, `${viewport.name}: visible rank card missing`, failures)
   assert(
     ['Block Controls', 'LastFM Settings', 'Show Dev Image', 'Persist Dev Mode', 'Chat Messages Testing'].every(
       (label) => dom.controlText.includes(label),
@@ -285,6 +324,19 @@ for (const viewport of viewports) {
     'picks overlay state',
   )
   await chooseSelect(0, 'Dire')
+  const picksState = await evaluate(`({
+    controls: [...document.querySelectorAll('.ant-select-selection-item')]
+      .map((node) => node.textContent.trim()),
+    picksBlocker: Boolean(document.querySelector('#picks-blocker-parent')),
+    picksHud: Boolean(document.querySelector('#pick-screen-hud')),
+  })`)
+  assert(
+    picksState.controls[0] === 'Dire' && picksState.controls[1] === 'Picks',
+    `Overlay controls did not select Dire/Picks: ${JSON.stringify(picksState.controls)}`,
+    failures,
+  )
+  assert(picksState.picksHud, 'Picks HUD did not render', failures)
+  assert(picksState.picksBlocker, 'Picks blocker surface did not render', failures)
   await send('Input.dispatchMouseEvent', {
     button: 'left',
     clickCount: 1,
@@ -335,17 +387,35 @@ for (const viewport of viewports) {
   const interaction = await evaluate(`({
     chatCleared: !document.querySelector('#chat-messages-overlay'),
     devImageHidden: !document.querySelector('img[alt$="dev screenshot"]'),
+    picksBlocker: Boolean(document.querySelector('#picks-blocker-parent')),
     picksHud: Boolean(document.querySelector('#pick-screen-hud')),
   })`)
   assert(chatAdded, 'Sample chat message was not added to the overlay', failures)
   assert(interaction.chatCleared, 'Overlay chat messages did not clear', failures)
   assert(interaction.devImageHidden, 'Dev background image did not hide', failures)
   assert(interaction.picksHud, 'Picks overlay disappeared after hiding dev image', failures)
+  assert(interaction.picksBlocker, 'Picks blocker disappeared after hiding dev image', failures)
   await screenshot('overlay-picks-without-background-16x9.png')
   audits.at(-1).interaction = { chatAdded, ...interaction }
 }
 
 assert(failedAssets.length === 0, `Overlay assets failed to load: ${JSON.stringify(failedAssets)}`, failures)
+assert(
+  failedResponses.length === 0,
+  `Overlay assets returned HTTP errors: ${JSON.stringify(failedResponses)}`,
+  failures,
+)
+if (expectedSocketOrigin) {
+  const unexpectedSocketRequests = socketRequests.filter(
+    (requestUrl) => new URL(requestUrl).origin !== expectedSocketOrigin,
+  )
+  assert(socketRequests.length > 0, 'Overlay did not attempt a Socket.IO connection', failures)
+  assert(
+    unexpectedSocketRequests.length === 0,
+    `Overlay contacted an unexpected Socket.IO origin: ${JSON.stringify(unexpectedSocketRequests)}`,
+    failures,
+  )
+}
 assert(
   browserExceptions.length === 0,
   `Overlay raised browser exceptions: ${JSON.stringify(browserExceptions)}`,
@@ -357,8 +427,11 @@ const report = {
   axeEnabled: Boolean(axeSource),
   browserExceptions,
   failedAssets,
+  failedResponses,
   fixture: { userId: fixture.userId, username: fixture.username },
+  expectedSocketOrigin,
   route,
+  socketRequests,
 }
 await fs.writeFile(
   path.join(outputDir, 'overlay-dev-mode-audit.json'),

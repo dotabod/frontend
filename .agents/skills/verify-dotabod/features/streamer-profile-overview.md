@@ -28,7 +28,7 @@ Preconditions:
 - **Find the overview.** The adapter waits for `[data-testid="profile-match-overview"]`. It finds semantic tables named `Most played heroes` and `Latest matches` with one to five rows each.
 - **Check destinations.** The overview exposes `View all matches` with href `/maxid1337/matches` and `View all hero win rates` with href `/maxid1337/matches?view=heroes`.
 - **Check ordering.** The first latest-match link points to `https://www.opendota.com/matches/8964010929`, the newest seeded match.
-- **Proof.** Inspect `profile-overview-desktop.png`, `profile-overview-mobile.png`, and the `/maxid1337` entries under `profileAudits` in `profile-navigation-audit.json`. Both routes must have zero scoped axe violations and no horizontal document overflow.
+- **Proof.** Inspect `profile-overview-desktop.png`, `profile-overview-mobile.png`, and the `/maxid1337` entries under `profileAudits` in `profile-navigation-audit.json`. Both viewports must have zero scoped axe violations and no horizontal document overflow.
 
 ## Gotchas
 
