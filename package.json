@@ -41,10 +41,10 @@
     "mongo:pull": "doppler run -- npx prisma db pull --schema=./prisma-mongo/schema.prisma",
     "mongo:push": "doppler run -- npx prisma db push --schema=./prisma-mongo/schema.prisma",
     "mongo:studio": "doppler run -- npx prisma studio --schema=./prisma-mongo/schema.prisma",
-    "dev:vinext": "doppler run -- vinext dev --port 3001",
-    "build:vinext": "prisma generate --no-engine && prisma generate --schema=./prisma-mongo/schema.prisma && VERCEL=1 vinext build",
+    "dev:vinext": "VINEXT=1 doppler run -- vinext dev --port 3001",
+    "build:vinext": "prisma generate --no-engine && prisma generate --schema=./prisma-mongo/schema.prisma && VINEXT=1 VERCEL=1 vinext build",
     "start:vinext": "wrangler dev",
-    "deploy:vinext": "VERCEL=1 vinext-cloudflare deploy"
+    "deploy:vinext": "VINEXT=1 VERCEL=1 vinext-cloudflare deploy"
   },
   "dependencies": {
     "@ant-design/cssinjs": "^1.24.0",

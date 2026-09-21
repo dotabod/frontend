@@ -7,6 +7,8 @@
 
 import { withSentryConfig } from '@sentry/nextjs/config'
 
+const vinextAliases = process.env.VINEXT === '1' ? { '@/lib/db': './src/lib/db.cloudflare.ts' } : {}
+
 /**
  * @type {import('next').NextConfig}
  */
@@ -54,6 +56,7 @@ const nextConfig = {
   },
   turbopack: {
     resolveAlias: {
+      ...vinextAliases,
       '@ant-design/cssinjs': '@ant-design/cssinjs/lib',
     },
   },
@@ -110,6 +113,8 @@ const nextConfig = {
     'rc-util',
   ],
   webpack: (config, { dev, isServer }) => {
+    Object.assign(config.resolve.alias, vinextAliases)
+
     // Fix for the "Cannot read properties of null (reading '1')" error in production
     if (!dev && !isServer) {
       Object.assign(config.resolve.alias, {
