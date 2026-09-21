@@ -1,4 +1,3 @@
-import { PrismaPg } from '@prisma/adapter-pg'
 import { PrismaClient } from '@prisma/client'
 
 import { PrismaClient as PrismaMongo } from '.prisma-mongo/client'
@@ -7,19 +6,22 @@ import { PrismaClient as PrismaMongo } from '.prisma-mongo/client'
 declare global {
   var prismaGlobal: PrismaClient | undefined
   var prismaMongoGlobal: PrismaMongo | undefined
+  var cloudflarePrismaAdapterFactory: ((connectionString: string) => PrismaAdapter) | undefined
 }
+
+type PrismaClientOptions = NonNullable<ConstructorParameters<typeof PrismaClient>[0]>
+type PrismaAdapter = NonNullable<PrismaClientOptions['adapter']>
 
 const isCloudflareRuntime = process.env.DOTABOD_RUNTIME === 'cloudflare'
 
 const createCloudflarePrismaClient = () => {
   const hyperdrive = globalThis.hyperdriveGlobal
-  if (!hyperdrive) {
-    throw new Error('Missing HYPERDRIVE binding')
+  const adapterFactory = globalThis.cloudflarePrismaAdapterFactory
+  if (!hyperdrive || !adapterFactory) {
+    throw new Error('Missing Cloudflare database binding')
   }
 
-  const adapter = new PrismaPg({
-    connectionString: hyperdrive.connectionString,
-  })
+  const adapter = adapterFactory(hyperdrive.connectionString)
 
   return new PrismaClient({ adapter })
 }
