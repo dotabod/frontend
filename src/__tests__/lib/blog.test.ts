@@ -17,6 +17,6 @@ describe('blog post sources', () => {
   })
 
   it('returns the newest published post', () => {
-    expect(getLatestPost()).toEqual(getAllPosts()[0])
+    expect(getLatestPost()).toStrictEqual(getAllPosts()[0])
   })
 })

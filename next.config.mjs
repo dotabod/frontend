@@ -79,6 +79,7 @@ const nextConfig = {
       '.prisma/client/**/*',
       '.prisma-mongo/client/**/*',
     ],
+    '/api/latest-post': ['./src/pages/blog/**/*.md'],
   },
   transpilePackages: [
     '@ant-design',

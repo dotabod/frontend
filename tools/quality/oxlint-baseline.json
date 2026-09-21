@@ -55218,26 +55218,6 @@
         "severity": "error"
       }
     },
-    "6daa948a5ac1b4b291ea5bead9e071fd52a6ce1743a248846e9ac2dda138433a": {
-      "count": 1,
-      "summary": {
-        "code": "eslint(require-await)",
-        "file": "src/pages/blog/[slug].tsx",
-        "labels": [
-          {
-            "context": {
-              "current": "export const getStaticPaths: GetStaticPaths = async () => {",
-              "next": "const postsDirectory = path.join(process.cwd(), 'src/pages/blog')",
-              "previous": ""
-            },
-            "span": "async () => {\n  const postsDirectory = path.join(process.cwd(), 'src/pages/blog')\n  const filenames = fs.readdirSync(postsDirectory)\n\n  const paths = filenames\n    .filter((filename) => filename.endsWith('.md'))\n    .filter((filename) => {\n      // Filter out draft posts\n      const filePath = path.join(postsDirectory, filename)\n      const fileContents = fs.readFileSync(filePath, 'utf-8')\n      const { data } = matter(fileContents)\n      return !data.draft\n    })\n    .map((filename) => ({\n      params: {\n        slug: filename.replace(/\\.md$/u, ''),\n      },\n    }))\n\n  return {\n    fallback: false,\n    paths,\n  }\n}",
-            "text": ""
-          }
-        ],
-        "message": "Async function has no `await` expression.",
-        "severity": "error"
-      }
-    },
     "6db68f69bed0b9f35c0d4e4502a39cf752f92258e732f9d4bd1dacaba9a08099": {
       "count": 1,
       "summary": {
@@ -61342,26 +61322,6 @@
         "severity": "error"
       }
     },
-    "7a89a24897ef7282d290b70fa20d03a590673ad4665b506392c890fd09512814": {
-      "count": 1,
-      "summary": {
-        "code": "react-doctor(js-combine-iterations)",
-        "file": "src/lib/blog.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "return filenames",
-              "next": ".filter((filename) => filename.endsWith('.md'))",
-              "previous": ""
-            },
-            "span": "filenames\n    .filter((filename) => filename.endsWith('.md'))\n    .map((filename) => {\n      const fileContents = fs.readFileSync(path.join(postsDirectory, filename), 'utf-8')\n      const { data } = matter(fileContents)\n\n      const date = data.date\n        ? data.date instanceof Date\n          ? data.date.toISOString()\n          : String(data.date)\n        : new Date().toISOString()\n\n      return {\n        author: data.author ?? null,\n        date,\n        description: data.description ?? '',\n        draft: Boolean(data.draft),\n        slug: filename.replace(/\\.md$/u, ''),\n        title: data.title ?? 'Untitled',\n      }\n    })\n    .filter((post) => !post.draft)",
-            "text": ""
-          }
-        ],
-        "message": "This loops over your list twice because .map().filter() makes two passes, so do it in one pass with .reduce() or a for...of loop",
-        "severity": "error"
-      }
-    },
     "7a8a3ce5cff97bc23ceca3ae14fcf8174c8618da8cc0dfd6c9fd5a84b57bef72": {
       "count": 1,
       "summary": {
@@ -61408,26 +61368,6 @@
           }
         ],
         "message": "Unsafe member access .statusCode on an `error` typed value.",
-        "severity": "error"
-      }
-    },
-    "7a96e7987dad003db4a6c6a6fb0b841bf3e8f6e8e099011079356be1191f1421": {
-      "count": 1,
-      "summary": {
-        "code": "typescript(strict-boolean-expressions)",
-        "file": "src/pages/blog/[slug].tsx",
-        "labels": [
-          {
-            "context": {
-              "current": "return !data.draft",
-              "next": "})",
-              "previous": "const { data } = matter(fileContents)"
-            },
-            "span": "data.draft",
-            "text": ""
-          }
-        ],
-        "message": "Unexpected any value in conditional. Use a more specific type to ensure type safety.",
         "severity": "error"
       }
     },
@@ -125633,26 +125573,6 @@
           }
         ],
         "message": "(BuildHIR::lowerStatement) Support ThrowStatement inside of try/catch",
-        "severity": "error"
-      }
-    },
-    "fa7c2a125e0f1be23b561d7222f231e9cacc7fa17f655ea0edc8ea8f3deb96c5": {
-      "count": 1,
-      "summary": {
-        "code": "react-doctor(js-combine-iterations)",
-        "file": "src/pages/blog/[slug].tsx",
-        "labels": [
-          {
-            "context": {
-              "current": "const paths = filenames",
-              "next": ".filter((filename) => filename.endsWith('.md'))",
-              "previous": ""
-            },
-            "span": "filenames\n    .filter((filename) => filename.endsWith('.md'))\n    .filter((filename) => {\n      // Filter out draft posts\n      const filePath = path.join(postsDirectory, filename)\n      const fileContents = fs.readFileSync(filePath, 'utf-8')\n      const { data } = matter(fileContents)\n      return !data.draft\n    })\n    .map((filename) => ({\n      params: {\n        slug: filename.replace(/\\.md$/u, ''),\n      },\n    }))",
-            "text": ""
-          }
-        ],
-        "message": "This loops over your list twice because .filter().map() makes two passes, so do it in one pass with .reduce() or a for...of loop",
         "severity": "error"
       }
     },

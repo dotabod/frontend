@@ -96,7 +96,7 @@ BlogPost.getLayout = function getLayout(page: ReactElement) {
   )
 }
 
-export const getStaticPaths: GetStaticPaths = async () => {
+export const getStaticPaths: GetStaticPaths = () => {
   const paths = getAllPosts().map((post) => ({
     params: {
       slug: post.slug,
