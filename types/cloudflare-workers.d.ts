@@ -1,7 +1,9 @@
-declare module 'cloudflare:workers' {
-  export const env: {
-    HYPERDRIVE: {
-      connectionString: string
-    }
-  }
+interface DotabodHyperdriveBinding {
+  connectionString: string
 }
+
+interface DotabodCloudflareEnv {
+  HYPERDRIVE: DotabodHyperdriveBinding
+}
+
+declare var hyperdriveGlobal: DotabodHyperdriveBinding | undefined
