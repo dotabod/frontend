@@ -5,18 +5,20 @@ import { runBackgroundTask } from '../background-task'
 
 describe('background tasks', () => {
   it('registers pending work with the Worker without waiting for completion', async () => {
-    const deferred = Promise.withResolvers<undefined>()
+    const deferred = Promise.withResolvers<boolean>()
     const context = { waitUntil: vi.fn<(task: Promise<unknown>) => void>() }
 
-    await runWithExecutionContext(context, async () => await runBackgroundTask(deferred.promise))
+    await runWithExecutionContext(context, async () => {
+      await runBackgroundTask(deferred.promise)
+    })
 
     expect(context.waitUntil).toHaveBeenCalledWith(deferred.promise)
-    deferred.resolve(undefined)
+    deferred.resolve(true)
     await deferred.promise
   })
 
   it('awaits work outside a Worker request', async () => {
-    const deferred = Promise.withResolvers<undefined>()
+    const deferred = Promise.withResolvers<boolean>()
     let completed = false
     const result = runBackgroundTask(deferred.promise).then(() => {
       completed = true
@@ -24,7 +26,7 @@ describe('background tasks', () => {
 
     await Promise.resolve()
     expect(completed).toBeFalsy()
-    deferred.resolve(undefined)
+    deferred.resolve(true)
     await result
     expect(completed).toBeTruthy()
   })
