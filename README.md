@@ -42,6 +42,14 @@ pnpm dev
 
 1. Undo the moderator scope changes and login with a normal twitch user that you want to stream on
 
+## Cloudflare Preview authentication
+
+Set the Workers Builds **Preview deploy command** to `pnpm run cloudflare:preview:deploy` after this script is available on the deployed branch. Keep the build command as `pnpm run build:vinext`.
+
+The deploy script reads Cloudflare's stable Preview URL and updates `NEXTAUTH_URL` on that Preview in a second deployment. It does not change production or Preview Base secrets. Do not treat the first deployment as ready until the command completes; a failed secret update fails the command. Unique deployment URLs use the stable branch URL for authentication.
+
+Twitch requires the exact `${NEXTAUTH_URL}/api/auth/callback/twitch` URL to be registered in the Twitch application used by Preview credentials. The script prints that URL. New branch URLs are not automatically authorized by Twitch. Use registered branches for authenticated testing; arbitrary branches need callback registration first. Do not derive `NEXTAUTH_URL` from untrusted request headers or mutate it per request.
+
 ## Refreshing the queue blocker art 🖼️
 
 The queue blocker draws a fake main menu over a streamer's real one, so its two background images have to keep matching whatever Valve is currently shipping:

@@ -47,6 +47,7 @@
     "build:vinext:doppler": "doppler run -- sh -c 'exec env NEXT_PUBLIC_LASTFM_API_KEY=\"$LASTFM_API_KEY\" npm run build:vinext'",
     "cloudflare:preview-secrets:check": "node scripts/sync-cloudflare-secrets.mjs --preview --doppler-config preview --dry-run",
     "cloudflare:preview-secrets:sync": "node scripts/sync-cloudflare-secrets.mjs --preview --doppler-config preview",
+    "cloudflare:preview:deploy": "node scripts/deploy-cloudflare-preview.mjs",
     "cloudflare:secrets:check": "node scripts/sync-cloudflare-secrets.mjs --dry-run",
     "cloudflare:secrets:sync": "node scripts/sync-cloudflare-secrets.mjs",
     "start:vinext": "wrangler dev",
