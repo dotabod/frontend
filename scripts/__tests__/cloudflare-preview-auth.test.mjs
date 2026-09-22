@@ -4,8 +4,12 @@ import { previewAuthTarget } from '../lib/cloudflare-preview-auth.mjs'
 
 const deployment = (url, workerName = 'frontend') =>
   JSON.stringify({
-    deployment: { urls: ['https://unique-deployment.example.com'] },
-    preview: { name: 'feature/login', urls: [url], worker_name: workerName },
+    deployment_urls: ['https://unique-deployment.example.com'],
+    preview_name: 'feature/login',
+    preview_urls: [url],
+    type: 'preview',
+    version: 1,
+    worker_name: workerName,
   })
 
 describe('Cloudflare Preview auth origin', () => {
@@ -23,6 +27,16 @@ describe('Cloudflare Preview auth origin', () => {
     expect(previewAuthTarget(deployment('https://feature-login.dev.dotabod.com')).origin).toBe(
       'https://feature-login.dev.dotabod.com',
     )
+  })
+
+  it('reads the final Preview record after Wrangler session metadata', () => {
+    const output = `{"type":"wrangler-session","version":1}\n${deployment('https://branch.dev.dotabod.com')}\n`
+    expect(previewAuthTarget(output).origin).toBe('https://branch.dev.dotabod.com')
+  })
+
+  it('rejects console output and incomplete deployments', () => {
+    expect(() => previewAuthTarget('Using redirected Wrangler configuration.')).toThrow()
+    expect(() => previewAuthTarget('{"type":"wrangler-session","version":1}\n')).toThrow()
   })
 
   it.each([
