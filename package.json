@@ -44,8 +44,11 @@
     "mongo:studio": "doppler run -- npx prisma studio --schema=./prisma-mongo/schema.prisma",
     "dev:vinext": "VINEXT=1 doppler run -- vinext dev --port 3001",
     "build:vinext": "npm run generate:blog && PRISMA_CLIENT_ENGINE_TYPE=client prisma generate && prisma generate --schema=./prisma-mongo/schema.prisma && VINEXT=1 VERCEL=1 vinext build",
+    "build:vinext:doppler": "doppler run -- sh -c 'exec env NEXT_PUBLIC_LASTFM_API_KEY=\"$LASTFM_API_KEY\" npm run build:vinext'",
+    "cloudflare:secrets:check": "node scripts/sync-cloudflare-secrets.mjs --dry-run",
+    "cloudflare:secrets:sync": "node scripts/sync-cloudflare-secrets.mjs",
     "start:vinext": "wrangler dev",
-    "deploy:vinext": "VINEXT=1 VERCEL=1 vinext-cloudflare deploy"
+    "deploy:vinext": "npm run cloudflare:secrets:sync && doppler run -- sh -c 'exec env NEXT_PUBLIC_LASTFM_API_KEY=\"$LASTFM_API_KEY\" VINEXT=1 VERCEL=1 vinext-cloudflare deploy --name frontend'"
   },
   "dependencies": {
     "@ant-design/cssinjs": "^1.24.0",
