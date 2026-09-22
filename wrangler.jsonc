@@ -3,6 +3,7 @@
   "name": "frontend",
   "compatibility_date": "2026-09-21",
   "compatibility_flags": ["nodejs_compat"],
+  "preview_urls": true,
   "vars": {
     "DOTABOD_RUNTIME": "cloudflare",
     "VERCEL_ENV": "production",
@@ -50,4 +51,16 @@
       "id": "764dd78253334cca9da8576f2ea5a537",
     },
   ],
+  "previews": {
+    "vars": {
+      "DOTABOD_RUNTIME": "cloudflare",
+      "VERCEL_ENV": "preview",
+    },
+    "hyperdrive": [
+      {
+        "binding": "HYPERDRIVE",
+        "id": "04710431a2fd4fde903da24b82fee25c",
+      },
+    ],
+  },
 }
