@@ -46,7 +46,7 @@ pnpm dev
 
 ### Production and development
 
-`frontend` is the production Worker, with production Hyperdrive and `NEXTAUTH_URL=https://dotabod.com`. `frontend-dev` is a separate deployment for `dev.dotabod.com`, built with `pnpm run build:vinext:dev` and deployed with `pnpm exec wrangler deploy --name frontend-dev`. Cloudflare's Vite plugin selects `env.dev` at **build time**, not at deploy time.
+`frontend` is the production Worker, with production Hyperdrive and `NEXTAUTH_URL=https://dotabod.com`. `frontend-dev` follows the `cloudflare-dev` branch and is a separate deployment for `dev.dotabod.com`, built with `pnpm run build:vinext:dev` and deployed with `pnpm exec wrangler deploy --name frontend-dev`. Cloudflare's Vite plugin selects `env.dev` at **build time**, not at deploy time.
 
 Development uses Doppler's `preview` configuration, preview Hyperdrive, test payments, and `NEXTAUTH_URL=https://dev.dotabod.com`. Sync its runtime secrets with `pnpm run cloudflare:dev-secrets:sync`. Production users/settings are not copied into the development database. Some third-party integration credentials remain shared; separate deployments do not imply every external service is sandboxed.
 

@@ -1,6 +1,7 @@
 import { PrismaPg } from '@prisma/adapter-pg'
 import vinextWorker from 'vinext/server/fetch-handler'
-import { type ExecutionContextLike, runWithExecutionContext } from 'vinext/shims/request-context'
+import type { ExecutionContextLike } from 'vinext/shims/request-context'
+import { runWithExecutionContext } from 'vinext/shims/request-context'
 
 interface VinextWorker {
   fetch: (
@@ -22,6 +23,9 @@ export default {
     context: ExecutionContextLike,
   ): Promise<Response> {
     globalThis.hyperdriveGlobal = env.HYPERDRIVE
-    return await runWithExecutionContext(context, () => worker.fetch(request, env, context))
+    return await runWithExecutionContext(
+      context,
+      async () => await worker.fetch(request, env, context),
+    )
   },
 }

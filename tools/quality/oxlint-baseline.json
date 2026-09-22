@@ -81762,26 +81762,6 @@
         "severity": "error"
       }
     },
-    "a248bb23877f9cd408190df06f2adfe567aa52ab60c914064f4ced6e8ded8564": {
-      "count": 1,
-      "summary": {
-        "code": "promise(prefer-await-to-then)",
-        "file": "src/pages/api/hubspot/visitor-token.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "enrichContact(token, session.user.id, email, session.user.name ?? '').catch((error) => {",
-              "next": "captureException(error instanceof Error ? error : new Error(String(error)))",
-              "previous": "waitUntil("
-            },
-            "span": "catch",
-            "text": ""
-          }
-        ],
-        "message": "Prefer await to then()/catch()/finally()",
-        "severity": "error"
-      }
-    },
     "a24d42a27fd4725489e6a459faa5b9c8b1f1b98fd308b995ecb4036a0405c54c": {
       "count": 1,
       "summary": {
@@ -85305,26 +85285,6 @@
           }
         ],
         "message": "Unexpected nullable string value in conditional. Please handle the nullish and empty string cases explicitly.",
-        "severity": "error"
-      }
-    },
-    "a96b8f7d8d7386dd7bd2964f34224b295e1696cecc4caeacc8415c3dcad2e9e3": {
-      "count": 1,
-      "summary": {
-        "code": "promise(prefer-await-to-callbacks)",
-        "file": "src/pages/api/hubspot/visitor-token.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "enrichContact(token, session.user.id, email, session.user.name ?? '').catch((error) => {",
-              "next": "captureException(error instanceof Error ? error : new Error(String(error)))",
-              "previous": "waitUntil("
-            },
-            "span": "(error) => {\n        captureException(error instanceof Error ? error : new Error(String(error)))\n      }",
-            "text": ""
-          }
-        ],
-        "message": "Prefer `async`/`await` to the callback pattern",
         "severity": "error"
       }
     },

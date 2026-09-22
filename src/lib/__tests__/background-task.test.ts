@@ -5,33 +5,33 @@ import { runBackgroundTask } from '../background-task'
 
 describe('background tasks', () => {
   it('registers pending work with the Worker without waiting for completion', async () => {
-    const deferred = Promise.withResolvers<void>()
-    const context = { waitUntil: vi.fn() }
+    const deferred = Promise.withResolvers<undefined>()
+    const context = { waitUntil: vi.fn<(task: Promise<unknown>) => void>() }
 
-    await runWithExecutionContext(context, () => runBackgroundTask(deferred.promise))
+    await runWithExecutionContext(context, async () => await runBackgroundTask(deferred.promise))
 
     expect(context.waitUntil).toHaveBeenCalledWith(deferred.promise)
-    deferred.resolve()
+    deferred.resolve(undefined)
     await deferred.promise
   })
 
   it('awaits work outside a Worker request', async () => {
-    const deferred = Promise.withResolvers<void>()
+    const deferred = Promise.withResolvers<undefined>()
     let completed = false
     const result = runBackgroundTask(deferred.promise).then(() => {
       completed = true
     })
 
     await Promise.resolve()
-    expect(completed).toBe(false)
-    deferred.resolve()
+    expect(completed).toBeFalsy()
+    deferred.resolve(undefined)
     await result
-    expect(completed).toBe(true)
+    expect(completed).toBeTruthy()
   })
 
   it('keeps concurrent request contexts separate across async continuations', async () => {
-    const first = { waitUntil: vi.fn() }
-    const second = { waitUntil: vi.fn() }
+    const first = { waitUntil: vi.fn<(task: Promise<unknown>) => void>() }
+    const second = { waitUntil: vi.fn<(task: Promise<unknown>) => void>() }
     const firstTask = Promise.resolve('first')
     const secondTask = Promise.resolve('second')
 
