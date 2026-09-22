@@ -3,7 +3,7 @@ import type { Collection, Document, WithId } from 'mongodb'
 
 import { prismaMongo } from '@/lib/db'
 
-export interface NotablePlayer {
+interface NotablePlayer {
   id: string
   account_id: unknown
   addedBy: string | null
@@ -33,7 +33,7 @@ export interface NotablePlayer {
   team_tag: string | null
 }
 
-export interface CreateNotablePlayerInput {
+interface CreateNotablePlayerInput {
   account_id: number
   addedBy: string | null
   channel: string
@@ -42,16 +42,13 @@ export interface CreateNotablePlayerInput {
   name: string
 }
 
-export interface UpdateNotablePlayerInput {
+interface UpdateNotablePlayerInput {
   account_id: number
   country_code?: string
   name: string
 }
 
-export type NotablePlayerOwnership = Pick<
-  NotablePlayer,
-  'addedBy' | 'country_code' | 'createdAt' | 'name'
->
+type NotablePlayerOwnership = Pick<NotablePlayer, 'addedBy' | 'country_code' | 'createdAt' | 'name'>
 
 export interface NotablePlayersDatabase {
   create: (data: CreateNotablePlayerInput) => Promise<NotablePlayer>
