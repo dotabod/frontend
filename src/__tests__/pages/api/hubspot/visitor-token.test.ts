@@ -1,3 +1,4 @@
+import fetch from 'node-fetch'
 import { createMocks } from 'node-mocks-http'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
@@ -13,6 +14,7 @@ vi.mock('@/lib/hubspot', () => ({
   syncHubSpotContact: vi.fn().mockResolvedValue(undefined),
 }))
 vi.mock('@/utils/subscription', () => ({ getSubscription: vi.fn() }))
+vi.mock('node-fetch', () => ({ default: vi.fn() }))
 vi.mock('@sentry/nextjs', () => ({ captureException: vi.fn() }))
 
 const anyVal = (v: unknown) => v as any
@@ -34,8 +36,9 @@ const session = (over: Record<string, unknown> = {}) =>
 describe('GET /api/hubspot/visitor-token', () => {
   beforeEach(() => {
     vi.stubEnv('HUBSPOT_PRIVATE_APP_TOKEN', 'test-token')
+    vi.stubGlobal('fetch', fetch)
     vi.mocked(getSubscription).mockResolvedValue(anyVal({ status: 'ACTIVE', tier: 'PRO' }))
-    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(tokenOk()))
+    vi.mocked(fetch).mockResolvedValue(tokenOk())
     vi.mocked(syncHubSpotContact).mockResolvedValue(true)
     vi.mocked(subscriptionToValue).mockReturnValue('pro')
   })

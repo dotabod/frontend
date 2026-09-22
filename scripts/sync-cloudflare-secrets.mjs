@@ -1,16 +1,18 @@
 import { execFileSync, spawnSync } from 'node:child_process'
 import { readFileSync } from 'node:fs'
 
-const manifest = JSON.parse(
-  readFileSync(new URL('./cloudflare-env-manifest.json', import.meta.url), 'utf8'),
+import { z } from 'zod'
+
+const manifestSchema = z.object({
+  runtimeSecretKeys: z.array(z.string().min(1)).min(1),
+  workerName: z.string().min(1),
+})
+const dopplerSecretsSchema = z.record(z.string(), z.object({ computed: z.string() }))
+
+const { runtimeSecretKeys: secretNames, workerName } = manifestSchema.parse(
+  JSON.parse(readFileSync(new URL('cloudflare-env-manifest.json', import.meta.url), 'utf-8')),
 )
 const dryRun = process.argv.includes('--dry-run')
-const workerName = manifest.workerName
-const secretNames = manifest.runtimeSecretKeys
-
-if (!workerName || !Array.isArray(secretNames) || secretNames.length === 0) {
-  throw new Error('Cloudflare environment manifest is missing its Worker name or runtime secrets')
-}
 
 const uniqueSecretNames = [...new Set(secretNames)]
 if (uniqueSecretNames.length !== secretNames.length) {
@@ -26,21 +28,32 @@ if (unsafeNames.length > 0) {
   )
 }
 
-let dopplerSecrets
-try {
-  const output = execFileSync('doppler', ['secrets', '--json', '--no-check-version'], {
-    encoding: 'utf8',
-    maxBuffer: 10 * 1024 * 1024,
-  })
-  dopplerSecrets = JSON.parse(output)
-} catch {
-  throw new Error('Could not read the configured Doppler project and config')
+const readDopplerSecrets = () => {
+  try {
+    // oxlint-disable-next-line sonarjs/no-os-command-from-path -- SAFETY: Doppler is an explicitly required operator-installed CLI; no user input reaches the command name or arguments.
+    const output = execFileSync('doppler', ['secrets', '--json', '--no-check-version'], {
+      encoding: 'utf-8',
+      maxBuffer: 10 * 1024 * 1024,
+    })
+    return dopplerSecretsSchema.parse(JSON.parse(output))
+  } catch {
+    throw new Error('Could not read the configured Doppler project and config')
+  }
 }
 
-const missingSecrets = secretNames.filter((name) => {
+const dopplerSecrets = readDopplerSecrets()
+
+const missingSecrets = []
+/** @type {Record<string, string>} */
+const payload = {}
+for (const name of secretNames) {
   const value = dopplerSecrets[name]?.computed
-  return typeof value !== 'string' || value.length === 0
-})
+  if (value === undefined || value.length === 0) {
+    missingSecrets.push(name)
+  } else {
+    payload[name] = value
+  }
+}
 
 if (missingSecrets.length > 0) {
   throw new Error(`Required Doppler secrets are missing or empty: ${missingSecrets.join(', ')}`)
@@ -52,10 +65,9 @@ if (dryRun) {
   process.exit(0)
 }
 
-const payload = Object.fromEntries(secretNames.map((name) => [name, dopplerSecrets[name].computed]))
 const pnpm = process.platform === 'win32' ? 'pnpm.cmd' : 'pnpm'
 const result = spawnSync(pnpm, ['exec', 'wrangler', 'secret', 'bulk', '--name', workerName], {
-  encoding: 'utf8',
+  encoding: 'utf-8',
   input: JSON.stringify(payload),
   stdio: ['pipe', 'inherit', 'inherit'],
 })
