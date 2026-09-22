@@ -1,5 +1,6 @@
 import { execFileSync, spawnSync } from 'node:child_process'
 import { readFileSync } from 'node:fs'
+import { fileURLToPath } from 'node:url'
 
 import { z } from 'zod'
 
@@ -11,12 +12,16 @@ const manifestSchema = z.object({
 const dopplerSecretsSchema = z.record(z.string(), z.object({ computed: z.string() }))
 
 const preview = process.argv.includes('--preview')
+const development = process.argv.includes('--dev')
+if (preview && development) {
+  throw new Error('Choose either --preview or --dev')
+}
 const { preservedRuntimeSecretKeys, runtimeSecretKeys, workerName } = manifestSchema.parse(
   JSON.parse(readFileSync(new URL('cloudflare-env-manifest.json', import.meta.url), 'utf-8')),
 )
-const secretNames = preview
-  ? [...runtimeSecretKeys, ...preservedRuntimeSecretKeys]
-  : runtimeSecretKeys
+const targetWorkerName = development ? `${workerName}-dev` : workerName
+const secretNames =
+  preview || development ? [...runtimeSecretKeys, ...preservedRuntimeSecretKeys] : runtimeSecretKeys
 const dryRun = process.argv.includes('--dry-run')
 const dopplerConfigIndex = process.argv.indexOf('--doppler-config')
 const dopplerConfig = dopplerConfigIndex === -1 ? undefined : process.argv[dopplerConfigIndex + 1]
@@ -76,17 +81,17 @@ if (missingSecrets.length > 0) {
 }
 
 if (dryRun) {
-  const target = preview ? 'Worker Preview base config' : 'Worker production config'
-  console.log(`Validated ${secretNames.length} Doppler secrets for ${target} ${workerName}:`)
+  const target = preview ? 'Worker Preview base config' : 'Worker deployment'
+  console.log(`Validated ${secretNames.length} Doppler secrets for ${target} ${targetWorkerName}:`)
   console.log(secretNames.join('\n'))
   process.exit(0)
 }
 
-const pnpm = process.platform === 'win32' ? 'pnpm.cmd' : 'pnpm'
+const wrangler = fileURLToPath(new URL('../node_modules/.bin/wrangler', import.meta.url))
 const wranglerArgs = preview
-  ? ['exec', 'wrangler', 'preview', 'base-config', 'secret', 'bulk', '--worker-name', workerName]
-  : ['exec', 'wrangler', 'secret', 'bulk', '--name', workerName]
-const result = spawnSync(pnpm, wranglerArgs, {
+  ? ['preview', 'base-config', 'secret', 'bulk', '--worker-name', workerName]
+  : ['secret', 'bulk', '--name', targetWorkerName, '--env', '']
+const result = spawnSync(wrangler, wranglerArgs, {
   encoding: 'utf-8',
   input: JSON.stringify(payload),
   stdio: ['pipe', 'inherit', 'inherit'],
@@ -99,5 +104,5 @@ if (result.status !== 0) {
   process.exit(result.status ?? 1)
 }
 
-const target = preview ? 'Worker Preview base config' : 'Worker production config'
-console.log(`Synced ${secretNames.length} Doppler secrets to ${target} ${workerName}`)
+const target = preview ? 'Worker Preview base config' : 'Worker deployment'
+console.log(`Synced ${secretNames.length} Doppler secrets to ${target} ${targetWorkerName}`)

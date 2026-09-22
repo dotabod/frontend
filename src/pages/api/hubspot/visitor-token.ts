@@ -1,10 +1,10 @@
 import { captureException } from '@sentry/nextjs'
-import { waitUntil } from '@vercel/functions'
 import type { NextApiRequest, NextApiResponse } from 'next'
 
 import { withMethods } from '@/lib/api-middlewares/with-methods'
 import { getServerSession } from '@/lib/api/get-server-session'
 import { authOptions } from '@/lib/auth'
+import { runBackgroundTask } from '@/lib/background-task'
 import { subscriptionToValue, syncHubSpotContact } from '@/lib/hubspot'
 import { getSubscription } from '@/utils/subscription'
 
@@ -81,18 +81,17 @@ const handler = async function handler(req: NextApiRequest, res: NextApiResponse
     return
   }
 
-  // Respond immediately — the widget only needs the token to identify the visitor.
-  res.status(200).json({ email, token: visitorToken })
-
   // Skip enrichment while impersonating: the session id is the admin's but the
   // Email/name are the impersonated user's, so writing would corrupt their contact.
   if (!session.user.isImpersonating) {
-    waitUntil(
+    await runBackgroundTask(
       enrichContact(token, session.user.id, email, session.user.name ?? '').catch((error) => {
         captureException(error instanceof Error ? error : new Error(String(error)))
       }),
     )
   }
+
+  res.status(200).json({ email, token: visitorToken })
 }
 
 export default withMethods(['GET'], handler)

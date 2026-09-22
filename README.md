@@ -44,6 +44,16 @@ pnpm dev
 
 ## Cloudflare Preview authentication
 
+### Production and development
+
+`frontend` is the production Worker, with production Hyperdrive and `NEXTAUTH_URL=https://dotabod.com`. `frontend-dev` is a separate deployment for `dev.dotabod.com`, built with `pnpm run build:vinext:dev` and deployed with `pnpm exec wrangler deploy --name frontend-dev`. Cloudflare's Vite plugin selects `env.dev` at **build time**, not at deploy time.
+
+Development uses Doppler's `preview` configuration, preview Hyperdrive, test payments, and `NEXTAUTH_URL=https://dev.dotabod.com`. Sync its runtime secrets with `pnpm run cloudflare:dev-secrets:sync`. Production users/settings are not copied into the development database. Some third-party integration credentials remain shared; separate deployments do not imply every external service is sandboxed.
+
+The production auth URL must be set in both Workers runtime secrets and Workers Builds variables. Do not change the public `dotabod.com`/`www` DNS until cutover is approved and verified. Keep the existing Twitch callbacks for production and dev.
+
+### Branch previews
+
 Set the Workers Builds **Preview deploy command** to `pnpm run cloudflare:preview:deploy` after this script is available on the deployed branch. Keep the build command as `pnpm run build:vinext`.
 
 The deploy script reads Cloudflare's stable Preview URL and updates `NEXTAUTH_URL` on that Preview in a second deployment. It does not change production or Preview Base secrets. Do not treat the first deployment as ready until the command completes; a failed secret update fails the command. Unique deployment URLs use the stable branch URL for authentication.
