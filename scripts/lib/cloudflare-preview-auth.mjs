@@ -5,7 +5,7 @@ const deploymentSchema = z.object({
   preview_urls: z.array(z.string().min(1)).min(1),
   type: z.literal('preview'),
   version: z.literal(1),
-  worker_name: z.literal('frontend'),
+  worker_name: z.literal('frontend').default('frontend'),
 })
 
 // Use Cloudflare's stable branch URL, never the unique deployment URL or a request header.

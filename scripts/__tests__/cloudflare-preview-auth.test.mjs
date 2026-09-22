@@ -2,6 +2,8 @@ import { describe, expect, it } from 'vitest'
 
 import { previewAuthTarget } from '../lib/cloudflare-preview-auth.mjs'
 
+const branchOrigin = 'https://branch.dev.dotabod.com'
+
 const deployment = (url, workerName = 'frontend') =>
   JSON.stringify({
     deployment_urls: ['https://unique-deployment.example.com'],
@@ -30,8 +32,18 @@ describe('Cloudflare Preview auth origin', () => {
   })
 
   it('reads the final Preview record after Wrangler session metadata', () => {
-    const output = `{"type":"wrangler-session","version":1}\n${deployment('https://branch.dev.dotabod.com')}\n`
-    expect(previewAuthTarget(output).origin).toBe('https://branch.dev.dotabod.com')
+    const output = `{"type":"wrangler-session","version":1}\n${deployment(branchOrigin)}\n`
+    expect(previewAuthTarget(output).origin).toBe(branchOrigin)
+  })
+
+  it('accepts missing worker_name from the explicitly targeted frontend deployment', () => {
+    const output = JSON.stringify({
+      preview_name: 'branch',
+      preview_urls: [branchOrigin],
+      type: 'preview',
+      version: 1,
+    })
+    expect(previewAuthTarget(output).workerName).toBe('frontend')
   })
 
   it('rejects console output and incomplete deployments', () => {
@@ -59,6 +71,6 @@ describe('Cloudflare Preview auth origin', () => {
   it('fails closed for missing metadata and other Workers', () => {
     expect(() => previewAuthTarget('{}')).toThrow()
     expect(() => previewAuthTarget('not json')).toThrow()
-    expect(() => previewAuthTarget(deployment('https://branch.dev.dotabod.com', 'other'))).toThrow()
+    expect(() => previewAuthTarget(deployment(branchOrigin, 'other'))).toThrow()
   })
 })
