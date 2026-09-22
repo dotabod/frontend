@@ -9,7 +9,7 @@ const deploymentSchema = z.object({
 })
 
 // Use Cloudflare's stable branch URL, never the unique deployment URL or a request header.
-/** @param {string} output */
+/** @param {string} output - JSON returned by wrangler preview --json. */
 export const previewAuthTarget = (output) => {
   const { preview } = deploymentSchema.parse(JSON.parse(output))
   const url = new URL(preview.urls[0])

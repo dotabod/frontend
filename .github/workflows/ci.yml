@@ -49,11 +49,6 @@ jobs:
           DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:5432/dotabod_test
           DIRECT_URL: postgresql://postgres:postgres@127.0.0.1:5432/dotabod_test
           RUN_STRIPE_WEBHOOK_POSTGRES_TESTS: 'true'
-      - name: Diagnose preview auth lint
-        run: >-
-          pnpm exec oxlint --disable-nested-config --config oxlint.config.ts --type-aware
-          scripts/deploy-cloudflare-preview.mjs scripts/lib/cloudflare-preview-auth.mjs
-          scripts/__tests__/cloudflare-preview-auth.test.mjs
       - name: Run quality checks
         run: pnpm quality
       - name: Run tests
