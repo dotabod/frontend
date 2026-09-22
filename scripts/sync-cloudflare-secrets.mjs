@@ -21,7 +21,7 @@ const dryRun = process.argv.includes('--dry-run')
 const dopplerConfigIndex = process.argv.indexOf('--doppler-config')
 const dopplerConfig = dopplerConfigIndex === -1 ? undefined : process.argv[dopplerConfigIndex + 1]
 
-if (dopplerConfigIndex !== -1 && !dopplerConfig) {
+if (dopplerConfigIndex !== -1 && (dopplerConfig === undefined || dopplerConfig.length === 0)) {
   throw new Error('--doppler-config requires a config name')
 }
 
@@ -42,7 +42,7 @@ if (unsafeNames.length > 0) {
 const readDopplerSecrets = () => {
   try {
     const args = ['secrets', '--json', '--no-check-version']
-    if (dopplerConfig) {
+    if (dopplerConfig !== undefined && dopplerConfig.length > 0) {
       args.push('--config', dopplerConfig)
     }
 
