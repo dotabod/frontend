@@ -1,7 +1,6 @@
 import { captureException } from '@sentry/nextjs'
 import { waitUntil } from '@vercel/functions'
 import type { NextApiRequest, NextApiResponse } from 'next'
-import fetch from 'node-fetch'
 
 import { withMethods } from '@/lib/api-middlewares/with-methods'
 import { getServerSession } from '@/lib/api/get-server-session'

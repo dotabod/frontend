@@ -85,6 +85,7 @@
     "gray-matter": "^4.0.3",
     "lucide-react": "^0.487.0",
     "mantine-flagpack": "^4.1.1",
+    "mongodb": "^7.6.0",
     "next": "^16.3.4",
     "next-auth": "4.24.15",
     "node-fetch": "^2.7.0",

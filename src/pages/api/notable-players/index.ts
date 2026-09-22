@@ -7,7 +7,11 @@ import { withAuthentication } from '@/lib/api-middlewares/with-authentication'
 import { withMethods } from '@/lib/api-middlewares/with-methods'
 import { getServerSession } from '@/lib/api/get-server-session'
 import { authOptions } from '@/lib/auth'
-import { prismaMongo } from '@/lib/db'
+import {
+  createNotablePlayer,
+  findNotablePlayerByAccountId,
+  listNotablePlayers,
+} from '@/lib/notable-players-db'
 
 // Define validation schema for creating a notable player
 const createNotablePlayerSchema = z.object({
@@ -35,14 +39,7 @@ const handler = async function handler(req: NextApiRequest, res: NextApiResponse
 
     // GET - List notable players for the user's channel
     if (req.method === 'GET') {
-      const notablePlayers = await prismaMongo.notablePlayers.findMany({
-        orderBy: {
-          name: 'asc',
-        },
-        where: {
-          channel,
-        },
-      })
+      const notablePlayers = await listNotablePlayers(channel)
 
       res.status(200).json(notablePlayers)
       return
@@ -53,28 +50,19 @@ const handler = async function handler(req: NextApiRequest, res: NextApiResponse
       const validatedData = createNotablePlayerSchema.parse(req.body)
 
       // Check if player with this account_id already exists for this channel
-      const existingPlayer = await prismaMongo.notablePlayers.findFirst({
-        where: {
-          account_id: {
-            equals: validatedData.account_id,
-          },
-          channel,
-        },
-      })
+      const existingPlayer = await findNotablePlayerByAccountId(channel, validatedData.account_id)
 
       if (existingPlayer) {
         res.status(409).json({ error: 'Player already exists' })
         return
       }
 
-      // Create the new notable player with type assertion for the data
-      const newPlayer = await prismaMongo.notablePlayers.create({
-        data: {
-          ...validatedData,
-          addedBy: session.user.name,
-          channel,
-          createdAt: new Date(),
-        },
+      // Create the new notable player
+      const newPlayer = await createNotablePlayer({
+        ...validatedData,
+        addedBy: session.user.name,
+        channel,
+        createdAt: new Date(),
       })
 
       res.status(201).json(newPlayer)
