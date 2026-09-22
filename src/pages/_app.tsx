@@ -1,7 +1,6 @@
 import { createCache, StyleProvider } from '@ant-design/cssinjs'
 import { MantineProvider } from '@mantine/core'
 import { GoogleAnalytics } from '@next/third-parties/google'
-import { Analytics as VercelAnalytics } from '@vercel/analytics/react'
 import { App as AntProvider, ConfigProvider, unstableSetRender } from 'antd'
 import type { NextPage } from 'next'
 import type { Session } from 'next-auth'
@@ -96,9 +95,6 @@ const App = ({ Component, pageProps: { session, ...pageProps } }: AppPropsWithLa
   const content = (
     <ConfigProvider theme={themeConfig}>
       {!isPublicOverlayRoute && <SentrySession />}
-
-      {/* Only load Vercel Analytics if explicit consent has been given */}
-      {hasConsented && cookieConsent.analytics && <VercelAnalytics />}
 
       {/* Only load Google Analytics if explicit consent has been given */}
       {hasConsented && cookieConsent.analytics && (

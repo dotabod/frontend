@@ -1,7 +1,7 @@
-import fs from 'node:fs'
-import path from 'node:path'
-
 import matter from 'gray-matter'
+import { z } from 'zod'
+
+import blogPostSources from '@/generated/blog-posts.json'
 
 export interface Post {
   slug: string
@@ -12,34 +12,42 @@ export interface Post {
   draft: boolean
 }
 
-const postsDirectory = path.join(process.cwd(), 'src/pages/blog')
+const blogPostDateSchema = z.union([z.date(), z.string(), z.number()]).nullable().optional()
 
 export const getAllPosts = function getAllPosts(): Post[] {
-  const filenames = fs.readdirSync(postsDirectory)
+  const posts: Post[] = []
 
-  return filenames
-    .filter((filename) => filename.endsWith('.md'))
-    .map((filename) => {
-      const fileContents = fs.readFileSync(path.join(postsDirectory, filename), 'utf-8')
-      const { data } = matter(fileContents)
+  for (const { slug, source } of blogPostSources) {
+    const { data } = matter(source)
+    const dateValue = blogPostDateSchema.parse(data.date)
 
-      const date = data.date
-        ? data.date instanceof Date
-          ? data.date.toISOString()
-          : String(data.date)
-        : new Date().toISOString()
+    let date = new Date().toISOString()
 
-      return {
-        author: data.author ?? null,
-        date,
-        description: data.description ?? '',
-        draft: Boolean(data.draft),
-        slug: filename.replace(/\.md$/u, ''),
-        title: data.title ?? 'Untitled',
-      }
-    })
-    .filter((post) => !post.draft)
-    .toSorted((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+    if (dateValue instanceof Date) {
+      date = dateValue.toISOString()
+    } else if (dateValue !== null && dateValue !== undefined) {
+      date = String(dateValue)
+    }
+
+    const post = {
+      author: data.author ?? null,
+      date,
+      description: data.description ?? '',
+      draft: Boolean(data.draft),
+      slug,
+      title: data.title ?? 'Untitled',
+    }
+
+    if (!post.draft) {
+      posts.push(post)
+    }
+  }
+
+  return posts.toSorted((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+}
+
+export const getPostSource = function getPostSource(slug: string): string | null {
+  return blogPostSources.find((post) => post.slug === slug)?.source ?? null
 }
 
 export const getLatestPost = function getLatestPost(): Post | null {

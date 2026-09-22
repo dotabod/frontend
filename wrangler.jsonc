@@ -1,0 +1,87 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "frontend",
+  "compatibility_date": "2026-09-21",
+  "compatibility_flags": ["nodejs_compat"],
+  "preview_urls": true,
+  "observability": {
+    "logs": {
+      "enabled": true,
+      "invocation_logs": true,
+    },
+  },
+  "vars": {
+    "DOTABOD_RUNTIME": "cloudflare",
+    "VERCEL_ENV": "production",
+  },
+  "secrets": {
+    "required": [
+      "CRON_SECRET",
+      "CRON_TWITCH_ID",
+      "CROWDIN_TOKEN",
+      "DATABASE_URL",
+      "DIRECT_URL",
+      "HUBSPOT_PRIVATE_APP_TOKEN",
+      "IS_IN_MAINTENANCE_MODE",
+      "MONGO_URL",
+      "NEXTAUTH_SECRET",
+      "NEXTAUTH_URL",
+      "NOWPAYMENTS_API_KEY",
+      "NOWPAYMENTS_IPN_SECRET",
+      "OPENNODE_API_KEY",
+      "PAYLINK_SIGNING_SECRET",
+      "PAYPAL_API_BASE",
+      "PAYPAL_CLIENT_ID",
+      "PAYPAL_CLIENT_SECRET",
+      "PAYPAL_PLAN_ID_ANNUAL",
+      "PAYPAL_PLAN_ID_MONTHLY",
+      "PAYPAL_WEBHOOK_ID",
+      "SEVENTV_AUTH",
+      "STEAM_WEB_API",
+      "STRIPE_SECRET_KEY",
+      "STRIPE_WEBHOOK_SECRET",
+      "TWITCH_BOT_PROVIDERID",
+      "TWITCH_CLIENT_ID",
+      "TWITCH_CLIENT_SECRET",
+    ],
+  },
+  "main": "src/cloudflare-worker.ts",
+  "env": {
+    "dev": {
+      "name": "frontend-dev",
+      "vars": {
+        "DOTABOD_RUNTIME": "cloudflare",
+        "VERCEL_ENV": "preview",
+      },
+      "hyperdrive": [
+        {
+          "binding": "HYPERDRIVE",
+          "id": "04710431a2fd4fde903da24b82fee25c",
+        },
+      ],
+    },
+  },
+  "assets": {
+    "directory": "dist/client",
+    "not_found_handling": "none",
+    "binding": "ASSETS",
+  },
+  "hyperdrive": [
+    {
+      "binding": "HYPERDRIVE",
+      "id": "764dd78253334cca9da8576f2ea5a537",
+    },
+  ],
+  "previews": {
+    "vars": {
+      "DOTABOD_RUNTIME": "cloudflare",
+      "VERCEL_ENV": "preview",
+    },
+    "hyperdrive": [
+      {
+        "binding": "HYPERDRIVE",
+        "id": "04710431a2fd4fde903da24b82fee25c",
+      },
+    ],
+  },
+}

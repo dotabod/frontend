@@ -7,6 +7,7 @@ interface ModImageProps {
 
 const ModImage = ({ className = '' }: ModImageProps) => (
   <Image
+    unoptimized
     height={18}
     width={18}
     className={clsx('mr-1 inline max-w-none align-middle', className)}

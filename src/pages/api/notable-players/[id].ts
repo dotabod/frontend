@@ -7,7 +7,11 @@ import { withAuthentication } from '@/lib/api-middlewares/with-authentication'
 import { withMethods } from '@/lib/api-middlewares/with-methods'
 import { getServerSession } from '@/lib/api/get-server-session'
 import { authOptions } from '@/lib/auth'
-import { prismaMongo } from '@/lib/db'
+import {
+  deleteNotablePlayer,
+  findNotablePlayerOwnership,
+  updateNotablePlayer,
+} from '@/lib/notable-players-db'
 
 // Define validation schema for updating a notable player
 const updateNotablePlayerSchema = z.object({
@@ -37,18 +41,7 @@ const handler = async function handler(req: NextApiRequest, res: NextApiResponse
     }
 
     // Find the player, ensuring it belongs to the user's channel
-    const player = await prismaMongo.notablePlayers.findFirst({
-      select: {
-        addedBy: true,
-        country_code: true,
-        createdAt: true,
-        name: true,
-      },
-      where: {
-        channel: session.user.twitchId,
-        id,
-      },
-    })
+    const player = await findNotablePlayerOwnership(session.user.twitchId, id)
 
     if (!player) {
       res.status(404).json({ error: 'Player not found' })
@@ -65,10 +58,7 @@ const handler = async function handler(req: NextApiRequest, res: NextApiResponse
     if (req.method === 'PUT') {
       const validatedData = updateNotablePlayerSchema.parse(req.body)
 
-      const updatedPlayer = await prismaMongo.notablePlayers.update({
-        data: validatedData,
-        where: { id },
-      })
+      const updatedPlayer = await updateNotablePlayer(id, validatedData)
 
       res.status(200).json(updatedPlayer)
       return
@@ -76,9 +66,7 @@ const handler = async function handler(req: NextApiRequest, res: NextApiResponse
 
     // DELETE - Delete a notable player
     if (req.method === 'DELETE') {
-      await prismaMongo.notablePlayers.delete({
-        where: { id },
-      })
+      await deleteNotablePlayer(id)
 
       return res.status(204).end()
     }

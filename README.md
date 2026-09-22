@@ -42,6 +42,24 @@ pnpm dev
 
 1. Undo the moderator scope changes and login with a normal twitch user that you want to stream on
 
+## Cloudflare Preview authentication
+
+### Production and development
+
+`frontend` is the production Worker, with production Hyperdrive and `NEXTAUTH_URL=https://dotabod.com`. `frontend-dev` follows the `cloudflare-dev` branch and is a separate deployment for `dev.dotabod.com`, built with `pnpm run build:vinext:dev` and deployed with `pnpm exec wrangler deploy --name frontend-dev`. Cloudflare's Vite plugin selects `env.dev` at **build time**, not at deploy time.
+
+Development uses Doppler's `preview` configuration, preview Hyperdrive, test payments, and `NEXTAUTH_URL=https://dev.dotabod.com`. Sync its runtime secrets with `pnpm run cloudflare:dev-secrets:sync`. Production users/settings are not copied into the development database. Some third-party integration credentials remain shared; separate deployments do not imply every external service is sandboxed.
+
+The production auth URL must be set in both Workers runtime secrets and Workers Builds variables. Do not change the public `dotabod.com`/`www` DNS until cutover is approved and verified. Keep the existing Twitch callbacks for production and dev.
+
+### Branch previews
+
+Set the Workers Builds **Preview deploy command** to `pnpm run cloudflare:preview:deploy` after this script is available on the deployed branch. Keep the build command as `pnpm run build:vinext`.
+
+The deploy script reads Cloudflare's stable Preview URL and updates `NEXTAUTH_URL` on that Preview in a second deployment. It does not change production or Preview Base secrets. Do not treat the first deployment as ready until the command completes; a failed secret update fails the command. Unique deployment URLs use the stable branch URL for authentication.
+
+Twitch requires the exact `${NEXTAUTH_URL}/api/auth/callback/twitch` URL to be registered in the Twitch application used by Preview credentials. The script prints that URL. New branch URLs are not automatically authorized by Twitch. Use registered branches for authenticated testing; arbitrary branches need callback registration first. Do not derive `NEXTAUTH_URL` from untrusted request headers or mutate it per request.
+
 ## Refreshing the queue blocker art 🖼️
 
 The queue blocker draws a fake main menu over a streamer's real one, so its two background images have to keep matching whatever Valve is currently shipping:

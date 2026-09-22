@@ -40,6 +40,7 @@ const handler = async function handler(req: NextApiRequest, res: NextApiResponse
     })
     return
   } catch (error) {
+    console.error('Failed to fetch featured users', error)
     captureException(error)
     return res.status(500).end()
   }
