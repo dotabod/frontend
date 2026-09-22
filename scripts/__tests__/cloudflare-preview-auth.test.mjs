@@ -4,8 +4,8 @@ import { previewAuthTarget } from '../lib/cloudflare-preview-auth.mjs'
 
 const deployment = (url, workerName = 'frontend') =>
   JSON.stringify({
-    preview: { name: 'feature/login', worker_name: workerName, urls: [url] },
     deployment: { urls: ['https://unique-deployment.example.com'] },
+    preview: { name: 'feature/login', urls: [url], worker_name: workerName },
   })
 
 describe('Cloudflare Preview auth origin', () => {
@@ -31,6 +31,7 @@ describe('Cloudflare Preview auth origin', () => {
     'https://frontend.ketodev.workers.dev',
     'https://branch-frontend.ketodev.workers.dev.evil.example',
     'https://evil.example',
+    // oxlint-disable-next-line sonarjs/no-clear-text-protocols -- SAFETY: negative fixture proves insecure origins are rejected; no network request is made.
     'http://branch.dev.dotabod.com',
     'https://user:password@branch.dev.dotabod.com',
     'https://branch.dev.dotabod.com:444',
