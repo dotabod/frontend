@@ -3,6 +3,9 @@ import vinextWorker from 'vinext/server/fetch-handler'
 import type { ExecutionContextLike } from 'vinext/shims/request-context'
 import { runWithExecutionContext } from 'vinext/shims/request-context'
 
+import { createInstallResponse } from './lib/install-script'
+import installScript from './lib/private/install.ps1?raw'
+
 interface VinextWorker {
   fetch: (
     request: Request,
@@ -22,6 +25,10 @@ export default {
     env: DotabodCloudflareEnv,
     context: ExecutionContextLike,
   ): Promise<Response> {
+    if (request.method === 'GET' && new URL(request.url).pathname === '/api/install') {
+      return createInstallResponse(request, installScript)
+    }
+
     globalThis.hyperdriveGlobal = env.HYPERDRIVE
     return await runWithExecutionContext(
       context,
