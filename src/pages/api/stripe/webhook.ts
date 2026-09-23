@@ -74,7 +74,8 @@ const verifyWebhook = async function verifyWebhook(
     debugLog('Getting raw body')
     const rawBody = await getRawBody(req)
     debugLog('Constructing webhook event')
-    const event = stripe.webhooks.constructEvent(rawBody, signature, webhookSecret)
+    // Workers load Stripe's SubtleCrypto build, which only verifies signatures asynchronously.
+    const event = await stripe.webhooks.constructEventAsync(rawBody, signature, webhookSecret)
     debugLog('Webhook event constructed successfully', { eventId: event.id })
     debugLog('Exiting verifyWebhook successfully')
     return { event }

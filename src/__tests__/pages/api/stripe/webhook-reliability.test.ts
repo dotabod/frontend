@@ -4,8 +4,9 @@ import { createMocks } from 'node-mocks-http'
 import { Stripe } from 'stripe'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
+import { stripe } from '@/lib/stripe-server'
 import type { WebhookHandlerDependencies } from '@/pages/api/stripe/webhook'
-import { createWebhookHandler } from '@/pages/api/stripe/webhook'
+import webhookHandler, { createWebhookHandler } from '@/pages/api/stripe/webhook'
 
 const testStripe = new Stripe('sk_test_dummy')
 const webhookSecret = 'test-secret'
@@ -302,5 +303,28 @@ describe('Stripe webhook reliability', () => {
     })
     expect(res.statusCode).toBe(200)
     expect(res._getJSONData()).toStrictEqual({ processed: true, received: true })
+  })
+})
+
+describe('Stripe webhook signature verification', () => {
+  it('accepts a signed delivery when Stripe only supports async crypto, as on Workers', async () => {
+    vi.stubEnv('STRIPE_SECRET_KEY', 'sk_test_dummy')
+    vi.stubEnv('STRIPE_WEBHOOK_SECRET', webhookSecret)
+    // Stripe's Workers build verifies with SubtleCrypto and rejects the synchronous API.
+    vi.spyOn(stripe.webhooks, 'constructEvent').mockImplementation(() => {
+      throw new Error('SubtleCryptoProvider cannot be used in a synchronous context.')
+    })
+    const { req, res } = createMocks<NextApiRequest, NextApiResponse>({
+      headers: { 'stripe-signature': irrelevantSignature },
+      method: 'POST',
+    })
+
+    const handled = webhookHandler(req, res)
+    req.emit('data', Buffer.from(irrelevantPayload))
+    req.emit('end')
+    await handled
+
+    expect(res.statusCode).toBe(200)
+    expect(res._getJSONData()).toStrictEqual({ received: true })
   })
 })
