@@ -1,5 +1,4 @@
 import { captureException } from '@sentry/nextjs'
-import fetch from 'node-fetch'
 
 import prisma from '@/lib/db'
 
