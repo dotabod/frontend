@@ -1,5 +1,4 @@
 import { captureException } from '@sentry/nextjs'
-import fetch from 'node-fetch'
 
 const CRM_BASE = 'https://api.hubapi.com/crm/v3'
 

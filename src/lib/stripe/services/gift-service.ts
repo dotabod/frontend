@@ -1,12 +1,50 @@
+import { setTimeout as sleep } from 'node:timers/promises'
+
 import { SubscriptionStatus, TransactionType } from '@prisma/client'
 import type { Prisma } from '@prisma/client'
 import type Stripe from 'stripe'
 
+import { runBackgroundTask } from '@/lib/background-task'
 import { stripe } from '@/lib/stripe-server'
 import { getSubscriptionTier } from '@/utils/subscription'
 
 import { withErrorHandling } from '../utils/error-handling'
 import { CustomerService } from './customer-service'
+
+/**
+ * Applies a gift recipient's credit after the webhook transaction commits. Workers end the request
+ * once the response is sent, so the delayed call must be registered as background work or it never
+ * runs.
+ */
+export const scheduleGiftCreditAutoApply = async function scheduleGiftCreditAutoApply(
+  recipientUserId: string,
+): Promise<void> {
+  const autoApply = async () => {
+    // Small delay to ensure transaction completes
+    await sleep(500)
+    try {
+      // Call the apply-gift-credit API endpoint
+      const autoApplyResponse = await fetch(
+        `${process.env.NEXTAUTH_URL ?? 'https://dotabod.com'}/api/stripe/apply-gift-credit`,
+        {
+          body: JSON.stringify({
+            userId: recipientUserId,
+          }),
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          method: 'POST',
+        },
+      )
+
+      const _result = await autoApplyResponse.json()
+    } catch (autoApplyError) {
+      console.error('Failed to auto-apply gift credits:', autoApplyError)
+      // Don't fail the overall process if auto-apply fails
+    }
+  }
+  await runBackgroundTask(autoApply())
+}
 
 /**
  * Service for managing gift subscription operations using Stripe customer balance credits
@@ -168,30 +206,7 @@ export class GiftService {
           // If the user doesn't have an active subscription, attempt to apply the credits automatically
           // We'll do this after the transaction completes to avoid complications
           if (!existingSubscription) {
-            // Schedule automatic application of credits for after this transaction completes
-            setTimeout(async () => {
-              try {
-                // Call the apply-gift-credit API endpoint
-                const autoApplyResponse = await fetch(
-                  `${process.env.NEXTAUTH_URL ?? 'https://dotabod.com'}/api/stripe/apply-gift-credit`,
-                  {
-                    body: JSON.stringify({
-                      userId: recipientUserId,
-                    }),
-                    headers: {
-                      'Content-Type': 'application/json',
-                    },
-                    method: 'POST',
-                  },
-                )
-
-                const _result = await autoApplyResponse.json()
-              } catch (autoApplyError) {
-                console.error('Failed to auto-apply gift credits:', autoApplyError)
-                // Don't fail the overall process if auto-apply fails
-              }
-              // Small delay to ensure transaction completes
-            }, 500)
+            void scheduleGiftCreditAutoApply(recipientUserId)
           }
 
           return true

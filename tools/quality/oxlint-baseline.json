@@ -11075,26 +11075,6 @@
         "severity": "error"
       }
     },
-    "14a37b45039a9e2424133864a02a80f9706cda843760a49e1647d1fb5c107fb9": {
-      "count": 1,
-      "summary": {
-        "code": "vitest(require-mock-type-parameters)",
-        "file": "src/__tests__/pages/api/hubspot/visitor-token.test.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "vi.mock('@/utils/subscription', () => ({ getSubscription: vi.fn() }))",
-              "next": "vi.mock('node-fetch', () => ({ default: vi.fn() }))",
-              "previous": "}))"
-            },
-            "span": "fn",
-            "text": ""
-          }
-        ],
-        "message": "Missing type parameters on mock function call",
-        "severity": "error"
-      }
-    },
     "14a8af2fbedb5daa6c9e24511b5bfced4e62f9048102256284aec3d2d2f46347": {
       "count": 1,
       "summary": {
@@ -24426,26 +24406,6 @@
         "severity": "error"
       }
     },
-    "2f0809f4cc6cd12b7eab80d133fab4ee8f2e67e3c8e8f6154834495fd5d2b4fa": {
-      "count": 1,
-      "summary": {
-        "code": "typescript(strict-void-return)",
-        "file": "src/lib/stripe/services/gift-service.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "setTimeout(async () => {",
-              "next": "try {",
-              "previous": "// Schedule automatic application of credits for after this transaction completes"
-            },
-            "span": "async () => {\n              try {\n                // Call the apply-gift-credit API endpoint\n                const autoApplyResponse = await fetch(\n                  `${process.env.NEXTAUTH_URL ?? 'https://dotabod.com'}/api/stripe/apply-gift-credit`,\n                  {\n                    body: JSON.stringify({\n                      userId: recipientUserId,\n                    }),\n                    headers: {\n                      'Content-Type': 'application/json',\n                    },\n                    method: 'POST',\n                  },\n                )\n\n                const _result = await autoApplyResponse.json()\n              } catch (autoApplyError) {\n                console.error('Failed to auto-apply gift credits:', autoApplyError)\n                // Don't fail the overall process if auto-apply fails\n              }\n              // Small delay to ensure transaction completes\n            }",
-            "text": ""
-          }
-        ],
-        "message": "Async function used in a context where a void function is expected.",
-        "severity": "error"
-      }
-    },
     "2f1b568261b6eb6c100d4c96bc4efbd20e79981c71eab0a6f38a2aaa360826b0": {
       "count": 1,
       "summary": {
@@ -25784,6 +25744,26 @@
               "current": "remove: vi.fn(),",
               "next": "}",
               "previous": "refresh: vi.fn(),"
+            },
+            "span": "fn",
+            "text": ""
+          }
+        ],
+        "message": "Missing type parameters on mock function call",
+        "severity": "error"
+      }
+    },
+    "31d427ca9ceaa89c61b076fb421a1c5bc07fa130762cbeb0039d8f02761f395e": {
+      "count": 1,
+      "summary": {
+        "code": "vitest(require-mock-type-parameters)",
+        "file": "src/__tests__/lib/hubspot.test.ts",
+        "labels": [
+          {
+            "context": {
+              "current": "vi.mock('@sentry/nextjs', () => ({ captureException: vi.fn() }))",
+              "next": "",
+              "previous": ""
             },
             "span": "fn",
             "text": ""
@@ -47411,26 +47391,6 @@
         "severity": "error"
       }
     },
-    "5df584f33afb66c88bbbac9f85b73576cd17355a53e28c490a9e2b56613e4896": {
-      "count": 1,
-      "summary": {
-        "code": "vitest(require-mock-type-parameters)",
-        "file": "src/__tests__/lib/hubspot.test.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "vi.mock('@sentry/nextjs', () => ({ captureException: vi.fn() }))",
-              "next": "",
-              "previous": "vi.mock('node-fetch', () => ({ default: vi.fn() }))"
-            },
-            "span": "fn",
-            "text": ""
-          }
-        ],
-        "message": "Missing type parameters on mock function call",
-        "severity": "error"
-      }
-    },
     "5dfb86802c0a1e56d9260491c9c51f4546e19cfb04ebefeb028323dfb8ba204f": {
       "count": 1,
       "summary": {
@@ -57323,6 +57283,26 @@
         "severity": "error"
       }
     },
+    "722e521727828022f760aebfb57f575807dfffca67c5f3d1a34a8910ac3c5d83": {
+      "count": 1,
+      "summary": {
+        "code": "vitest(require-mock-type-parameters)",
+        "file": "src/__tests__/pages/api/hubspot/visitor-token.test.ts",
+        "labels": [
+          {
+            "context": {
+              "current": "vi.mock('@/utils/subscription', () => ({ getSubscription: vi.fn() }))",
+              "next": "vi.mock('@sentry/nextjs', () => ({ captureException: vi.fn() }))",
+              "previous": "}))"
+            },
+            "span": "fn",
+            "text": ""
+          }
+        ],
+        "message": "Missing type parameters on mock function call",
+        "severity": "error"
+      }
+    },
     "723ae2b5e0515f94c979e409f0d56fea40fbab4fa418f544f8de7699b1777a2f": {
       "count": 1,
       "summary": {
@@ -65923,26 +65903,6 @@
           }
         ],
         "message": "Calling setState synchronously within an effect can trigger cascading renders",
-        "severity": "error"
-      }
-    },
-    "830cb8c7f83a71d4689df16ac5e4223ba382161f1afe840ce89edf04342bca87": {
-      "count": 1,
-      "summary": {
-        "code": "anti-slop(no-module-mocking)",
-        "file": "src/__tests__/pages/api/hubspot/visitor-token.test.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "vi.mock('node-fetch', () => ({ default: vi.fn() }))",
-              "next": "vi.mock('@sentry/nextjs', () => ({ captureException: vi.fn() }))",
-              "previous": "vi.mock('@/utils/subscription', () => ({ getSubscription: vi.fn() }))"
-            },
-            "span": "vi.mock('node-fetch', () => ({ default: vi.fn() }))",
-            "text": ""
-          }
-        ],
-        "message": "Replace module mocking with dependency injection through a real interface, service layer, or faithful test implementation.",
         "severity": "error"
       }
     },
@@ -77810,26 +77770,6 @@
         "severity": "error"
       }
     },
-    "9ab1af9ccc6197d5e76317d76e9db8fca43d01d2899528161478a76ee377ccde": {
-      "count": 1,
-      "summary": {
-        "code": "typescript(no-misused-promises)",
-        "file": "src/lib/stripe/services/gift-service.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "setTimeout(async () => {",
-              "next": "try {",
-              "previous": "// Schedule automatic application of credits for after this transaction completes"
-            },
-            "span": "async () => {\n              try {\n                // Call the apply-gift-credit API endpoint\n                const autoApplyResponse = await fetch(\n                  `${process.env.NEXTAUTH_URL ?? 'https://dotabod.com'}/api/stripe/apply-gift-credit`,\n                  {\n                    body: JSON.stringify({\n                      userId: recipientUserId,\n                    }),\n                    headers: {\n                      'Content-Type': 'application/json',\n                    },\n                    method: 'POST',\n                  },\n                )\n\n                const _result = await autoApplyResponse.json()\n              } catch (autoApplyError) {\n                console.error('Failed to auto-apply gift credits:', autoApplyError)\n                // Don't fail the overall process if auto-apply fails\n              }\n              // Small delay to ensure transaction completes\n            }",
-            "text": ""
-          }
-        ],
-        "message": "Promise returned in function argument where a void return was expected.",
-        "severity": "error"
-      }
-    },
     "9acc003329682496f14030afcb94e5cff81767826c93da094761f524f3051303": {
       "count": 1,
       "summary": {
@@ -84049,26 +83989,6 @@
           }
         ],
         "message": "Refactor this function to reduce its Cognitive Complexity from 23 to the 20 allowed.",
-        "severity": "error"
-      }
-    },
-    "a6c58bbc8535c5ebb0d384352574597cc031cc07b59d43d543767ed5648fbe95": {
-      "count": 1,
-      "summary": {
-        "code": "vitest(require-mock-type-parameters)",
-        "file": "src/__tests__/lib/hubspot.test.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "vi.mock('node-fetch', () => ({ default: vi.fn() }))",
-              "next": "vi.mock('@sentry/nextjs', () => ({ captureException: vi.fn() }))",
-              "previous": ""
-            },
-            "span": "fn",
-            "text": ""
-          }
-        ],
-        "message": "Missing type parameters on mock function call",
         "severity": "error"
       }
     },
@@ -93172,26 +93092,6 @@
         "severity": "error"
       }
     },
-    "bbd0602f671cff9315bbb1b8be1c1b82712e4246eba5b0f3c2c626407e91a8d9": {
-      "count": 1,
-      "summary": {
-        "code": "vitest(require-mock-type-parameters)",
-        "file": "src/__tests__/pages/api/hubspot/visitor-token.test.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "vi.mock('node-fetch', () => ({ default: vi.fn() }))",
-              "next": "vi.mock('@sentry/nextjs', () => ({ captureException: vi.fn() }))",
-              "previous": "vi.mock('@/utils/subscription', () => ({ getSubscription: vi.fn() }))"
-            },
-            "span": "fn",
-            "text": ""
-          }
-        ],
-        "message": "Missing type parameters on mock function call",
-        "severity": "error"
-      }
-    },
     "bbf6187e98e88d99ab8cdb47f615d818035a36e0f3a07ee1606ef0b8e414fa16": {
       "count": 1,
       "summary": {
@@ -97573,26 +97473,6 @@
           }
         ],
         "message": "Dependency cycle detected",
-        "severity": "error"
-      }
-    },
-    "c46a95f333c367cca23797adda9c93445f62c07a1085213c8cbea2c36ba666d5": {
-      "count": 1,
-      "summary": {
-        "code": "anti-slop(no-module-mocking)",
-        "file": "src/__tests__/lib/hubspot.test.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "vi.mock('node-fetch', () => ({ default: vi.fn() }))",
-              "next": "vi.mock('@sentry/nextjs', () => ({ captureException: vi.fn() }))",
-              "previous": ""
-            },
-            "span": "vi.mock('node-fetch', () => ({ default: vi.fn() }))",
-            "text": ""
-          }
-        ],
-        "message": "Replace module mocking with dependency injection through a real interface, service layer, or faithful test implementation.",
         "severity": "error"
       }
     },
@@ -104858,26 +104738,6 @@
         "severity": "error"
       }
     },
-    "d26414ed8254babf775a23c64b3f65ca0361543f931bf0b26390619a851a6361": {
-      "count": 1,
-      "summary": {
-        "code": "vitest(prefer-import-in-mock)",
-        "file": "src/__tests__/lib/hubspot.test.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "vi.mock('node-fetch', () => ({ default: vi.fn() }))",
-              "next": "vi.mock('@sentry/nextjs', () => ({ captureException: vi.fn() }))",
-              "previous": ""
-            },
-            "span": "'node-fetch', () => ({ default: vi.fn() })",
-            "text": ""
-          }
-        ],
-        "message": "Mocked modules must be dynamic imported.",
-        "severity": "error"
-      }
-    },
     "d266477b91f616b9cacfdeb48631e5e24f4c018e48c7621ec06c2a6c900764ab": {
       "count": 1,
       "summary": {
@@ -106643,26 +106503,6 @@
         "severity": "error"
       }
     },
-    "d5ed2d4526dc555cecf4d18dda3b60e134a0f3fad05c3260b5d9f817facdda1c": {
-      "count": 1,
-      "summary": {
-        "code": "vitest(prefer-import-in-mock)",
-        "file": "src/__tests__/pages/api/hubspot/visitor-token.test.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "vi.mock('node-fetch', () => ({ default: vi.fn() }))",
-              "next": "vi.mock('@sentry/nextjs', () => ({ captureException: vi.fn() }))",
-              "previous": "vi.mock('@/utils/subscription', () => ({ getSubscription: vi.fn() }))"
-            },
-            "span": "'node-fetch', () => ({ default: vi.fn() })",
-            "text": ""
-          }
-        ],
-        "message": "Mocked modules must be dynamic imported.",
-        "severity": "error"
-      }
-    },
     "d60654ed0408d1a44bff29a1ebc2171849a83447f7f84345a5945c619804deb0": {
       "count": 1,
       "summary": {
@@ -108327,6 +108167,26 @@
           }
         ],
         "message": "Unsafe assignment of an error typed value.",
+        "severity": "error"
+      }
+    },
+    "d91a7711504840f50b44913add1d80787174e4892ecaa3853b5adad4ebe39e32": {
+      "count": 1,
+      "summary": {
+        "code": "vitest(require-mock-type-parameters)",
+        "file": "src/__tests__/pages/api/hubspot/visitor-token.test.ts",
+        "labels": [
+          {
+            "context": {
+              "current": "vi.mock('@sentry/nextjs', () => ({ captureException: vi.fn() }))",
+              "next": "",
+              "previous": "vi.mock('@/utils/subscription', () => ({ getSubscription: vi.fn() }))"
+            },
+            "span": "fn",
+            "text": ""
+          }
+        ],
+        "message": "Missing type parameters on mock function call",
         "severity": "error"
       }
     },
@@ -126782,26 +126642,6 @@
           }
         ],
         "message": "Unsafe member access .headers on an `any` value.",
-        "severity": "error"
-      }
-    },
-    "fcce4937831e87bd037055bc5ccd8730e5e45db55dbaaf1f9c440db1a2114e45": {
-      "count": 1,
-      "summary": {
-        "code": "vitest(require-mock-type-parameters)",
-        "file": "src/__tests__/pages/api/hubspot/visitor-token.test.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "vi.mock('@sentry/nextjs', () => ({ captureException: vi.fn() }))",
-              "next": "",
-              "previous": "vi.mock('node-fetch', () => ({ default: vi.fn() }))"
-            },
-            "span": "fn",
-            "text": ""
-          }
-        ],
-        "message": "Missing type parameters on mock function call",
         "severity": "error"
       }
     },
