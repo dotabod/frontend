@@ -25,10 +25,11 @@ export const handleInvoiceEvent = async function handleInvoiceEvent(
     await tx.$executeRaw(Prisma.sql`SELECT pg_advisory_xact_lock(hashtext(${invoice.id}))`)
   }
 
-  // Check for OpenNode crypto payment
+  // Check for OpenNode or NOWPayments crypto payment
   if (
     invoice.status === 'paid' &&
-    invoice.metadata?.paymentProvider === 'opennode' &&
+    (invoice.metadata?.paymentProvider === 'opennode' ||
+      invoice.metadata?.paymentProvider === 'nowpayments') &&
     invoice.metadata?.isCryptoPayment === 'true'
   ) {
     return await handleOpenNodeInvoicePaid(invoice, tx)
