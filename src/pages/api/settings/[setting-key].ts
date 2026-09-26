@@ -9,6 +9,7 @@ import { getServerSession } from '@/lib/api/get-server-session'
 import { authOptions } from '@/lib/auth'
 import prisma from '@/lib/db'
 import { Settings } from '@/lib/default-settings'
+import { manualSettingUpdate } from '@/lib/manual-setting-update'
 import { dynamicSettingSchema, settingKeySchema } from '@/lib/validations/setting'
 import { whatsNew } from '@/lib/whats-new'
 import { getSubscription } from '@/utils/subscription'
@@ -128,10 +129,7 @@ const handlePatchRequest = async function handlePatchRequest(
         userId,
         value: settingValue,
       },
-      update: {
-        updatedAt: new Date(),
-        value: settingValue,
-      },
+      update: manualSettingUpdate(validatedBody.key, settingValue),
       where: {
         key_userId: {
           key: validatedBody.key,
