@@ -1,5 +1,5 @@
 import { App, Button, Tooltip } from 'antd'
-import { useSession } from 'next-auth/react'
+import { signOut, useSession } from 'next-auth/react'
 import { useEffect } from 'react'
 import useSWR from 'swr'
 
@@ -90,6 +90,16 @@ export const DisableToggle = () => {
               <span>
                 <strong>Action needed:</strong> {explanation.action}
               </span>
+            )}
+            {disableReason === 'TOKEN_REVOKED' && (
+              <Button
+                type='primary'
+                onClick={() => {
+                  void signOut({ callbackUrl: '/login?setup-scopes' })
+                }}
+              >
+                Reconnect Twitch
+              </Button>
             )}
             <Toggle />
           </div>
