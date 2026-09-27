@@ -40,9 +40,9 @@ const HomepageShell = ({
 }) => {
   useMaybeSignout()
 
-  const defaultTitle = 'Dotabod — Tools for Dota 2 streamers'
+  const defaultTitle = 'Dotabod - Enhance Your Dota 2 Streaming Experience'
   const defaultDescription =
-    'Tools for Dota 2 streamers: Twitch predictions, anti-snipe overlays, chat commands, MMR tracking, and live stats.'
+    'Dotabod provides Dota 2 streamers with a suite of tools, including automatic Twitch predictions, minimap & hero blocker, OBS scene switcher, chat commands, MMR tracking, live stats, and more to elevate your streaming experience!'
   const host = process.env.NEXT_PUBLIC_VERCEL_PROJECT_PRODUCTION_URL ?? 'dotabod.com'
   const baseUrl = `https://${host}`
   // Generate dynamic OG image URL using parameters
@@ -62,7 +62,7 @@ const HomepageShell = ({
   }
   // For backward compatibility - if only username is provided
   else if (username) {
-    defaultOgImage = `/api/og-image?title=${encodeURIComponent(username)}&subtitle=Commands, MMR tracking, and live stats`
+    defaultOgImage = `/api/og-image?title=${encodeURIComponent(username)}&subtitle=Commands, MMR Tracking, Live Stats, and more!`
   }
 
   const defaultUrl = process.env.NEXT_PUBLIC_VERCEL_PROJECT_PRODUCTION_URL

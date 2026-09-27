@@ -173,7 +173,13 @@ export const SecondaryFeatures = () => {
     <section id='secondary-features' aria-label='More Dotabod features' className='py-20'>
       <Container>
         <div className='mx-auto max-w-2xl sm:text-center'>
-          <h2 className='text-3xl font-medium tracking-tight text-gray-200'>More stream tools</h2>
+          <h2 className='text-3xl font-medium tracking-tight text-gray-200'>
+            But wait, there&apos;s more.
+          </h2>
+          <p className='mt-2 text-lg text-gray-300'>
+            Under active development and speaking to multiple Dota 2 personalities, features are
+            being added as they are requested.
+          </p>
         </div>
         <BentoGrid className='lg:grid-rows-3'>
           {features.map((feature, i) => (
