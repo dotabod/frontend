@@ -70,8 +70,9 @@ const BlockScreen = ({
     <MotionAppScreenHeader {...(animated ? headerAnimation : {})}>
       <AppScreen.Title>Custom covers</AppScreen.Title>
       <AppScreen.Subtitle>
-        A semi-transparent minimap blocker with <span className='text-white'>extra-large</span> and{' '}
-        <span className='text-white'>simple</span> layouts.
+        Semi-transparent blocker that auto places itself over your minimap. Works with{' '}
+        <span className='text-white'>extra large</span> minimaps, and also{' '}
+        <span className='text-white'>simple</span> minimaps backgrounds.
       </AppScreen.Subtitle>
     </MotionAppScreenHeader>
     <MotionAppScreenBody
@@ -105,7 +106,7 @@ const BetsScreen = ({
 }) => (
   <AppScreen className='w-full'>
     <MotionAppScreenHeader {...(animated ? headerAnimation : {})}>
-      <AppScreen.Title>Automatic predictions</AppScreen.Title>
+      <AppScreen.Title>Give gamba</AppScreen.Title>
       <AppScreen.Subtitle>
         Create and close bets <span className='text-white'>automatically</span> for every match.
       </AppScreen.Subtitle>
@@ -137,9 +138,10 @@ const OBSScreen = ({
 }) => (
   <AppScreen className='w-full'>
     <MotionAppScreenHeader {...(animated ? headerAnimation : {})}>
-      <AppScreen.Title>Game-aware chat</AppScreen.Title>
+      <AppScreen.Title>Dotabod has things to say</AppScreen.Title>
       <AppScreen.Subtitle>
-        Choose which game events Dotabod <span className='text-white'>announces in chat</span>.
+        So many chatter options to choose from, why not just{' '}
+        <span className='text-white'>enable them all</span>?
       </AppScreen.Subtitle>
     </MotionAppScreenHeader>
     <MotionAppScreenBody
@@ -178,11 +180,12 @@ const features = [
         src='/images/emotes/peepogamba.webp'
       />
     ),
-    name: 'Automatic Twitch predictions',
+    name: 'Twitch predictions creator',
     screen: BetsScreen,
   },
   {
-    description: 'Post context-aware messages about game events as they happen.',
+    description:
+      'Dotabod sends timely, context-aware chat messages to engage your audience with insights relevant to your gameplay—never spammy, always helpful.',
     icon: (props?: { className?: string }) => (
       <Image
         className={clsx('ml-1 inline', props?.className)}
@@ -192,7 +195,7 @@ const features = [
         src='https://cdn.betterttv.net/emote/618c77311f8ff7628e6d5b8f/3x'
       />
     ),
-    name: 'Game-aware chat',
+    name: 'Active chatting',
     screen: OBSScreen,
   },
   {
@@ -211,7 +214,7 @@ const features = [
         src='/images/emotes/ttours.png'
       />
     ),
-    name: 'Anti-snipe overlays',
+    name: 'Minimap and hero picks blocker',
     screen: BlockScreen,
   },
 ]
@@ -397,8 +400,13 @@ export const PrimaryFeatures = () => (
     <Container>
       <div className='mx-auto max-w-2xl lg:mx-0 lg:max-w-3xl'>
         <h2 className='text-3xl font-medium tracking-tight text-white'>
-          Everything your Dota 2 stream needs
+          Best features you need to stream. Try it for yourself.
         </h2>
+        <p className='mt-2 text-lg text-gray-400'>
+          Dotabod was built for streamers like you who play by their own rules and aren&apos;t going
+          to let anything get in the way of their dreams. If other streaming tools are afraid to
+          build it, Dotabod has it.
+        </p>
       </div>
     </Container>
     <div className='mt-16 md:hidden'>
