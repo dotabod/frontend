@@ -38,6 +38,19 @@ export interface WhatsNewEntry {
 
 export const whatsNew: WhatsNewEntry[] = [
   {
+    blogSlug: 'more-headroom-on-dotabod-servers',
+    category: 'advanced',
+    description:
+      "Dotabod's main server now handles the same streams with about half the processing power, leaving more room for busy hours. Your setup stays the same.",
+    details: [
+      "Most game data reaching Dotabod came from streamers who weren't live. Dotabod now waits three seconds before answering those updates, so Dota sends them about a third as often. Live streams still get an answer right away.",
+      'Live game data is copied less, routine check-ins are no longer written to request logs, and background health checks run less often.',
+    ],
+    id: 'server-headroom',
+    releaseDate: '2026-09-27',
+    title: "More headroom on Dotabod's servers",
+  },
+  {
     blogSlug: 'custom-win-loss-stat-windows',
     category: 'overlay',
     command: '!wl',

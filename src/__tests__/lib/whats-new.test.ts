@@ -14,9 +14,9 @@ const CATEGORIES = ['chat', 'overlay', 'commands', 'pages', 'advanced', 'bets', 
 describe('whatsNew registry', () => {
   it('starts with the newest public-facing release', () => {
     expect(whatsNewSorted[0]).toMatchObject({
-      blogSlug: 'custom-win-loss-stat-windows',
-      id: 'custom-wl-stats-window',
-      releaseDate: '2026-09-04',
+      blogSlug: 'more-headroom-on-dotabod-servers',
+      id: 'server-headroom',
+      releaseDate: '2026-09-27',
     })
   })
 
