@@ -28,13 +28,8 @@ import SentrySession from '@/components/sentry-session'
 import { SubscriptionProvider } from '@/contexts/subscription-context'
 import { SubscriptionProviderMain } from '@/hooks/subscription-provider'
 import { useCookiePreferences } from '@/lib/cookie-manager'
-import { checkForInvalidOverlay, InvalidOverlayPage } from '@/lib/overlay-utils'
 import store from '@/lib/redux/store'
 import themeConfig from '@/lib/theme/theme-config'
-
-const isInvalidLocalCheck = checkForInvalidOverlay(
-  typeof window === 'undefined' ? '' : window.location.pathname,
-)
 
 // Define a type for the container with _reactRoot property
 interface ContainerWithRoot extends Element {
@@ -126,18 +121,6 @@ const App = ({ Component, pageProps: { session, ...pageProps } }: AppPropsWithLa
       </MantineProvider>
     </ConfigProvider>
   )
-
-  if (isInvalidLocalCheck) {
-    // If it's a known invalid overlay, render the InvalidOverlayPage directly
-    // And bypass the main layout and providers that might make API calls.
-    return (
-      <StyleProvider cache={clientCache} hashPriority='high'>
-        <AntProvider>
-          <InvalidOverlayPage />
-        </AntProvider>
-      </StyleProvider>
-    )
-  }
 
   const appContent = (
     <SubscriptionProviderMain>

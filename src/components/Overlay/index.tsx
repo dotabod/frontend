@@ -26,7 +26,6 @@ import type { ChatMessage, WinChance, wlType } from '@/lib/hooks/use-socket'
 import { useStreamOfflineNotification } from '@/lib/hooks/use-stream-offline-notification'
 import { useUpdateSetting } from '@/lib/hooks/use-update-setting'
 import { useWindowSize } from '@/lib/hooks/use-window-size'
-import { checkForInvalidOverlay, InvalidOverlayPage } from '@/lib/overlay-utils'
 import { getRankDetail } from '@/lib/ranks'
 import { motionProps } from '@/ui/utils'
 
@@ -39,14 +38,6 @@ interface PotentialError {
   status?: number
   message?: string
 }
-
-// Check before the component even renders - this check is now primarily for _app.tsx
-// OverlayPage will rely on the determination made in _app.tsx, passed via props or context if necessary,
-// Or _app.tsx will render InvalidOverlayPage directly.
-// For now, we keep a local check as a fallback or if this page is accessed directly not through _app standard flow.
-const isInvalidLocalCheck = checkForInvalidOverlay(
-  typeof window === 'undefined' ? '' : window.location.pathname,
-)
 
 const OverlayPage = () => {
   const { notification } = App.useApp()
@@ -188,23 +179,6 @@ const OverlayPage = () => {
     }
 
     if (is404) {
-      // For 404 errors, add local storage cache to prevent repeated API calls
-      if (typeof window !== 'undefined' && window.localStorage) {
-        try {
-          // Store the invalid URL in local storage with timestamp
-          const pathKey = `invalid_overlay_${window.location.pathname}`
-          localStorage.setItem(
-            pathKey,
-            JSON.stringify({
-              status: 404,
-              timestamp: Date.now(),
-            }),
-          )
-        } catch {
-          // Ignore storage errors
-        }
-      }
-
       notification.open({
         description: 'Please delete your overlay and setup Dotabod again by visiting dotabod.com',
         duration: 0,
@@ -245,11 +219,6 @@ const OverlayPage = () => {
   })
 
   useOBS({ block, connected })
-
-  // This specific check might become redundant if _app.tsx handles it robustly.
-  if (isInvalidLocalCheck) {
-    return <InvalidOverlayPage />
-  }
 
   if (is404) {
     // Return minimal content for 404s to reduce resource usage
