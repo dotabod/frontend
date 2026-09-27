@@ -12371,26 +12371,6 @@
         "severity": "error"
       }
     },
-    "170185cfde822b0b81dd36cd8f0e4ce7bcf6d787cfa577c29281b8a81229c834": {
-      "count": 1,
-      "summary": {
-        "code": "eslint(sort-keys)",
-        "file": "src/instrumentation-client.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "Sentry.init({",
-              "next": "dsn: SENTRY_DSN,",
-              "previous": "if (SENTRY_DSN) {"
-            },
-            "span": "{\n    dsn: SENTRY_DSN,\n\n    // Use tracesSampler for more granular control over sampling\n    tracesSampleRate: 0.5,\n    // Capture errors based on environment\n    release: process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA,\n\n    // Setting this option to true will print useful information to the console while you're setting up Sentry.\n    debug: false,\n\n    /**\n     * Initialize the Sentry SDK as normal.\n     *\n     * `replaysSessionSampleRate` and `replaysOnErrorSampleRate` are both set to\n     * \"0\" so that we have manual control over session-based replays\n     */\n    replaysSessionSampleRate: 0,\n    replaysOnErrorSampleRate: 1,\n    integrations: [replay],\n\n    // Auto-installer polls http://localhost:<port>/status until the local\n    // helper is running. Failures are expected and handled at the call site\n    // (WindowsInstaller.tsx), but extensions that wrap window.fetch can\n    // surface them as global unhandled rejections.\n    ignoreErrors: [\n      /Failed to fetch \\(localhost:/iu,\n      /NetworkError when attempting to fetch resource\\.? \\(localhost:/iu,\n    ],\n    // Some Yandex Browser extensions / AV products monkey-patch\n    // Object.getOwnPropertyDescriptor with a wrapper that recurses into\n    // itself. The resulting RangeError has zero application frames — just\n    // the wrapper looping until V8 runs out of stack. Drop only that exact\n    // shape so genuine stack-overflow bugs in our own code still surface.\n    beforeSend(event, hint) {\n      const error = hint?.originalException\n      if (!(error instanceof RangeError)) {\n        return event\n      }\n      if (!/Maximum call stack size exceeded/iu.test(error.message)) {\n        return event\n      }\n\n      const frames = event.exception?.values?.[0]?.stacktrace?.frames ?? []\n      if (frames.length === 0) {\n        return event\n      }\n\n      const allExtensionFrames = frames.every(\n        (f) => f.function?.includes('getOwnPropertyDescriptor') && !f.in_app,\n      )\n      return allExtensionFrames ? null : event\n    },\n  }",
-            "text": ""
-          }
-        ],
-        "message": "Object keys should be sorted",
-        "severity": "error"
-      }
-    },
     "1708a5f8c648d0faaa29bc3b40af8a2f36c8eb39589d700a39036e73af9c8ec4": {
       "count": 1,
       "summary": {
@@ -38974,6 +38954,26 @@
           }
         ],
         "message": "Unsafe member access .statusCode on an `error` typed value.",
+        "severity": "error"
+      }
+    },
+    "4ba02676f05ef3f0c33612d975d9b0b490f52c20404232890f6002db99791c3d": {
+      "count": 1,
+      "summary": {
+        "code": "eslint(sort-keys)",
+        "file": "src/instrumentation-client.ts",
+        "labels": [
+          {
+            "context": {
+              "current": "Sentry.init({",
+              "next": "dsn: SENTRY_DSN,",
+              "previous": "if (SENTRY_DSN) {"
+            },
+            "span": "{\n    dsn: SENTRY_DSN,\n\n    // Use tracesSampler for more granular control over sampling\n    tracesSampleRate: 0.5,\n\n    // Setting this option to true will print useful information to the console while you're setting up Sentry.\n    debug: false,\n\n    /**\n     * Initialize the Sentry SDK as normal.\n     *\n     * `replaysSessionSampleRate` and `replaysOnErrorSampleRate` are both set to\n     * \"0\" so that we have manual control over session-based replays\n     */\n    replaysSessionSampleRate: 0,\n    replaysOnErrorSampleRate: 1,\n    integrations: [replay],\n\n    // Auto-installer polls http://localhost:<port>/status until the local\n    // helper is running. Failures are expected and handled at the call site\n    // (WindowsInstaller.tsx), but extensions that wrap window.fetch can\n    // surface them as global unhandled rejections.\n    ignoreErrors: [\n      /Failed to fetch \\(localhost:/iu,\n      /NetworkError when attempting to fetch resource\\.? \\(localhost:/iu,\n    ],\n    beforeSend: dropExtensionNoise,\n  }",
+            "text": ""
+          }
+        ],
+        "message": "Object keys should be sorted",
         "severity": "error"
       }
     },
@@ -89140,26 +89140,6 @@
         "severity": "error"
       }
     },
-    "b252c4a0d174d1ec08624419a2c29cbd9f48c29119f7981fde6920f581868e27": {
-      "count": 1,
-      "summary": {
-        "code": "typescript(strict-boolean-expressions)",
-        "file": "src/instrumentation-client.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "(f) => f.function?.includes('getOwnPropertyDescriptor') && !f.in_app,",
-              "next": ")",
-              "previous": "const allExtensionFrames = frames.every("
-            },
-            "span": "f.in_app",
-            "text": ""
-          }
-        ],
-        "message": "Unexpected nullable boolean value in conditional. Please handle the nullish case explicitly.",
-        "severity": "error"
-      }
-    },
     "b267960150880d4ef880f628151763093bed31c8db9c6bb1601ad417ca9a779a": {
       "count": 1,
       "summary": {
@@ -90544,26 +90524,6 @@
           }
         ],
         "message": "Replace module mocking with dependency injection through a real interface, service layer, or faithful test implementation.",
-        "severity": "error"
-      }
-    },
-    "b59f12b116e57d52e1ae30a54ee0d2cebebb06443c5fb597e2c4c63dbb29a8f5": {
-      "count": 1,
-      "summary": {
-        "code": "typescript(strict-boolean-expressions)",
-        "file": "src/instrumentation-client.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "(f) => f.function?.includes('getOwnPropertyDescriptor') && !f.in_app,",
-              "next": ")",
-              "previous": "const allExtensionFrames = frames.every("
-            },
-            "span": "f.function?.includes('getOwnPropertyDescriptor')",
-            "text": ""
-          }
-        ],
-        "message": "Unexpected nullable boolean value in conditional. Please handle the nullish case explicitly.",
         "severity": "error"
       }
     },
@@ -110243,26 +110203,6 @@
           }
         ],
         "message": "Unsafe call of a(n) `any` typed value.",
-        "severity": "error"
-      }
-    },
-    "dd23a32beff55dcb46b730ba031d9ce7060fa276cc6aa07186008b05e79aa2d6": {
-      "count": 1,
-      "summary": {
-        "code": "typescript(strict-boolean-expressions)",
-        "file": "src/instrumentation-client.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "const allExtensionFrames = frames.every(",
-              "next": "(f) => f.function?.includes('getOwnPropertyDescriptor') && !f.in_app,",
-              "previous": ""
-            },
-            "span": "frames.every(\n        (f) => f.function?.includes('getOwnPropertyDescriptor') && !f.in_app,\n      )",
-            "text": ""
-          }
-        ],
-        "message": "Unexpected nullable boolean value in conditional. Please handle the nullish case explicitly.",
         "severity": "error"
       }
     },
