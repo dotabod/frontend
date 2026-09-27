@@ -14007,6 +14007,26 @@
         "severity": "error"
       }
     },
+    "1aafc6bfea14b1dc77fc037c1504e90b3e2831ffdc35695f248a0fe286bb1b0b": {
+      "count": 1,
+      "summary": {
+        "code": "eslint(sort-keys)",
+        "file": "src/lib/validations/setting.ts",
+        "labels": [
+          {
+            "context": {
+              "current": "const settingsSchema = {",
+              "next": "aegis: z.boolean(),",
+              "previous": "// Define schemas for each specific setting"
+            },
+            "span": "{\n  aegis: z.boolean(),\n  autoCommandsOnMatchStart: z.array(z.string().max(45)),\n  autoTranslate: z.boolean(),\n  battlepass: z.boolean(),\n  bets: z.boolean(),\n  betsInfo: z.object({\n    duration: z\n      .string()\n      .regex(/^\\d+$/u, 'Duration must be a numeric string')\n      .transform((str) => Math.trunc(Number(str)))\n      .refine((num) => num >= 30 && num <= 1800, {\n        message: 'Duration must be between 30 and 1800 seconds',\n      }),\n    no: z.string().max(25),\n    title: z.string().max(45),\n    yes: z.string().max(25),\n  }),\n  chatter: z.boolean(),\n  autoOptInNewFeatures: z.boolean(),\n  // Tri-state: the null \"follow autoOptInNewFeatures\" state is the ABSENCE of a settings row\n  // (the default), not a persisted value. The UI only ever PATCHes true/false, and Prisma Json\n  // columns can't store raw null, so the write schema is boolean.\n  cosmeticsAnnounce: z.boolean(),\n  // Same tri-state new-feature toggle as cosmeticsAnnounce (the \"team smoked without you\" roast).\n  smokeActivated: z.boolean(),\n  chatters: z\n    .object({\n      bounties: z.object({ enabled: z.boolean() }),\n      commandsReady: z.object({ enabled: z.boolean() }),\n      dotapatch: z.object({ enabled: z.boolean() }),\n      firstBloodDeath: z.object({ enabled: z.boolean() }),\n      killstreak: z.object({ enabled: z.boolean() }),\n      matchOutcome: z.object({ enabled: z.boolean() }),\n      midas: z.object({ enabled: z.boolean() }),\n      neutralItems: z.object({ enabled: z.boolean() }),\n      noTp: z.object({ enabled: z.boolean() }),\n      passiveDeath: z.object({ enabled: z.boolean() }),\n      pause: z.object({ enabled: z.boolean() }),\n      powerTreads: z.object({ enabled: z.boolean() }),\n      roshDeny: z.object({ enabled: z.boolean() }),\n      roshPickup: z.object({ enabled: z.boolean() }),\n      roshanKilled: z.object({ enabled: z.boolean() }),\n      smoke: z.object({ enabled: z.boolean() }),\n      tip: z.object({ enabled: z.boolean() }),\n    })\n    .partial(),\n  // Command on/off toggles are derived from the single source of truth (`commands` in\n  // defaultSettings) so this allowlist can never drift from the dashboard toggles again.\n  // Previously these were hand-listed and had silently dropped keys like `commandSet`,\n  // making the API reject them with \"Invalid setting key\". Every command setting is a boolean.\n  ...(Object.fromEntries(Object.keys(commands).map((key) => [key, z.boolean()])) as Record<\n    keyof typeof commands,\n    z.ZodBoolean\n  >),\n  crypto_payment_interest: z.object({\n    interested: z.boolean(),\n    tier: z.enum(['FREE', 'PRO']),\n    transactionType: z.enum(['RECURRING', 'LIFETIME']),\n  }),\n  disableAutoClipping: z.boolean(),\n  discardZeroBets: z.boolean(),\n  lastFmOverlay: z.boolean(),\n  lastFmRefreshRate: z.number().min(5).max(60),\n  lastFmUsername: z.string().max(45).optional(),\n  livePolls: z.boolean(),\n  'minimap-blocker': z.boolean(),\n  'minimap-opacity': z.number().min(0).max(1),\n  'minimap-simple': z.boolean(),\n  'minimap-xl': z.boolean(),\n  minimapRight: z.boolean(),\n  mmr: z.number().min(0).max(30_000),\n  'mmr-tracker': z.boolean(),\n  notablePlayersOverlay: z.boolean(),\n  notablePlayersOverlayFlags: z.boolean(),\n  notablePlayersOverlayFlagsCmd: z.boolean(),\n  'obs-dc': z.string().max(200).max(45),\n  'obs-minimap': z.string().max(200).max(45),\n  'obs-picks': z.string().max(200).max(45),\n  'obs-scene-switcher': z.boolean(),\n  obsServerPassword: z.string().max(45),\n  obsServerPort: z.number().min(1).max(65_535),\n  'only-block-ranked': z.boolean(),\n  onlyParty: z.boolean(),\n  'picks-blocker': z.boolean(),\n  queueBlocker: z.boolean(),\n  queueBlockerFindMatch: z.boolean(),\n  queueBlockerFindMatchText: z.string().max(45),\n  rankOnly: z.object({\n    enabled: z.boolean(),\n    minimumRank: z.enum([\n      'Herald',\n      'Guardian',\n      'Crusader',\n      'Archon',\n      'Legend',\n      'Ancient',\n      'Divine',\n      'Immortal',\n    ]),\n    minimumRankTier: z.number().min(0).max(100),\n  }),\n  rosh: z.boolean(),\n  showRankImage: z.boolean(),\n  showRankLeader: z.boolean(),\n  showRankMmr: z.boolean(),\n  streamDelay: z.number().min(0).max(3_000_000),\n  streamersAnnounce: z.boolean(),\n  streamersNpSuffix: z.boolean(),\n  tellChatBets: z.boolean(),\n  tellChatNewMMR: z.boolean(),\n  translateOnOverlay: z.boolean(),\n  translationLanguage: z.string().max(5),\n  winProbabilityOverlay: z.boolean(),\n  winProbabilityOverlayIntervalMinutes: z.number().min(0).max(60),\n  wlStatsDays: z.number().int().min(1).max(365).nullable(),\n  wlStatsStartDate: z\n    .string()\n    .regex(/^\\d{4}-\\d{2}-\\d{2}$/u)\n    .refine((value) => {\n      const date = new Date(`${value}T00:00:00.000Z`)\n      return Number.isFinite(date.getTime()) && date.toISOString().slice(0, 10) === value\n    })\n    .nullable(),\n}",
+            "text": ""
+          }
+        ],
+        "message": "Object keys should be sorted",
+        "severity": "error"
+      }
+    },
     "1ab48a196028ba3dbf6ad49be74a5388b9d5ff651591aba2fc923fe08c6868ad": {
       "count": 1,
       "summary": {
@@ -50512,6 +50532,26 @@
         "severity": "error"
       }
     },
+    "648a4eba08241bae3145297b916209b365cc36f0dbce1d8e1e36556edd7202e9": {
+      "count": 1,
+      "summary": {
+        "code": "typescript(no-unsafe-type-assertion)",
+        "file": "src/lib/validations/setting.ts",
+        "labels": [
+          {
+            "context": {
+              "current": "Object.keys(settingsSchema) as [SettingKeys, ...SettingKeys[]],",
+              "next": ")",
+              "previous": "export const settingKeySchema = z.enum("
+            },
+            "span": "Object.keys(settingsSchema) as [SettingKeys, ...SettingKeys[]]",
+            "text": ""
+          }
+        ],
+        "message": "Unsafe type assertion: type '[\"aegis\" | \"autoCommandsOnMatchStart\" | \"autoOptInNewFeatures\" | \"autoTranslate\" | \"battlepass\" | \"bets\" | \"betsInfo\" | \"chatter\" | \"chatters\" | \"commandAPM\" | \"commandAghs\" | ... 103 more ... | \"wlStatsStartDate\", ...(\"aegis\" | ... 113 more ... | \"wlStatsStartDate\")[]]' is more narrow than the original type.",
+        "severity": "error"
+      }
+    },
     "649b5b089b5d3c1f499abd07483ba436775801fb8f01041581ec39eab8e3ac6f": {
       "count": 1,
       "summary": {
@@ -68844,26 +68884,6 @@
           }
         ],
         "message": "Unexpected `any`. Specify a different type.",
-        "severity": "error"
-      }
-    },
-    "88d2ad9b0ca1eaebd41243554825439b0b3dd48c96f9219db0029ff184ee0cc4": {
-      "count": 1,
-      "summary": {
-        "code": "eslint(sort-keys)",
-        "file": "src/lib/validations/setting.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "const settingsSchema = {",
-              "next": "aegis: z.boolean(),",
-              "previous": "// Define schemas for each specific setting"
-            },
-            "span": "{\n  aegis: z.boolean(),\n  autoCommandsOnMatchStart: z.array(z.string().max(45)),\n  autoTranslate: z.boolean(),\n  battlepass: z.boolean(),\n  bets: z.boolean(),\n  betsInfo: z.object({\n    duration: z\n      .string()\n      .regex(/^\\d+$/u, 'Duration must be a numeric string')\n      .transform((str) => Math.trunc(Number(str)))\n      .refine((num) => num >= 30 && num <= 1800, {\n        message: 'Duration must be between 30 and 1800 seconds',\n      }),\n    no: z.string().max(25),\n    title: z.string().max(45),\n    yes: z.string().max(25),\n  }),\n  chatter: z.boolean(),\n  autoOptInNewFeatures: z.boolean(),\n  // Tri-state: the null \"follow autoOptInNewFeatures\" state is the ABSENCE of a settings row\n  // (the default), not a persisted value. The UI only ever PATCHes true/false, and Prisma Json\n  // columns can't store raw null, so the write schema is boolean.\n  cosmeticsAnnounce: z.boolean(),\n  // Same tri-state new-feature toggle as cosmeticsAnnounce (the \"team smoked without you\" roast).\n  smokeActivated: z.boolean(),\n  chatters: z\n    .object({\n      bounties: z.object({ enabled: z.boolean() }),\n      commandsReady: z.object({ enabled: z.boolean() }),\n      dotapatch: z.object({ enabled: z.boolean() }),\n      firstBloodDeath: z.object({ enabled: z.boolean() }),\n      killstreak: z.object({ enabled: z.boolean() }),\n      matchOutcome: z.object({ enabled: z.boolean() }),\n      midas: z.object({ enabled: z.boolean() }),\n      neutralItems: z.object({ enabled: z.boolean() }),\n      noTp: z.object({ enabled: z.boolean() }),\n      passiveDeath: z.object({ enabled: z.boolean() }),\n      pause: z.object({ enabled: z.boolean() }),\n      powerTreads: z.object({ enabled: z.boolean() }),\n      roshDeny: z.object({ enabled: z.boolean() }),\n      roshPickup: z.object({ enabled: z.boolean() }),\n      roshanKilled: z.object({ enabled: z.boolean() }),\n      smoke: z.object({ enabled: z.boolean() }),\n      tip: z.object({ enabled: z.boolean() }),\n    })\n    .partial(),\n  // Command on/off toggles are derived from the single source of truth (`commands` in\n  // defaultSettings) so this allowlist can never drift from the dashboard toggles again.\n  // Previously these were hand-listed and had silently dropped keys like `commandSet`,\n  // making the API reject them with \"Invalid setting key\". Every command setting is a boolean.\n  ...(Object.fromEntries(Object.keys(commands).map((key) => [key, z.boolean()])) as Record<\n    keyof typeof commands,\n    z.ZodBoolean\n  >),\n  crypto_payment_interest: z.object({\n    interested: z.boolean(),\n    tier: z.enum(['FREE', 'PRO']),\n    transactionType: z.enum(['RECURRING', 'LIFETIME']),\n  }),\n  disableAutoClipping: z.boolean(),\n  discardZeroBets: z.boolean(),\n  lastFmOverlay: z.boolean(),\n  lastFmRefreshRate: z.number().min(5).max(60),\n  lastFmUsername: z.string().max(45).optional(),\n  livePolls: z.boolean(),\n  'minimap-blocker': z.boolean(),\n  'minimap-opacity': z.number().min(0).max(1),\n  'minimap-simple': z.boolean(),\n  'minimap-xl': z.boolean(),\n  minimapRight: z.boolean(),\n  mmr: z.number().min(0).max(30_000),\n  'mmr-tracker': z.boolean(),\n  notablePlayersOverlay: z.boolean(),\n  notablePlayersOverlayFlags: z.boolean(),\n  notablePlayersOverlayFlagsCmd: z.boolean(),\n  'obs-dc': z.string().max(200).max(45),\n  'obs-minimap': z.string().max(200).max(45),\n  'obs-picks': z.string().max(200).max(45),\n  'obs-scene-switcher': z.boolean(),\n  obsServerPassword: z.string().max(45),\n  obsServerPort: z.number().min(1).max(65_535),\n  'only-block-ranked': z.boolean(),\n  onlyParty: z.boolean(),\n  'picks-blocker': z.boolean(),\n  queueBlocker: z.boolean(),\n  queueBlockerFindMatch: z.boolean(),\n  queueBlockerFindMatchText: z.string().max(45),\n  rankOnly: z.object({\n    enabled: z.boolean(),\n    minimumRank: z.enum([\n      'Herald',\n      'Guardian',\n      'Crusader',\n      'Archon',\n      'Legend',\n      'Ancient',\n      'Divine',\n      'Immortal',\n    ]),\n    minimumRankTier: z.number().min(0).max(100),\n  }),\n  rosh: z.boolean(),\n  showRankImage: z.boolean(),\n  showRankLeader: z.boolean(),\n  showRankMmr: z.boolean(),\n  streamDelay: z.number().min(0).max(3_000_000),\n  tellChatBets: z.boolean(),\n  tellChatNewMMR: z.boolean(),\n  translateOnOverlay: z.boolean(),\n  translationLanguage: z.string().max(5),\n  winProbabilityOverlay: z.boolean(),\n  winProbabilityOverlayIntervalMinutes: z.number().min(0).max(60),\n  wlStatsDays: z.number().int().min(1).max(365).nullable(),\n  wlStatsStartDate: z\n    .string()\n    .regex(/^\\d{4}-\\d{2}-\\d{2}$/u)\n    .refine((value) => {\n      const date = new Date(`${value}T00:00:00.000Z`)\n      return Number.isFinite(date.getTime()) && date.toISOString().slice(0, 10) === value\n    })\n    .nullable(),\n}",
-            "text": ""
-          }
-        ],
-        "message": "Object keys should be sorted",
         "severity": "error"
       }
     },
@@ -120167,26 +120187,6 @@
           }
         ],
         "message": "This type assertion has no `SAFETY:` justification. State the checked invariant immediately before the assertion or its containing statement.",
-        "severity": "error"
-      }
-    },
-    "efba5e4733bcec32ce1a2aa59d9e9adc4ada0098cf0b7ac62248b912acde75d9": {
-      "count": 1,
-      "summary": {
-        "code": "typescript(no-unsafe-type-assertion)",
-        "file": "src/lib/validations/setting.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "Object.keys(settingsSchema) as [SettingKeys, ...SettingKeys[]],",
-              "next": ")",
-              "previous": "export const settingKeySchema = z.enum("
-            },
-            "span": "Object.keys(settingsSchema) as [SettingKeys, ...SettingKeys[]]",
-            "text": ""
-          }
-        ],
-        "message": "Unsafe type assertion: type '[\"aegis\" | \"autoCommandsOnMatchStart\" | \"autoOptInNewFeatures\" | \"autoTranslate\" | \"battlepass\" | \"bets\" | \"betsInfo\" | \"chatter\" | \"chatters\" | \"commandAPM\" | \"commandAghs\" | ... 101 more ... | \"wlStatsStartDate\", ...(\"aegis\" | ... 111 more ... | \"wlStatsStartDate\")[]]' is more narrow than the original type.",
         "severity": "error"
       }
     },
