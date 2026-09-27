@@ -4,7 +4,12 @@
 
 import * as Sentry from '@sentry/nextjs'
 
+import { dropExtensionNoise } from '@/lib/sentry-client-filters'
+import { guardDomAgainstTranslation } from '@/lib/translate-dom-guard'
+
 export const onRouterTransitionStart = Sentry.captureRouterTransitionStart
+
+guardDomAgainstTranslation()
 
 const SENTRY_DSN = process.env.SENTRY_DSN ?? process.env.NEXT_PUBLIC_SENTRY_DSN
 
@@ -31,8 +36,6 @@ if (SENTRY_DSN) {
 
     // Use tracesSampler for more granular control over sampling
     tracesSampleRate: 0.5,
-    // Capture errors based on environment
-    release: process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA,
 
     // Setting this option to true will print useful information to the console while you're setting up Sentry.
     debug: false,
@@ -55,33 +58,16 @@ if (SENTRY_DSN) {
       /Failed to fetch \(localhost:/iu,
       /NetworkError when attempting to fetch resource\.? \(localhost:/iu,
     ],
-    // Some Yandex Browser extensions / AV products monkey-patch
-    // Object.getOwnPropertyDescriptor with a wrapper that recurses into
-    // itself. The resulting RangeError has zero application frames — just
-    // the wrapper looping until V8 runs out of stack. Drop only that exact
-    // shape so genuine stack-overflow bugs in our own code still surface.
-    beforeSend(event, hint) {
-      const error = hint?.originalException
-      if (!(error instanceof RangeError)) {
-        return event
-      }
-      if (!/Maximum call stack size exceeded/iu.test(error.message)) {
-        return event
-      }
-
-      const frames = event.exception?.values?.[0]?.stacktrace?.frames ?? []
-      if (frames.length === 0) {
-        return event
-      }
-
-      const allExtensionFrames = frames.every(
-        (f) => f.function?.includes('getOwnPropertyDescriptor') && !f.in_app,
-      )
-      return allExtensionFrames ? null : event
-    },
+    beforeSend: dropExtensionNoise,
   })
 
   if (typeof window !== 'undefined') {
+    // vinext doesn't fire a navigation for the initial page load, so the
+    // listener below never sees an overlay that OBS opens directly.
+    if (window.location.pathname.startsWith('/overlay')) {
+      void replay.stop()
+    }
+
     if (window.navigation) {
       // Use the Navigation API if available
       window.navigation.addEventListener(

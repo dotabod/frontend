@@ -112,6 +112,8 @@ const settingsSchema = {
   showRankLeader: z.boolean(),
   showRankMmr: z.boolean(),
   streamDelay: z.number().min(0).max(3_000_000),
+  streamersAnnounce: z.boolean(),
+  streamersNpSuffix: z.boolean(),
   tellChatBets: z.boolean(),
   tellChatNewMMR: z.boolean(),
   translateOnOverlay: z.boolean(),
