@@ -45,7 +45,7 @@ describe(Banner, () => {
 
   beforeEach(() => {
     vi.useFakeTimers()
-    vi.setSystemTime(new Date('2026-09-04T12:00:00Z'))
+    vi.setSystemTime(new Date('2026-09-27T12:00:00Z'))
 
     const store: Record<string, string> = {}
     vi.stubGlobal('localStorage', {
@@ -76,12 +76,12 @@ describe(Banner, () => {
 
     const banner = screen.getByRole('complementary', { name: 'Latest Dotabod update' })
     expect(screen.getByText(/New in Dotabod/u)).toBeInTheDocument()
-    expect(screen.getByText(/Keep your win\/loss counter across streams/u)).toBeInTheDocument()
+    expect(screen.getByText(/More headroom on Dotabod's servers/u)).toBeInTheDocument()
     expect(banner).toHaveClass('overflow-hidden', 'bg-gray-800', 'px-6')
     expect(banner.querySelectorAll('.blur-2xl')).toHaveLength(2)
     expect(screen.getByRole('link', { name: /See what's new/u })).toHaveAttribute(
       'href',
-      '/dashboard/whats-new#custom-wl-stats-window',
+      '/dashboard/whats-new#server-headroom',
     )
     expect(screen.getByRole('link', { name: /See what's new/u })).toHaveClass('text-teal-300')
   })
@@ -92,12 +92,12 @@ describe(Banner, () => {
 
     expect(screen.getByRole('link', { name: /See what's new/u })).toHaveAttribute(
       'href',
-      '/whats-new#custom-wl-stats-window',
+      '/whats-new#server-headroom',
     )
   })
 
   it('keeps a newer fresh blog post as the announcement', () => {
-    mockPost({ ...freshPost, date: '2026-09-04T08:00:00Z' })
+    mockPost({ ...freshPost, date: '2026-09-27T08:00:00Z' })
     render(<Banner />)
 
     expect(screen.getByText(/Fresh on the blog/u)).toBeInTheDocument()
@@ -120,7 +120,7 @@ describe(Banner, () => {
     expect(screen.queryByText(/New in Dotabod/u)).not.toBeInTheDocument()
     expect(localStorage.setItem).toHaveBeenCalledWith(
       'dotabod-banner-dismissed-slug',
-      'whats-new:custom-wl-stats-window',
+      'whats-new:server-headroom',
     )
   })
 })
