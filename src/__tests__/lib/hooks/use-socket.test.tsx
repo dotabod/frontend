@@ -4,6 +4,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import { useAegis, useRoshan } from '@/lib/hooks/rosh'
 import { useSocket } from '@/lib/hooks/use-socket'
+import type { ChatMessage } from '@/lib/hooks/use-socket'
 
 type SocketHandler = (...args: unknown[]) => void
 type SocketProps = Parameters<typeof useSocket>[0]
@@ -300,12 +301,13 @@ describe(useSocket, () => {
 
   it('removes translated chat messages after ten seconds across rerenders', () => {
     vi.useFakeTimers()
-    const setChatMessages = vi.fn<SocketProps['setChatMessages']>()
-    const socketProps = createSocketProps({ setChatMessages })
+    const socketProps = createSocketProps()
 
-    const { rerender } = renderHook(
+    const { result, rerender } = renderHook(
       ({ setRoshan }) => {
-        useSocket({ ...socketProps, setRoshan })
+        const [chatMessages, setChatMessages] = useState<ChatMessage[]>([])
+        useSocket({ ...socketProps, setChatMessages, setRoshan })
+        return chatMessages
       },
       {
         initialProps: { setRoshan: socketProps.setRoshan },
@@ -315,15 +317,32 @@ describe(useSocket, () => {
     act(() => {
       socketState.handlers.get('chatMessage')?.({ message: 'Translated message', timestamp: 1 })
     })
-    expect(setChatMessages).toHaveBeenCalledOnce()
+    expect(result.current).toStrictEqual([{ message: 'Translated message', timestamp: 1 }])
+
+    act(() => {
+      vi.advanceTimersByTime(5000)
+      socketState.handlers.get('chatMessage')?.({ message: 'Newer translation' })
+    })
 
     rerender({ setRoshan: vi.fn<SocketProps['setRoshan']>() })
 
     act(() => {
-      vi.advanceTimersByTime(10_000)
+      vi.advanceTimersByTime(4999)
     })
+    expect(result.current.map(({ message }) => message)).toStrictEqual([
+      'Translated message',
+      'Newer translation',
+    ])
 
-    expect(setChatMessages).toHaveBeenCalledTimes(2)
+    act(() => {
+      vi.advanceTimersByTime(1)
+    })
+    expect(result.current.map(({ message }) => message)).toStrictEqual(['Newer translation'])
+
+    act(() => {
+      vi.advanceTimersByTime(5000)
+    })
+    expect(result.current).toStrictEqual([])
   })
 
   it('keeps real Roshan and Aegis setters stable across overlay rerenders', () => {

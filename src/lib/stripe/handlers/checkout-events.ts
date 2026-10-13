@@ -6,6 +6,7 @@ import { stripe } from '@/lib/stripe-server'
 
 import { GiftService } from '../services/gift-service'
 import { withErrorHandling } from '../utils/error-handling'
+import { cancelReplacedSubscription } from '../utils/replaced-subscription'
 import {
   createCryptoSubscription,
   createLifetimePurchase,
@@ -13,6 +14,24 @@ import {
   isLifetimePrice,
 } from '../utils/subscription-utils'
 import { handleSubscriptionEvent } from './subscription-events'
+
+// The old subscription is only canceled once the new one is recorded, so a failed sync never
+// Leaves the user without a subscription on file.
+const recordCheckoutSubscription = async function recordCheckoutSubscription(
+  subscription: Stripe.Subscription,
+  session: Stripe.Checkout.Session,
+  tx: Prisma.TransactionClient,
+): Promise<boolean> {
+  const recorded = await handleSubscriptionEvent(subscription, tx)
+  if (recorded) {
+    await cancelReplacedSubscription(
+      stripe.subscriptions,
+      session.metadata?.previousSubscriptionId,
+      subscription.id,
+    )
+  }
+  return recorded
+}
 
 export const handleCheckoutCompleted = async function handleCheckoutCompleted(
   session: Stripe.Checkout.Session,
@@ -55,7 +74,7 @@ export const handleCheckoutCompleted = async function handleCheckoutCompleted(
       async () => {
         if (session.mode === 'subscription' && session.subscription) {
           const subscription = await stripe.subscriptions.retrieve(session.subscription as string)
-          return await handleSubscriptionEvent(subscription, tx)
+          return await recordCheckoutSubscription(subscription, session, tx)
         }
 
         if (session.mode === 'payment') {
