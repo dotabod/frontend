@@ -50,12 +50,46 @@ export const handleCheckoutCompleted = async function handleCheckoutCompleted(
     }
   }
 
+  // A recurring checkout started while the user already had a Stripe subscription (e.g. a past_due
+  // Monthly plan) replaces it. Without this the old subscription keeps retrying its failed invoice.
+  const cancelReplacedSubscription = async (
+    previousSubscriptionId: string | undefined,
+    newSubscriptionId: string,
+  ) => {
+    if (
+      !previousSubscriptionId ||
+      previousSubscriptionId === newSubscriptionId ||
+      previousSubscriptionId.startsWith('crypto_')
+    ) {
+      return
+    }
+
+    try {
+      await stripe.subscriptions.cancel(previousSubscriptionId, {
+        invoice_now: false,
+        prorate: true,
+      })
+      console.log(
+        `Canceled replaced Stripe subscription ${previousSubscriptionId} after checkout ${session.id}`,
+      )
+    } catch (error) {
+      console.error(`Failed to cancel replaced subscription ${previousSubscriptionId}:`, error)
+    }
+  }
+
   return (
     (await withErrorHandling(
       async () => {
         if (session.mode === 'subscription' && session.subscription) {
           const subscription = await stripe.subscriptions.retrieve(session.subscription as string)
-          return await handleSubscriptionEvent(subscription, tx)
+          const synced = await handleSubscriptionEvent(subscription, tx)
+          if (synced) {
+            await cancelReplacedSubscription(
+              session.metadata?.previousSubscriptionId,
+              subscription.id,
+            )
+          }
+          return synced
         }
 
         if (session.mode === 'payment') {
