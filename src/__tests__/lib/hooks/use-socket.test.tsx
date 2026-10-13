@@ -317,7 +317,7 @@ describe(useSocket, () => {
     act(() => {
       socketState.handlers.get('chatMessage')?.({ message: 'Translated message', timestamp: 1 })
     })
-    expect(result.current).toEqual([{ message: 'Translated message', timestamp: 1 }])
+    expect(result.current).toStrictEqual([{ message: 'Translated message', timestamp: 1 }])
 
     act(() => {
       vi.advanceTimersByTime(5000)
@@ -329,7 +329,7 @@ describe(useSocket, () => {
     act(() => {
       vi.advanceTimersByTime(4999)
     })
-    expect(result.current.map(({ message }) => message)).toEqual([
+    expect(result.current.map(({ message }) => message)).toStrictEqual([
       'Translated message',
       'Newer translation',
     ])
@@ -337,12 +337,12 @@ describe(useSocket, () => {
     act(() => {
       vi.advanceTimersByTime(1)
     })
-    expect(result.current.map(({ message }) => message)).toEqual(['Newer translation'])
+    expect(result.current.map(({ message }) => message)).toStrictEqual(['Newer translation'])
 
     act(() => {
       vi.advanceTimersByTime(5000)
     })
-    expect(result.current).toEqual([])
+    expect(result.current).toStrictEqual([])
   })
 
   it('keeps real Roshan and Aegis setters stable across overlay rerenders', () => {
