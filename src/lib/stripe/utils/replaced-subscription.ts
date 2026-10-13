@@ -1,7 +1,10 @@
 import type Stripe from 'stripe'
 
 interface SubscriptionCanceler {
-  cancel: (subscriptionId: string, params: Stripe.SubscriptionCancelParams) => Promise<unknown>
+  cancel: (
+    subscriptionId: string,
+    params: Stripe.SubscriptionCancelParams,
+  ) => Promise<{ id: string }>
 }
 
 // A recurring checkout replaces the subscription it was started from, for example a past due

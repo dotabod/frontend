@@ -9,7 +9,7 @@ describe(cancelReplacedSubscription, () => {
 
   beforeEach(() => {
     cancel.mockReset()
-    cancel.mockResolvedValue(undefined)
+    cancel.mockResolvedValue({ id: 'sub_monthly_past_due' })
   })
 
   it('cancels the past due subscription the new plan replaces', async () => {
