@@ -44,7 +44,7 @@ interface GiftCreditBilling {
 
 export interface GiftCreditDependencies {
   billing: GiftCreditBilling
-  monthlyPriceId: string | undefined
+  monthlyPriceId: string | null
   store: GiftCreditStore
 }
 
@@ -58,7 +58,7 @@ export interface GiftCreditInput {
 export type GiftCreditResult =
   | { creditApplied: number; kind: 'applied'; priceId: string }
   | { balance: number; kind: 'no-credit' }
-  | { kind: 'already-active' | 'customer-deleted' | 'no-customer' | 'user-not-found' }
+  | { kind: 'already-active' | 'customer-deleted' | 'no-customer' }
 
 /**
  * Turns a recipient's Stripe credit balance into a Pro subscription. Stripe applies the balance
@@ -77,7 +77,7 @@ export const applyGiftCredit = async function applyGiftCredit(
 
   const user = await store.findUser(userId)
   if (user === null) {
-    return { kind: 'user-not-found' }
+    throw new Error(`User ${userId} not found`)
   }
 
   const customerId = input.stripeCustomerId ?? (await store.findCustomerId(userId))
@@ -94,29 +94,31 @@ export const applyGiftCredit = async function applyGiftCredit(
   }
 
   const priceId = (await store.findReactivationPriceId(userId)) ?? monthlyPriceId
-  if (priceId === undefined || priceId === '') {
+  if (priceId === null || priceId === '') {
     throw new Error('Monthly PRO price ID not configured')
   }
 
-  const created = await billing.createSubscription({
-    customer: customerId,
-    items: [{ price: priceId }],
-    metadata: {
-      email: user.email ?? '',
-      image: user.image ?? '',
-      isAutoApplied: 'true',
-      isCryptoPayment: 'false',
-      isGift: 'false',
-      isNewSubscription: 'true',
-      isUpgradeToLifetime: 'false',
-      locale: user.locale ?? '',
-      name: user.name ?? '',
-      userId,
-    },
-  })
-
-  // A past due subscription keeps retrying its failed invoice, which charges the card on file.
-  const pastDueIds = await store.findPastDueStripeSubscriptionIds(userId)
+  // A past due subscription keeps retrying its failed invoice, which charges the card on file, so
+  // It is canceled once the subscription that replaces it exists.
+  const [created, pastDueIds] = await Promise.all([
+    billing.createSubscription({
+      customer: customerId,
+      items: [{ price: priceId }],
+      metadata: {
+        email: user.email ?? '',
+        image: user.image ?? '',
+        isAutoApplied: 'true',
+        isCryptoPayment: 'false',
+        isGift: 'false',
+        isNewSubscription: 'true',
+        isUpgradeToLifetime: 'false',
+        locale: user.locale ?? '',
+        name: user.name ?? '',
+        userId,
+      },
+    }),
+    store.findPastDueStripeSubscriptionIds(userId),
+  ])
   await Promise.all(
     pastDueIds.map(async (pastDueId) => {
       await cancelReplacedSubscription(billing.subscriptions, pastDueId, created.id)
@@ -156,7 +158,7 @@ export const createGiftCreditDependencies =
             await stripe.subscriptions.cancel(subscriptionId, params),
         },
       },
-      monthlyPriceId: process.env.NEXT_PUBLIC_STRIPE_PRO_MONTHLY_PRICE_ID,
+      monthlyPriceId: process.env.NEXT_PUBLIC_STRIPE_PRO_MONTHLY_PRICE_ID ?? null,
       store: {
         findCustomerId: async (userId) => {
           const latest = await prisma.subscription.findFirst({

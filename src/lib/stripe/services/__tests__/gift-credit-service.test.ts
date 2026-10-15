@@ -111,8 +111,18 @@ describe(applyGiftCredit, () => {
     const fakes = createFakes()
 
     await expect(
-      applyGiftCredit(recipient, { ...fakes.dependencies, monthlyPriceId: undefined }),
+      applyGiftCredit(recipient, { ...fakes.dependencies, monthlyPriceId: null }),
     ).rejects.toThrow('Monthly PRO price ID not configured')
+    expect(fakes.createSubscription).not.toHaveBeenCalled()
+  })
+
+  it('throws when the member does not exist', async () => {
+    const fakes = createFakes()
+    fakes.findUser.mockResolvedValue(null)
+
+    await expect(applyGiftCredit(recipient, fakes.dependencies)).rejects.toThrow(
+      'User user_1 not found',
+    )
     expect(fakes.createSubscription).not.toHaveBeenCalled()
   })
 
@@ -129,13 +139,6 @@ describe(applyGiftCredit, () => {
       },
       kind: 'already-active',
       name: 'the member already has an active plan',
-    },
-    {
-      configure: (fakes) => {
-        fakes.findUser.mockResolvedValue(null)
-      },
-      kind: 'user-not-found',
-      name: 'the member does not exist',
     },
     {
       configure: (fakes) => {

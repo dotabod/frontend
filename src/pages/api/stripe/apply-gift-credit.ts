@@ -34,10 +34,6 @@ const respond = function respond(res: NextApiResponse, result: GiftCreditResult)
     })
     return
   }
-  if (result.kind === 'user-not-found') {
-    res.status(404).json({ error: 'User not found' })
-    return
-  }
   if (result.kind === 'no-customer') {
     res.status(404).json({ error: 'No Stripe customer found for this user', success: false })
     return

@@ -107,7 +107,7 @@ describe(SubscriptionAlerts, () => {
       <SubscriptionAlerts
         giftInfo={giftInfo}
         statusInfo={null}
-        handlePortalAccess={vi.fn()}
+        handlePortalAccess={vi.fn<() => Promise<void>>()}
         isLoading={false}
       />,
     )
