@@ -98214,26 +98214,6 @@
         "severity": "error"
       }
     },
-    "c63e20fced853b67364c8227192352fb232f745cfb06f9e8a4c80204d73eca04": {
-      "count": 1,
-      "summary": {
-        "code": "sonarjs(todo-tag)",
-        "file": "src/pages/api/check-requires-refresh.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "// TODO: Remove this once we have a way to check if the user has the correct scopes",
-              "next": "requiresRefresh = false",
-              "previous": "// For now, always return no refresh"
-            },
-            "span": "TODO",
-            "text": ""
-          }
-        ],
-        "message": "Complete the task associated to this \"TODO\" comment.",
-        "severity": "error"
-      }
-    },
     "c6414b0e806a385a9486be0568f8023845fce17078426fe8dfa230b516105ef4": {
       "count": 1,
       "summary": {
@@ -103517,26 +103497,6 @@
           }
         ],
         "message": "Unsafe member access .statusCode on an `error` typed value.",
-        "severity": "error"
-      }
-    },
-    "d0cf8f0375ca888aeff85c1aac18b386b0f6193e7bc2d87fc396667c128106ad": {
-      "count": 1,
-      "summary": {
-        "code": "eslint(no-warning-comments)",
-        "file": "src/pages/api/check-requires-refresh.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "// TODO: Remove this once we have a way to check if the user has the correct scopes",
-              "next": "requiresRefresh = false",
-              "previous": "// For now, always return no refresh"
-            },
-            "span": "// TODO: Remove this once we have a way to check if the user has the correct scopes",
-            "text": ""
-          }
-        ],
-        "message": "Unexpected 'todo' comment: TODO: Remove this once we have a way to...",
         "severity": "error"
       }
     },
@@ -110201,26 +110161,6 @@
           }
         ],
         "message": "Do not nest ternary expressions.",
-        "severity": "error"
-      }
-    },
-    "de0f387fc7dabdc3d57565aa0df25dea204ad6260d57b3e140e49566034c5862": {
-      "count": 1,
-      "summary": {
-        "code": "typescript(strict-boolean-expressions)",
-        "file": "src/pages/api/check-requires-refresh.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "if (response?.requires_refresh) {",
-              "next": "requiresRefresh = true",
-              "previous": "}"
-            },
-            "span": "response?.requires_refresh",
-            "text": ""
-          }
-        ],
-        "message": "Unexpected nullable boolean value in conditional. Please handle the nullish case explicitly.",
         "severity": "error"
       }
     },
