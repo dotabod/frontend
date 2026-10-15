@@ -47,7 +47,8 @@ export const DisableToggle = () => {
   // swallow any shorter poll.
   const { data: settingsData } = useSWR('/api/settings', fetcher, {
     ...SETTINGS_SWR_OPTIONS,
-    refreshInterval: (latest?: { stream_online?: boolean }) => (latest?.stream_online ? 0 : 60_000),
+    refreshInterval: (latest?: { stream_online?: boolean }) =>
+      latest?.stream_online === true ? 0 : 60_000,
   })
   const isLive = settingsData?.stream_online
   const { getDisableReasonExplanation } = useDisableReasons()
