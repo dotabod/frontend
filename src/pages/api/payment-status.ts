@@ -3,6 +3,7 @@ import type { NextApiRequest, NextApiResponse } from 'next'
 import { getServerSession } from '@/lib/api/get-server-session'
 import { authOptions } from '@/lib/auth'
 import prisma from '@/lib/db'
+import { sendNowPaymentsStatus } from '@/lib/nowpayments-payment-status'
 import { getOpenNodeChargeStatus } from '@/lib/opennode'
 import { isOpenNodePaymentConfirmed, processConfirmedOpenNodePayment } from '@/lib/opennode-payment'
 import { stripe } from '@/lib/stripe-server'
@@ -41,7 +42,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     })
 
     if (!openNodeCharge) {
-      res.status(404).json({ error: 'Payment not found' })
+      // Crypto buyers since May pay through NOWPayments, which never creates an OpenNode charge.
+      await sendNowPaymentsStatus(res, invoiceId, invoice)
       return
     }
 

@@ -25,9 +25,15 @@ const mocks = vi.hoisted(() => {
     getServerSession: vi.fn(),
     openNodeCharge,
     prisma: {
+      nowPaymentsInvoice: {
+        findUnique: vi.fn(),
+      },
       openNodeCharge: {
         findUnique: vi.fn(),
         update: vi.fn(),
+      },
+      subscription: {
+        findFirst: vi.fn(),
       },
     },
     processConfirmedOpenNodePayment: vi.fn(),
@@ -130,6 +136,34 @@ describe('payment-status API', () => {
       },
       invoiceId: 'in_1',
       status: 'paid',
+    })
+  })
+
+  it('reports a NOWPayments invoice instead of answering 404 when there is no OpenNode charge', async () => {
+    mocks.prisma.openNodeCharge.findUnique.mockResolvedValue(null)
+    mocks.prisma.nowPaymentsInvoice.findUnique.mockResolvedValue({
+      createdAt: new Date('2026-10-14T20:00:00.000Z'),
+      nowPaymentsId: 'np_inv_1',
+      priceAmount: 99,
+      priceCurrency: 'usd',
+      status: 'finished',
+      stripeInvoiceId: 'in_1',
+    })
+    mocks.prisma.subscription.findFirst.mockResolvedValue({ id: 'sub_1' })
+    const { req, res } = createMocks({
+      method: 'GET',
+      query: { invoiceId: 'in_1' },
+    })
+
+    await handler(req, res)
+
+    expect(res.statusCode).toBe(200)
+    expect(mocks.getOpenNodeChargeStatus).not.toHaveBeenCalled()
+    expect(res._getJSONData()).toMatchObject({
+      chargeId: 'np_inv_1',
+      invoiceId: 'in_1',
+      status: 'finished',
+      statusInfo: { type: 'success' },
     })
   })
 })
