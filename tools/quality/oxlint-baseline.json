@@ -6792,26 +6792,6 @@
         "severity": "error"
       }
     },
-    "0cdd644ca55b7a983cf3f69b8d22cfccb4984fa23d962c559e0167bc186c3ba8": {
-      "count": 2,
-      "summary": {
-        "code": "eslint(no-useless-return)",
-        "file": "src/pages/api/stripe/apply-gift-credit.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "return",
-              "next": "} catch (error) {",
-              "previous": "})"
-            },
-            "span": "return",
-            "text": ""
-          }
-        ],
-        "message": "Unnecessary return statement.",
-        "severity": "error"
-      }
-    },
     "0ce0e9a7cef4683935cbc81971b231b37ae20a8cac3d3ed67d200cb155cf848e": {
       "count": 1,
       "summary": {
@@ -9948,26 +9928,6 @@
         "severity": "error"
       }
     },
-    "12a1e071ec1854ca8daf8d50ab8dfd05b97d3e8f79615f3c592b149c141d08d4": {
-      "count": 2,
-      "summary": {
-        "code": "typescript(strict-boolean-expressions)",
-        "file": "src/pages/api/stripe/apply-gift-credit.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "newStripeSubscription.latest_invoice &&",
-              "next": "typeof newStripeSubscription.latest_invoice === 'object' &&",
-              "previous": "if ("
-            },
-            "span": "newStripeSubscription.latest_invoice",
-            "text": ""
-          }
-        ],
-        "message": "Unexpected value in conditional. A union of different types has inconsistent truthiness.",
-        "severity": "error"
-      }
-    },
     "12a8260902ec43463e30c2bb949321bc62fd93f2ad2a828b43e5e424ec842fb7": {
       "count": 1,
       "summary": {
@@ -12179,26 +12139,6 @@
           }
         ],
         "message": "Unsafe argument of type any assigned to a parameter of type string | undefined.",
-        "severity": "error"
-      }
-    },
-    "16a90795687037f11c6ce7887b59a50d82cf6b7641161de0b15e6f0853b0e963": {
-      "count": 1,
-      "summary": {
-        "code": "typescript(no-unsafe-member-access)",
-        "file": "src/pages/api/stripe/apply-gift-credit.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "const userId = req.body.userId as string",
-              "next": "",
-              "previous": "// Get the user from the session or from the request body (for internal calls)"
-            },
-            "span": "userId",
-            "text": ""
-          }
-        ],
-        "message": "Unsafe member access .userId on an `any` value.",
         "severity": "error"
       }
     },
@@ -16547,26 +16487,6 @@
           }
         ],
         "message": "Unsafe assertion to `any` detected: consider using a more specific type to ensure safety.",
-        "severity": "error"
-      }
-    },
-    "2051805fe77f47339f436da6393fe2e65b83dae9915ef3ddee98b7aa289331b8": {
-      "count": 1,
-      "summary": {
-        "code": "sonarjs(no-duplicated-branches)",
-        "file": "src/pages/api/stripe/apply-gift-credit.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "} else if (newStripeSubscription.items.data[0]?.current_period_end) {",
-              "next": "// Fallback to Stripe's period end even if invoice status is not 'paid' yet",
-              "previous": ")"
-            },
-            "span": "{\n          // Fallback to Stripe's period end even if invoice status is not 'paid' yet\n          currentPeriodEnd = new Date(\n            newStripeSubscription.items.data[0]?.current_period_end * 1000,\n          )\n        }",
-            "text": ""
-          }
-        ],
-        "message": "This branch's code block is the same as the block for the branch on line 193.",
         "severity": "error"
       }
     },
@@ -30548,26 +30468,6 @@
         "severity": "error"
       }
     },
-    "3b9b80d7bbad4d976c6c95524d593752e22f443aa32d5800323a08ff9ace4cd8": {
-      "count": 1,
-      "summary": {
-        "code": "typescript(strict-boolean-expressions)",
-        "file": "src/pages/api/stripe/apply-gift-credit.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "if (!priceId) {",
-              "next": "throw new Error('Monthly PRO price ID not configured')",
-              "previous": ""
-            },
-            "span": "priceId",
-            "text": ""
-          }
-        ],
-        "message": "Unexpected nullable string value in conditional. Please handle the nullish and empty string cases explicitly.",
-        "severity": "error"
-      }
-    },
     "3ba0f3dbfae97ffd5fbacb411c2945caaf224ad510e42f7957ceb498d52dc00b": {
       "count": 1,
       "summary": {
@@ -34366,26 +34266,6 @@
           }
         ],
         "message": "This type assertion has no `SAFETY:` justification. State the checked invariant immediately before the assertion or its containing statement.",
-        "severity": "error"
-      }
-    },
-    "430ae96adc9b79d4ec85343d8f562cdf3575ae175f392e759bd1c1831d779d0f": {
-      "count": 1,
-      "summary": {
-        "code": "typescript(strict-boolean-expressions)",
-        "file": "src/pages/api/stripe/apply-gift-credit.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "if (!stripeCustomerId) {",
-              "next": "res.status(404).json({",
-              "previous": ""
-            },
-            "span": "stripeCustomerId",
-            "text": ""
-          }
-        ],
-        "message": "Unexpected nullable string value in conditional. Please handle the nullish and empty string cases explicitly.",
         "severity": "error"
       }
     },
@@ -39266,26 +39146,6 @@
         "severity": "error"
       }
     },
-    "4c2f30b465f44484f67e9cd2448867604a58b4743ed39b06a823b2c01c39bd07": {
-      "count": 1,
-      "summary": {
-        "code": "typescript(strict-boolean-expressions)",
-        "file": "src/pages/api/stripe/apply-gift-credit.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "if (!userIdToUse) {",
-              "next": "res.status(400).json({ error: 'Missing user ID' })",
-              "previous": ""
-            },
-            "span": "userIdToUse",
-            "text": ""
-          }
-        ],
-        "message": "Unexpected nullable string value in conditional. Please handle the nullish and empty string cases explicitly.",
-        "severity": "error"
-      }
-    },
     "4c3cb9aaaac6b69644b4d1613234ce29caab36dd9b541344d6650486493bd9a3": {
       "count": 1,
       "summary": {
@@ -43020,26 +42880,6 @@
           }
         ],
         "message": "Missing type parameters on mock function call",
-        "severity": "error"
-      }
-    },
-    "53ff66c4d5220da571f7f717514608983436455fce55b1bb35ab20aad64d74d7": {
-      "count": 1,
-      "summary": {
-        "code": "anti-slop(require-safety-comment-for-type-assertion)",
-        "file": "src/pages/api/stripe/apply-gift-credit.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "const userId = req.body.userId as string",
-              "next": "",
-              "previous": "// Get the user from the session or from the request body (for internal calls)"
-            },
-            "span": "req.body.userId as string",
-            "text": ""
-          }
-        ],
-        "message": "This type assertion has no `SAFETY:` justification. State the checked invariant immediately before the assertion or its containing statement.",
         "severity": "error"
       }
     },
@@ -58161,26 +58001,6 @@
         "severity": "error"
       }
     },
-    "73d253c5de81591e4049c26cdf536efb8cc5f0f49ec726bdba2649aa5caa95a9": {
-      "count": 2,
-      "summary": {
-        "code": "anti-slop(no-runtime-typeof)",
-        "file": "src/pages/api/stripe/apply-gift-credit.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "typeof newStripeSubscription.latest_invoice === 'object' &&",
-              "next": "// Type guard for Invoice object",
-              "previous": "newStripeSubscription.latest_invoice &&"
-            },
-            "span": "typeof newStripeSubscription.latest_invoice",
-            "text": ""
-          }
-        ],
-        "message": "A `typeof` check narrows a representation without establishing its contract. Parse input at its I/O boundary, then branch on the domain value.",
-        "severity": "error"
-      }
-    },
     "73ea392b70cbfd3119ee347a310cead526fe5cfe5ccf5c95e2a2a7ad4c338210": {
       "count": 1,
       "summary": {
@@ -59966,26 +59786,6 @@
         "severity": "error"
       }
     },
-    "78026282e75eb4128876928498891b7cb17ca7cb46021c1fc818eb4ba593b1f4": {
-      "count": 1,
-      "summary": {
-        "code": "eslint(complexity)",
-        "file": "src/pages/api/stripe/apply-gift-credit.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "export default async function handler(req: NextApiRequest, res: NextApiResponse) {",
-              "next": "if (req.method !== 'POST') {",
-              "previous": "*/"
-            },
-            "span": "async function handler(req: NextApiRequest, res: NextApiResponse) {\n  if (req.method !== 'POST') {\n    res.status(405).json({ error: 'Method not allowed' })\n    return\n  }\n\n  try {\n    const session = await getServerSession(req, res, authOptions)\n    // Get the user from the session or from the request body (for internal calls)\n    const userId = req.body.userId as string\n\n    if (!userId) {\n      // If no userId in body, check if authenticated user\n      if (!session?.user) {\n        res.status(401).json({ error: 'Unauthorized' })\n        return\n      }\n      if (session.user.isImpersonating) {\n        res.status(403).json({ error: 'Unauthorized: Impersonation not allowed' })\n        return\n      }\n    }\n\n    // Use session user ID if no userId was provided in request body\n    const userIdToUse = userId || session?.user.id\n\n    if (!userIdToUse) {\n      res.status(400).json({ error: 'Missing user ID' })\n      return\n    }\n\n    // Check if the user has an active subscription already\n    const activeSubscription = await getSubscription(userIdToUse)\n\n    // If the user already has an active subscription (not a grace period one),\n    // There's no need to apply credits automatically\n    if (\n      activeSubscription &&\n      !activeSubscription.isGift &&\n      isSubscriptionActive(activeSubscription)\n    ) {\n      res.status(200).json({\n        activeSubscription: true,\n        message: 'User already has an active subscription',\n        success: false,\n      })\n      return\n    }\n\n    // Get the user's Stripe customer ID\n    const user = await prisma.user.findUnique({\n      select: {\n        email: true,\n        id: true,\n        image: true,\n        locale: true,\n        name: true,\n      },\n      where: { id: userIdToUse },\n    })\n\n    if (!user) {\n      res.status(404).json({ error: 'User not found' })\n      return\n    }\n\n    // Find the user's Stripe customer ID\n    const subscription = await prisma.subscription.findFirst({\n      orderBy: { createdAt: 'desc' },\n      select: { stripeCustomerId: true },\n      where: { userId: userIdToUse },\n    })\n\n    const stripeCustomerId = subscription?.stripeCustomerId\n\n    if (!stripeCustomerId) {\n      res.status(404).json({\n        error: 'No Stripe customer found for this user',\n        success: false,\n      })\n      return\n    }\n\n    // Get customer balance\n    const customer = await stripe.customers.retrieve(stripeCustomerId)\n\n    // Check if the customer is deleted\n    if (customer.deleted) {\n      res.status(404).json({\n        error: 'Stripe customer associated with this user has been deleted.',\n        success: false,\n      })\n      return\n    }\n\n    // Safely access the balance after ensuring the customer is not deleted\n    const { balance } = customer\n\n    // If balance is zero or positive, there are no credits to use\n    if (balance >= 0) {\n      res.status(200).json({\n        balance,\n        message: 'No credit balance available',\n        success: false,\n      })\n      return\n    }\n\n    // Check for inactive subscriptions that can be reactivated\n    const inactiveSubsription = await prisma.subscription.findFirst({\n      orderBy: { createdAt: 'desc' },\n      where: {\n        cancelAtPeriodEnd: true,\n        status: {\n          in: [\n            SubscriptionStatus.CANCELED,\n            SubscriptionStatus.PAST_DUE,\n            SubscriptionStatus.INCOMPLETE,\n            SubscriptionStatus.UNPAID,\n          ],\n        },\n        stripeSubscriptionId: { not: null },\n        userId: userIdToUse,\n      },\n    })\n\n    // If stripe subscription exists, try to reactivate it\n    if (inactiveSubsription?.stripeSubscriptionId) {\n      try {\n        // Instead of reactivating, create a new subscription to ensure clean state\n        // Get the price ID from the inactive subscription\n        const priceId = inactiveSubsription.stripePriceId\n\n        if (!priceId) {\n          throw new Error('No price ID found in inactive subscription')\n        }\n\n        // Directly create the subscription using the API\n        // Stripe will automatically apply the customer's balance to the first invoice.\n        const newStripeSubscription: Stripe.Subscription = await stripe.subscriptions.create({\n          customer: stripeCustomerId,\n          items: [{ price: priceId }],\n          metadata: {\n            email: user.email ?? '',\n            image: user.image ?? '',\n            // Indicate this was auto-applied via gift credit\n            isAutoApplied: 'true',\n            isCryptoPayment: 'false',\n            isGift: 'false',\n            isNewSubscription: 'true',\n            isUpgradeToLifetime: 'false',\n            locale: user.locale || '',\n            name: user.name || '',\n            userId: userIdToUse,\n          },\n          // Optional: Add trial days or other parameters if needed\n          // Trial_period_days: 30, // Example: Give a 30-day trial\n        })\n\n        // Ensure the subscription was created successfully\n        if (!newStripeSubscription?.id) {\n          throw new Error('Failed to create Stripe subscription object.')\n        }\n\n        // If the latest invoice exists and is paid (likely due to balance application),\n        // Determine the correct currentPeriodEnd. Otherwise, estimate 30 days.\n        // Default: 30 days\n        let currentPeriodEnd = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)\n        if (\n          newStripeSubscription.latest_invoice &&\n          typeof newStripeSubscription.latest_invoice === 'object' &&\n          // Type guard for Invoice object\n          'status' in newStripeSubscription.latest_invoice &&\n          newStripeSubscription.latest_invoice.status === 'paid' &&\n          // Check if property exists\n          newStripeSubscription.items.data[0]?.current_period_end\n        ) {\n          // Use the period end from the Stripe subscription object if available\n          currentPeriodEnd = new Date(\n            newStripeSubscription.items.data[0]?.current_period_end * 1000,\n          )\n        } else if (newStripeSubscription.items.data[0]?.current_period_end) {\n          // Fallback to Stripe's period end even if invoice status is not 'paid' yet\n          currentPeriodEnd = new Date(\n            newStripeSubscription.items.data[0]?.current_period_end * 1000,\n          )\n        }\n\n        // Create a new subscription record in Prisma\n        await prisma.subscription.create({\n          data: {\n            cancelAtPeriodEnd: false,\n            currentPeriodEnd,\n            // This subscription itself isn't a gift, it was paid for by gift *credit*\n            isGift: false,\n            metadata: {\n              appliedAt: new Date().toISOString(),\n              autoApplied: 'true',\n              // Record the balance *before* application\n              creditBalanceUsed: balance.toString(),\n              source: 'gift-credit-auto-apply-reactivate-path',\n            },\n            // Assume active, Stripe webhooks will update if payment fails\n            status: SubscriptionStatus.ACTIVE,\n            stripeCustomerId,\n            stripePriceId: priceId,\n            // Store the new Stripe Subscription ID\n            stripeSubscriptionId: newStripeSubscription.id,\n            tier: 'PRO',\n            // Or GIFT if fully paid by credit? Needs clarification.\n            transactionType: TransactionType.RECURRING,\n            userId: userIdToUse,\n          },\n        })\n\n        res.status(200).json({\n          // Show the amount of credit potentially used\n          creditApplied: Math.abs(balance) / 100,\n          message: 'Successfully applied gift credits to create a new subscription',\n          priceId,\n          success: true,\n        })\n        return\n      } catch (error) {\n        console.error('Error creating subscription from inactive path:', error)\n        // Check for specific Stripe errors if needed\n        // If (error instanceof Stripe.errors.StripeCardError) { ... }\n        res.status(500).json({\n          details: error.message,\n          error: 'Failed to create subscription using gift credits',\n          success: false,\n        })\n        return\n      }\n    } else {\n      // No existing subscription to reactivate, create a new one\n      try {\n        // Get the default monthly PRO price ID\n        const priceId = process.env.NEXT_PUBLIC_STRIPE_PRO_MONTHLY_PRICE_ID\n\n        if (!priceId) {\n          throw new Error('Monthly PRO price ID not configured')\n        }\n\n        // Directly create the subscription using the API\n        // Stripe will automatically apply the customer's balance to the first invoice.\n        const newStripeSubscription: Stripe.Subscription = await stripe.subscriptions.create({\n          customer: stripeCustomerId,\n          items: [{ price: priceId }],\n          metadata: {\n            email: user.email ?? '',\n            image: user.image ?? '',\n            // Indicate this was auto-applied via gift credit\n            isAutoApplied: 'true',\n            isCryptoPayment: 'false',\n            isGift: 'false',\n            isNewSubscription: 'true',\n            isUpgradeToLifetime: 'false',\n            locale: user.locale || '',\n            name: user.name || '',\n            userId: userIdToUse,\n          },\n          // Optional: Add trial days or other parameters if needed\n          // Trial_period_days: 30, // Example: Give a 30-day trial\n        })\n\n        // Ensure the subscription was created successfully\n        if (!newStripeSubscription?.id) {\n          throw new Error('Failed to create Stripe subscription object.')\n        }\n\n        // If the latest invoice exists and is paid (likely due to balance application),\n        // Determine the correct currentPeriodEnd. Otherwise, estimate 30 days.\n        // Default: 30 days\n        let currentPeriodEnd = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)\n        if (\n          newStripeSubscription.latest_invoice &&\n          typeof newStripeSubscription.latest_invoice === 'object' &&\n          // Type guard for Invoice object\n          'status' in newStripeSubscription.latest_invoice &&\n          newStripeSubscription.latest_invoice.status === 'paid' &&\n          // Check if property exists\n          newStripeSubscription.items.data[0]?.current_period_end\n        ) {\n          // Use the period end from the Stripe subscription object if available\n          currentPeriodEnd = new Date(\n            newStripeSubscription.items.data[0]?.current_period_end * 1000,\n          )\n        } else if (newStripeSubscription.items.data[0]?.current_period_end) {\n          // Fallback to Stripe's period end even if invoice status is not 'paid' yet\n          currentPeriodEnd = new Date(\n            newStripeSubscription.items.data[0]?.current_period_end * 1000,\n          )\n        }\n\n        // Create a new subscription record in Prisma\n        await prisma.subscription.create({\n          data: {\n            cancelAtPeriodEnd: false,\n            currentPeriodEnd,\n            // This subscription itself isn't a gift, it was paid for by gift *credit*\n            isGift: false,\n            metadata: {\n              appliedAt: new Date().toISOString(),\n              autoApplied: 'true',\n              // Record the balance *before* application\n              creditBalanceUsed: balance.toString(),\n              source: 'gift-credit-auto-apply-new-path',\n            },\n            // Assume active, Stripe webhooks will update if payment fails\n            status: SubscriptionStatus.ACTIVE,\n            stripeCustomerId,\n            stripePriceId: priceId,\n            // Store the new Stripe Subscription ID\n            stripeSubscriptionId: newStripeSubscription.id,\n            tier: 'PRO',\n            // Or GIFT if fully paid by credit? Needs clarification.\n            transactionType: TransactionType.RECURRING,\n            userId: userIdToUse,\n          },\n        })\n\n        res.status(200).json({\n          // Show the amount of credit potentially used\n          creditApplied: Math.abs(balance) / 100,\n          message: 'Successfully applied gift credits to create a new subscription',\n          priceId,\n          success: true,\n        })\n        return\n      } catch (error) {\n        console.error('Error creating new subscription:', error)\n        // Check for specific Stripe errors if needed\n        // If (error instanceof Stripe.errors.StripeCardError) { ... }\n        res.status(500).json({\n          details: error.message,\n          error: 'Failed to create new subscription using gift credits',\n          success: false,\n        })\n        return\n      }\n    }\n  } catch (error) {\n    console.error('Error applying gift credit:', error)\n    res.status(500).json({\n      details: error.message,\n      error: 'An unexpected error occurred',\n      success: false,\n    })\n    return\n  }\n}",
-            "text": ""
-          }
-        ],
-        "message": "async function `handler` has a complexity of 56. Maximum allowed is 20.",
-        "severity": "error"
-      }
-    },
     "78048674343960fa205f1d2865efeb8255fb78411d3cc78b2ffe1b7d5a780b82": {
       "count": 1,
       "summary": {
@@ -60183,26 +59983,6 @@
           }
         ],
         "message": "Unsafe array destructuring of a tuple element with an error typed value.",
-        "severity": "error"
-      }
-    },
-    "7869148afd2f05b73288a6f7bde4153bf7ae46206c6c5bea1b74af3a79df223d": {
-      "count": 1,
-      "summary": {
-        "code": "sonarjs(no-unused-vars)",
-        "file": "src/lib/stripe/services/gift-service.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "const _result = await autoApplyResponse.json()",
-              "next": "} catch (autoApplyError) {",
-              "previous": ""
-            },
-            "span": "_result",
-            "text": ""
-          }
-        ],
-        "message": "Remove the declaration of the unused '_result' variable.",
         "severity": "error"
       }
     },
@@ -70034,26 +69814,6 @@
         "severity": "error"
       }
     },
-    "8b3ba893433587f974b6d38be56165d9245e0bd4750ed5ee6e9ac7f6f4d08f2c": {
-      "count": 1,
-      "summary": {
-        "code": "typescript(no-unsafe-assignment)",
-        "file": "src/lib/stripe/services/gift-service.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "const _result = await autoApplyResponse.json()",
-              "next": "} catch (autoApplyError) {",
-              "previous": ""
-            },
-            "span": "_result = await autoApplyResponse.json()",
-            "text": ""
-          }
-        ],
-        "message": "Unsafe assignment of an any value.",
-        "severity": "error"
-      }
-    },
     "8b4418bb187a282db17ee80f68d5095123ee6920f822a99312a63f79346f33a8": {
       "count": 1,
       "summary": {
@@ -78339,26 +78099,6 @@
         "severity": "error"
       }
     },
-    "9bfd21e5f6f442b5d8f68463f4fb3e16846c57c59f90130b41238fcfae35d8cd": {
-      "count": 1,
-      "summary": {
-        "code": "typescript(no-unsafe-type-assertion)",
-        "file": "src/pages/api/stripe/apply-gift-credit.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "const userId = req.body.userId as string",
-              "next": "",
-              "previous": "// Get the user from the session or from the request body (for internal calls)"
-            },
-            "span": "req.body.userId as string",
-            "text": ""
-          }
-        ],
-        "message": "Unsafe assertion from `any` detected: consider using type guards or a safer assertion.",
-        "severity": "error"
-      }
-    },
     "9bfe51f5dba4978d61125550b814e6e213a2c2be20c1a0d3c3195131fa182447": {
       "count": 1,
       "summary": {
@@ -81959,26 +81699,6 @@
           }
         ],
         "message": "Missing type parameters on mock function call",
-        "severity": "error"
-      }
-    },
-    "a2e70e09de0eb535054ef36eb07e0f847808c58d309c5bd63116c57c7b4f5083": {
-      "count": 3,
-      "summary": {
-        "code": "eslint(no-useless-return)",
-        "file": "src/pages/api/stripe/apply-gift-credit.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "return",
-              "next": "}",
-              "previous": "})"
-            },
-            "span": "return",
-            "text": ""
-          }
-        ],
-        "message": "Unnecessary return statement.",
         "severity": "error"
       }
     },
@@ -91025,26 +90745,6 @@
         "severity": "error"
       }
     },
-    "b6e2dff3dc1c6760540bbd4e62c25998fd96fca041e2a2970f3d9ee784487fb8": {
-      "count": 1,
-      "summary": {
-        "code": "sonarjs(no-duplicated-branches)",
-        "file": "src/pages/api/stripe/apply-gift-credit.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "} else if (newStripeSubscription.items.data[0]?.current_period_end) {",
-              "next": "// Fallback to Stripe's period end even if invoice status is not 'paid' yet",
-              "previous": ")"
-            },
-            "span": "{\n          // Fallback to Stripe's period end even if invoice status is not 'paid' yet\n          currentPeriodEnd = new Date(\n            newStripeSubscription.items.data[0]?.current_period_end * 1000,\n          )\n        }",
-            "text": ""
-          }
-        ],
-        "message": "This branch's code block is the same as the block for the branch on line 300.",
-        "severity": "error"
-      }
-    },
     "b6e7c81f80c27e82658104a5f155509585a848e0192df5b5c49f74f15e28ae72": {
       "count": 1,
       "summary": {
@@ -94041,26 +93741,6 @@
         "severity": "error"
       }
     },
-    "be2c25a0471142add6ce09b01f374118f9f2d65f1c8c102346d07d13744edf61": {
-      "count": 1,
-      "summary": {
-        "code": "typescript(no-unsafe-assignment)",
-        "file": "src/pages/api/stripe/apply-gift-credit.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "details: error.message,",
-              "next": "error: 'Failed to create new subscription using gift credits',",
-              "previous": "res.status(500).json({"
-            },
-            "span": "details: error.message",
-            "text": ""
-          }
-        ],
-        "message": "Unsafe assignment of an any value.",
-        "severity": "error"
-      }
-    },
     "be39a5e2ebc0f40cca97da0897ae1b50a841b6ff725e9ba9cc7d36946f4a0a23": {
       "count": 1,
       "summary": {
@@ -94912,26 +94592,6 @@
           }
         ],
         "message": "Unsafe assignment of an any value.",
-        "severity": "error"
-      }
-    },
-    "c00e7522728d7d8ea8fd63a51fefea26f1934f0d929a921c75838effb1ad14b8": {
-      "count": 1,
-      "summary": {
-        "code": "typescript(no-unsafe-member-access)",
-        "file": "src/pages/api/stripe/apply-gift-credit.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "details: error.message,",
-              "next": "error: 'Failed to create subscription using gift credits',",
-              "previous": "res.status(500).json({"
-            },
-            "span": "message",
-            "text": ""
-          }
-        ],
-        "message": "Unsafe member access .message on an `any` value.",
         "severity": "error"
       }
     },
@@ -99541,26 +99201,6 @@
         "severity": "error"
       }
     },
-    "c8862da4d34ef8edbf6dac2124c1d4a0f6dd9ef5e1f61fcaa7d6e125d5073f2a": {
-      "count": 1,
-      "summary": {
-        "code": "typescript(no-unsafe-member-access)",
-        "file": "src/pages/api/stripe/apply-gift-credit.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "details: error.message,",
-              "next": "error: 'Failed to create new subscription using gift credits',",
-              "previous": "res.status(500).json({"
-            },
-            "span": "message",
-            "text": ""
-          }
-        ],
-        "message": "Unsafe member access .message on an `any` value.",
-        "severity": "error"
-      }
-    },
     "c89c8da74908c6dea289890aebb7e4bb32789a4569a49fe1c5a070232e0b735f": {
       "count": 1,
       "summary": {
@@ -100098,26 +99738,6 @@
           }
         ],
         "message": "Missing type parameters on mock function call",
-        "severity": "error"
-      }
-    },
-    "c9ccb8aba0eb642eada4cffbcc3631cb0cb70a46e4328265bf5ebf161bf37f82": {
-      "count": 1,
-      "summary": {
-        "code": "sonarjs(cognitive-complexity)",
-        "file": "src/pages/api/stripe/apply-gift-credit.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "export default async function handler(req: NextApiRequest, res: NextApiResponse) {",
-              "next": "if (req.method !== 'POST') {",
-              "previous": "*/"
-            },
-            "span": "handler",
-            "text": ""
-          }
-        ],
-        "message": "Refactor this function to reduce its Cognitive Complexity from 36 to the 20 allowed.",
         "severity": "error"
       }
     },
@@ -107083,26 +106703,6 @@
         "severity": "error"
       }
     },
-    "d7850230c1cc6d95bc314d287ca1daf001db4e46796b1d7d91b06f197a30f06f": {
-      "count": 1,
-      "summary": {
-        "code": "typescript(no-unsafe-assignment)",
-        "file": "src/pages/api/stripe/apply-gift-credit.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "details: error.message,",
-              "next": "error: 'Failed to create subscription using gift credits',",
-              "previous": "res.status(500).json({"
-            },
-            "span": "details: error.message",
-            "text": ""
-          }
-        ],
-        "message": "Unsafe assignment of an any value.",
-        "severity": "error"
-      }
-    },
     "d78e845e43b5f0651347a3dc3c87036da995824a82ff07775db6d76e0f2bfc0e": {
       "count": 1,
       "summary": {
@@ -108919,26 +108519,6 @@
         "severity": "error"
       }
     },
-    "dadcf642c77430ddbb89e5cab77f90820811b7b6bcbf8e1717581548777c3c99": {
-      "count": 1,
-      "summary": {
-        "code": "typescript(no-unsafe-member-access)",
-        "file": "src/pages/api/stripe/apply-gift-credit.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "details: error.message,",
-              "next": "error: 'An unexpected error occurred',",
-              "previous": "res.status(500).json({"
-            },
-            "span": "message",
-            "text": ""
-          }
-        ],
-        "message": "Unsafe member access .message on an `any` value.",
-        "severity": "error"
-      }
-    },
     "dadf143d8ddc36a01adcc2bc3231645ec44503c2636a3dcf5e9219fc570740dd": {
       "count": 1,
       "summary": {
@@ -109554,26 +109134,6 @@
           }
         ],
         "message": "Unsafe member access ._getJSONData on an `error` typed value.",
-        "severity": "error"
-      }
-    },
-    "dbe8d18c41d9fa8c2ba061b86333436b5aa8edca22db966f175c7ca578e1a913": {
-      "count": 1,
-      "summary": {
-        "code": "typescript(strict-boolean-expressions)",
-        "file": "src/pages/api/stripe/apply-gift-credit.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "if (!priceId) {",
-              "next": "throw new Error('No price ID found in inactive subscription')",
-              "previous": ""
-            },
-            "span": "priceId",
-            "text": ""
-          }
-        ],
-        "message": "Unexpected nullable string value in conditional. Please handle the nullish and empty string cases explicitly.",
         "severity": "error"
       }
     },
@@ -120370,26 +119930,6 @@
         "severity": "error"
       }
     },
-    "f03630c6bff99d64c1e2ad7b7a3037a5b3630daf15b156d8e95f3880463c4078": {
-      "count": 2,
-      "summary": {
-        "code": "sonarjs(expression-complexity)",
-        "file": "src/pages/api/stripe/apply-gift-credit.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "newStripeSubscription.latest_invoice &&",
-              "next": "typeof newStripeSubscription.latest_invoice === 'object' &&",
-              "previous": "if ("
-            },
-            "span": "newStripeSubscription.latest_invoice &&\n          typeof newStripeSubscription.latest_invoice === 'object' &&\n          // Type guard for Invoice object\n          'status' in newStripeSubscription.latest_invoice &&\n          newStripeSubscription.latest_invoice.status === 'paid' &&\n          // Check if property exists\n          newStripeSubscription.items.data[0]?.current_period_end",
-            "text": ""
-          }
-        ],
-        "message": "Reduce the number of conditional operators (4) used in the expression (maximum allowed 3).",
-        "severity": "error"
-      }
-    },
     "f038be54b9998210b97853381974dd0e68b8c0e1f6b9e2996f2e2f25aa4d1d47": {
       "count": 1,
       "summary": {
@@ -121112,26 +120652,6 @@
               "previous": ""
             },
             "span": "process.env.OPENNODE_API_KEY",
-            "text": ""
-          }
-        ],
-        "message": "Unexpected nullable string value in conditional. Please handle the nullish and empty string cases explicitly.",
-        "severity": "error"
-      }
-    },
-    "f1b6850bcd6b25bf17fd3f3e92558d94beb72a6ecc46b71a31cc8bafdbf2cc71": {
-      "count": 1,
-      "summary": {
-        "code": "typescript(strict-boolean-expressions)",
-        "file": "src/pages/api/stripe/apply-gift-credit.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "if (inactiveSubsription?.stripeSubscriptionId) {",
-              "next": "try {",
-              "previous": "// If stripe subscription exists, try to reactivate it"
-            },
-            "span": "inactiveSubsription?.stripeSubscriptionId",
             "text": ""
           }
         ],
@@ -122303,26 +121823,6 @@
           }
         ],
         "message": "A `typeof` check narrows a representation without establishing its contract. Parse input at its I/O boundary, then branch on the domain value.",
-        "severity": "error"
-      }
-    },
-    "f491f5ea629d50bef7a7c80274b5f715bd6005e4757eedec68cfa9da8af1d491": {
-      "count": 1,
-      "summary": {
-        "code": "typescript(no-unsafe-assignment)",
-        "file": "src/pages/api/stripe/apply-gift-credit.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "details: error.message,",
-              "next": "error: 'An unexpected error occurred',",
-              "previous": "res.status(500).json({"
-            },
-            "span": "details: error.message",
-            "text": ""
-          }
-        ],
-        "message": "Unsafe assignment of an any value.",
         "severity": "error"
       }
     },

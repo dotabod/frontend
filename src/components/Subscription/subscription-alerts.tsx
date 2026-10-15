@@ -4,11 +4,20 @@ import { useState } from 'react'
 
 import { BillingNotice } from '@/components/Billing/billing-notice'
 import { useSubscriptionContext } from '@/contexts/subscription-context'
-import { GRACE_PERIOD_END, isInGracePeriod } from '@/utils/subscription'
+import { GRACE_PERIOD_END, isInGracePeriod, isSubscriptionActive } from '@/utils/subscription'
 
 import type { GiftInfo, GiftSubInfo, StatusInfo } from './types'
 
 const applyCreditsErrorMessage = 'Could not apply credits. Try again or contact support.'
+
+// A past due plan still carries a Stripe subscription id, but credit cannot go toward it, so the
+// Member needs the credit alert and its button to start a fresh plan.
+const isPlanLive = function isPlanLive(
+  subscription: Parameters<typeof isSubscriptionActive>[0],
+  isLifetimePlan: boolean,
+): boolean {
+  return isLifetimePlan || isSubscriptionActive(subscription)
+}
 
 interface SubscriptionAlertsProps {
   giftInfo: GiftInfo
@@ -30,13 +39,13 @@ export const SubscriptionAlerts = ({
     subscription,
     isLifetimePlan,
     inGracePeriod,
-    hasActivePlan,
     creditBalance,
     formattedCreditBalance,
     isLoading: subContextIsLoading,
   } = useSubscriptionContext()
   const [isApplyingCredits, setIsApplyingCredits] = useState(false)
   const hasStripeCustomer = Boolean(subscription?.stripeCustomerId)
+  const hasLivePlan = isPlanLive(subscription, isLifetimePlan)
 
   const isVirtualGracePeriodSubscription =
     (subscription !== null &&
@@ -114,7 +123,7 @@ export const SubscriptionAlerts = ({
         icon={<GiftIcon size={18} />}
         title='Credit balance available'
         action={
-          hasActivePlan ? undefined : (
+          hasLivePlan ? undefined : (
             <Button
               type='primary'
               size='small'
@@ -132,7 +141,7 @@ export const SubscriptionAlerts = ({
           automatically.
         </p>
         <p className='mt-1'>
-          {hasActivePlan
+          {hasLivePlan
             ? 'It goes toward your next invoice.'
             : 'It gets applied at checkout when you subscribe.'}
         </p>
@@ -151,7 +160,7 @@ export const SubscriptionAlerts = ({
   return (
     <div className='flex flex-col gap-4'>
       {creditBalance > 0 &&
-        !hasActivePlan &&
+        !hasLivePlan &&
         !isVirtualGracePeriodSubscription &&
         createCreditAlert()}
 
