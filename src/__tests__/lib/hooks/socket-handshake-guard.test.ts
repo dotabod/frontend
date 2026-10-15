@@ -51,10 +51,10 @@ describe(createHandshakeGuard, () => {
     vi.advanceTimersByTime(HANDSHAKE_TIMEOUT_MS * 2)
 
     expect(socket.disconnect).not.toHaveBeenCalled()
-    expect(guard.isBackingOff()).toBe(false)
+    expect(guard.isBackingOff()).toBeFalsy()
   })
 
-  it('drops a handshake the server never answers and redials after the first backoff', () => {
+  it('drops a handshake the server has not answered after ten seconds', () => {
     const socket = createFakeSocket()
     const guard = createHandshakeGuard(socket, fullDelay)
 
@@ -64,14 +64,21 @@ describe(createHandshakeGuard, () => {
 
     vi.advanceTimersByTime(1)
     expect(socket.disconnect).toHaveBeenCalledOnce()
-    expect(guard.isBackingOff()).toBe(true)
+    expect(guard.isBackingOff()).toBeTruthy()
+  })
 
+  it('redials once the first backoff has elapsed', () => {
+    const socket = createFakeSocket()
+    const guard = createHandshakeGuard(socket, fullDelay)
+
+    failHandshake(guard)
     vi.advanceTimersByTime(RETRY_BASE_MS - 1)
     expect(socket.connect).not.toHaveBeenCalled()
+    expect(guard.isBackingOff()).toBeTruthy()
 
     vi.advanceTimersByTime(1)
     expect(socket.connect).toHaveBeenCalledOnce()
-    expect(guard.isBackingOff()).toBe(false)
+    expect(guard.isBackingOff()).toBeFalsy()
   })
 
   it('waits longer after each consecutive failure and starts over once connected', () => {
@@ -80,11 +87,11 @@ describe(createHandshakeGuard, () => {
 
     failHandshake(guard)
     vi.advanceTimersByTime(30_000)
-    expect(socket.connect).toHaveBeenCalledTimes(1)
+    expect(socket.connect).toHaveBeenCalledOnce()
 
     failHandshake(guard)
     vi.advanceTimersByTime(59_999)
-    expect(socket.connect).toHaveBeenCalledTimes(1)
+    expect(socket.connect).toHaveBeenCalledOnce()
     vi.advanceTimersByTime(1)
     expect(socket.connect).toHaveBeenCalledTimes(2)
 

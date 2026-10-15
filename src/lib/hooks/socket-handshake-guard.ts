@@ -6,14 +6,14 @@
 
 export const HANDSHAKE_TIMEOUT_MS = 10_000
 export const RETRY_BASE_MS = 30_000
-export const RETRY_MAX_MS = 300_000
+const RETRY_MAX_MS = 300_000
 
 interface RetryableSocket {
-  connect: () => unknown
-  disconnect: () => unknown
+  connect: () => void
+  disconnect: () => void
 }
 
-export interface HandshakeGuard {
+interface HandshakeGuard {
   closed: () => void
   connected: () => void
   dispose: () => void

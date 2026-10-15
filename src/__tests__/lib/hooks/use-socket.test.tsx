@@ -79,6 +79,14 @@ const createSocketProps = (overrides: Partial<SocketProps> = {}): SocketProps =>
   ...overrides,
 })
 
+const openTransport = () => {
+  act(() => {
+    for (const handler of socketState.ioHandlers.get('open') ?? []) {
+      handler()
+    }
+  })
+}
+
 describe(useSocket, () => {
   afterEach(() => {
     cleanup()
@@ -419,11 +427,7 @@ describe(useSocket, () => {
     socketState.socket.connect.mockClear()
     socketState.socket.disconnect.mockClear()
 
-    act(() => {
-      socketState.ioHandlers.get('open')?.forEach((handler) => {
-        handler()
-      })
-    })
+    openTransport()
     act(() => {
       vi.advanceTimersByTime(10_000)
     })
@@ -450,13 +454,6 @@ describe(useSocket, () => {
     })
     socketState.socket.connect.mockClear()
     socketState.socket.disconnect.mockClear()
-    const openTransport = () => {
-      act(() => {
-        socketState.ioHandlers.get('open')?.forEach((handler) => {
-          handler()
-        })
-      })
-    }
 
     // The first attempt fails at 10s and redials at 40s; the second fails at 50s and backs off
     // for 60s. The monitor treats the connection as stale from 85s, while the backoff runs to 110s.
@@ -464,14 +461,14 @@ describe(useSocket, () => {
     act(() => {
       vi.advanceTimersByTime(40_000)
     })
-    expect(socketState.socket.connect).toHaveBeenCalledTimes(1)
+    expect(socketState.socket.connect).toHaveBeenCalledOnce()
 
     openTransport()
     act(() => {
       vi.advanceTimersByTime(69_000)
     })
     expect(socketState.socket.disconnect).toHaveBeenCalledTimes(2)
-    expect(socketState.socket.connect).toHaveBeenCalledTimes(1)
+    expect(socketState.socket.connect).toHaveBeenCalledOnce()
 
     act(() => {
       vi.advanceTimersByTime(1000)
