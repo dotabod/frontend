@@ -42,7 +42,13 @@ export const DisableToggle = () => {
   const { data } = useSWR('/api/check-ban', fetcher, SETTINGS_SWR_OPTIONS)
   const { notification } = App.useApp()
   const user = useSession()?.data?.user
-  const { data: settingsData } = useSWR('/api/settings', fetcher, SETTINGS_SWR_OPTIONS)
+  // Poll while offline so the banner clears once Twitch reports the stream live, instead of
+  // waiting for a page reload. Matches SETTINGS_SWR_OPTIONS.dedupingInterval, which would
+  // swallow any shorter poll.
+  const { data: settingsData } = useSWR('/api/settings', fetcher, {
+    ...SETTINGS_SWR_OPTIONS,
+    refreshInterval: (latest?: { stream_online?: boolean }) => (latest?.stream_online ? 0 : 60_000),
+  })
   const isLive = settingsData?.stream_online
   const { getDisableReasonExplanation } = useDisableReasons()
 
