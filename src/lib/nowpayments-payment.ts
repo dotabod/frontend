@@ -1,10 +1,12 @@
 import type { NowPaymentsInvoice } from '@prisma/client'
+import { captureMessage } from '@sentry/nextjs'
 
 import prisma from '@/lib/db'
 import { isNowPaymentsConfirmed } from '@/lib/nowpayments'
 import type { NowPaymentsPaymentStatus } from '@/lib/nowpayments'
 import { stripe } from '@/lib/stripe-server'
 import { handleInvoiceEvent } from '@/lib/stripe/handlers/invoice-events'
+import { hasCryptoInvoiceBeenCredited } from '@/lib/stripe/utils/crypto-invoice-credit'
 
 export interface NowPaymentsProcessResult {
   processed: boolean
@@ -84,17 +86,18 @@ export const processConfirmedNowPaymentsPayment = async function processConfirme
       throw new Error(`Invoice handler returned false for ${invoice.stripeInvoiceId}`)
     }
 
-    subscriptionCreated = Boolean(
-      await prisma.subscription.findFirst({
-        orderBy: { createdAt: 'desc' },
-        select: { id: true },
-        where: {
-          NOT: { status: 'CANCELED' },
-          stripeCustomerId: invoice.stripeCustomerId,
+    subscriptionCreated = await hasCryptoInvoiceBeenCredited(prisma, invoice.stripeInvoiceId)
+    if (!subscriptionCreated) {
+      console.error(`NOWPayments invoice ${invoice.nowPaymentsId} finished but credited nothing`)
+      captureMessage('NOWPayments payment finished without activating a subscription', {
+        extra: {
+          nowPaymentsId: invoice.nowPaymentsId,
+          stripeInvoiceId: invoice.stripeInvoiceId,
           userId: invoice.userId,
         },
-      }),
-    )
+        level: 'error',
+      })
+    }
 
     await prisma.nowPaymentsInvoice.update({
       data: {

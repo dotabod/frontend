@@ -2,6 +2,7 @@ import { Prisma, SubscriptionStatus, TransactionType } from '@prisma/client'
 import type Stripe from 'stripe'
 
 import { stripe } from '@/lib/stripe-server'
+import { hasCryptoInvoiceBeenCredited } from '@/lib/stripe/utils/crypto-invoice-credit'
 
 import { withErrorHandling } from '../utils/error-handling'
 import {
@@ -23,6 +24,18 @@ export const handleInvoiceEvent = async function handleInvoiceEvent(
 ): Promise<boolean> {
   if (invoice.id) {
     await tx.$executeRaw(Prisma.sql`SELECT pg_advisory_xact_lock(hashtext(${invoice.id}))`)
+  }
+
+  // The NOWPayments IPN and Stripe's own invoice.paid event both arrive for one payment. The lock
+  // Above makes the second wait, so it can see the first one's credit instead of adding it again.
+  if (
+    invoice.status === 'paid' &&
+    invoice.metadata?.isCryptoPayment === 'true' &&
+    invoice.id !== undefined &&
+    (await hasCryptoInvoiceBeenCredited(tx, invoice.id))
+  ) {
+    console.log(`Skipping crypto invoice ${invoice.id}: it has already been credited`)
+    return true
   }
 
   // Check for OpenNode or NOWPayments crypto payment
@@ -73,7 +86,7 @@ export const handleInvoiceEvent = async function handleInvoiceEvent(
       },
       `handleInvoiceEvent(${invoice.id})`,
       invoice.customer as string,
-    )) !== null
+    )) === true
   )
 }
 
@@ -188,7 +201,9 @@ const handleCryptoInvoiceEvent = async function handleCryptoInvoiceEvent(
             }
           }
 
-          return false
+          // A paid invoice that nothing was credited for is a failure the webhook must report.
+          // Unpaid ones, like an abandoned checkout that went overdue, have nothing to apply.
+          return invoice.status !== 'paid'
         }
 
         // Only process paid invoices
@@ -329,6 +344,7 @@ const handleCryptoInvoiceEvent = async function handleCryptoInvoiceEvent(
                 currentPeriodEnd: newPeriodEnd,
                 metadata: {
                   ...toMetadataObject(subscription.metadata),
+                  previousRenewalInvoiceId: invoice.id,
                   renewalError: 'true',
                 },
                 status: SubscriptionStatus.ACTIVE,
@@ -337,7 +353,9 @@ const handleCryptoInvoiceEvent = async function handleCryptoInvoiceEvent(
               where: { id: subscription.id },
             })
 
-            return false
+            // The period is extended and this invoice is recorded as applied, so the payment is
+            // Credited. The renewalError flag marks the subscription that lacks a next invoice.
+            return true
           }
         } else if (invoice.status === 'uncollectible' || invoice.status === 'void') {
           // Mark the subscription as inactive if the invoice is void or uncollectible
@@ -384,7 +402,7 @@ const handleCryptoInvoiceEvent = async function handleCryptoInvoiceEvent(
       },
       `handleCryptoInvoiceEvent(${invoice.id})`,
       customerId,
-    )) !== null
+    )) === true
   )
 }
 
@@ -715,7 +733,7 @@ const handleOpenNodeInvoicePaid = async function handleOpenNodeInvoicePaid(
       },
       `handleOpenNodeInvoicePaid(${invoice.id})`,
       userId || customerId,
-    )) !== null
+    )) === true
   )
 }
 
