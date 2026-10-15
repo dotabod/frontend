@@ -1,7 +1,18 @@
+import type { NowPaymentsInvoice, Prisma } from '@prisma/client'
+import type { NextApiRequest, NextApiResponse } from 'next'
 import { createMocks } from 'node-mocks-http'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import handler from '@/pages/api/payment-status'
+
+interface NowPaymentsRow {
+  createdAt: Date
+  nowPaymentsId: string
+  priceAmount: number
+  priceCurrency: string
+  status: NowPaymentsInvoice['status']
+  stripeInvoiceId: string
+}
 
 const mocks = vi.hoisted(() => {
   const openNodeCharge = {
@@ -26,14 +37,18 @@ const mocks = vi.hoisted(() => {
     openNodeCharge,
     prisma: {
       nowPaymentsInvoice: {
-        findUnique: vi.fn(),
+        findUnique:
+          vi.fn<
+            (args: Prisma.NowPaymentsInvoiceFindUniqueArgs) => Promise<NowPaymentsRow | null>
+          >(),
       },
       openNodeCharge: {
         findUnique: vi.fn(),
         update: vi.fn(),
       },
       subscription: {
-        findFirst: vi.fn(),
+        findFirst:
+          vi.fn<(args: Prisma.SubscriptionFindFirstArgs) => Promise<{ id: string } | null>>(),
       },
     },
     processConfirmedOpenNodePayment: vi.fn(),
@@ -150,7 +165,7 @@ describe('payment-status API', () => {
       stripeInvoiceId: 'in_1',
     })
     mocks.prisma.subscription.findFirst.mockResolvedValue({ id: 'sub_1' })
-    const { req, res } = createMocks({
+    const { req, res } = createMocks<NextApiRequest, NextApiResponse>({
       method: 'GET',
       query: { invoiceId: 'in_1' },
     })

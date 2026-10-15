@@ -9,7 +9,7 @@ interface NowPaymentsStatusInfo {
   canRetry: boolean
   description: string
   message: string
-  type: 'error' | 'expired' | 'processing' | 'success' | 'unknown' | 'warning'
+  type: string
 }
 
 type StatusInvoice = Pick<Stripe.Invoice, 'amount_due' | 'currency' | 'id' | 'number' | 'status'>
