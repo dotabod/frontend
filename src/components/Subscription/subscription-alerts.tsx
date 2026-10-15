@@ -10,6 +10,15 @@ import type { GiftInfo, GiftSubInfo, StatusInfo } from './types'
 
 const applyCreditsErrorMessage = 'Could not apply credits. Try again or contact support.'
 
+// A past due plan still carries a Stripe subscription id, but credit cannot go toward it, so the
+// Member needs the credit alert and its button to start a fresh plan.
+const isPlanLive = function isPlanLive(
+  subscription: Parameters<typeof isSubscriptionActive>[0],
+  isLifetimePlan: boolean,
+): boolean {
+  return isLifetimePlan || isSubscriptionActive(subscription)
+}
+
 interface SubscriptionAlertsProps {
   giftInfo: GiftInfo
   statusInfo: StatusInfo | null
@@ -36,9 +45,7 @@ export const SubscriptionAlerts = ({
   } = useSubscriptionContext()
   const [isApplyingCredits, setIsApplyingCredits] = useState(false)
   const hasStripeCustomer = Boolean(subscription?.stripeCustomerId)
-  // A past due plan still carries a Stripe subscription id, but credit cannot go toward it, so the
-  // Member needs the credit alert and its button to start a fresh plan.
-  const hasLivePlan = isLifetimePlan || isSubscriptionActive(subscription)
+  const hasLivePlan = isPlanLive(subscription, isLifetimePlan)
 
   const isVirtualGracePeriodSubscription =
     (subscription !== null &&
