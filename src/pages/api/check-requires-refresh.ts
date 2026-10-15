@@ -24,37 +24,19 @@ const handler = async function handler(req: NextApiRequest, res: NextApiResponse
   }
 
   try {
-    const response = await prisma.account.findFirst({
+    const account = await prisma.account.findFirst({
       select: {
         requires_refresh: true,
-        user: {
-          select: {
-            displayName: true,
-            name: true,
-          },
-        },
       },
       where: {
         userId: session.user.id,
       },
     })
 
-    let requiresRefresh = false
-
-    if (!response) {
-      requiresRefresh = true
-    }
-    if (response?.requires_refresh) {
-      requiresRefresh = true
-    }
-
-    if (session?.user?.name !== response?.user?.displayName) {
-      requiresRefresh = true
-    }
-
-    // For now, always return no refresh
-    // TODO: Remove this once we have a way to check if the user has the correct scopes
-    requiresRefresh = false
+    // Twitch revokes the token when the streamer changes their password, enables 2FA, or
+    // removes app access. Until they sign in again, the backend drops their GSI and the bot
+    // can't post, even if Dotabod is toggled on. useMaybeSignout sends them to re-link.
+    const requiresRefresh = !account || account.requires_refresh === true
 
     res.status(200).json(requiresRefresh)
     return
