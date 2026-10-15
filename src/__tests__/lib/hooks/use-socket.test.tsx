@@ -390,4 +390,92 @@ describe(useSocket, () => {
 
     expect(socketState.ioHandlers.get('ping')?.size).toBe(0)
   })
+
+  it('keeps the connection when a buffered auth_error is replayed after reconnecting', () => {
+    const socketProps = createSocketProps()
+
+    renderHook(() => {
+      useSocket(socketProps)
+    })
+    socketState.socket.disconnect.mockClear()
+
+    // socket.io replays events buffered during rejected attempts right before `connect`.
+    act(() => {
+      socketState.handlers.get('auth_error')?.('Invalid token')
+      socketState.handlers.get('connect')?.()
+    })
+
+    expect(socketState.socket.disconnect).not.toHaveBeenCalled()
+  })
+
+  it('drops a handshake the server never answers and redials after a backoff', () => {
+    vi.useFakeTimers()
+    vi.spyOn(Math, 'random').mockReturnValue(1)
+    const socketProps = createSocketProps()
+
+    renderHook(() => {
+      useSocket(socketProps)
+    })
+    socketState.socket.connect.mockClear()
+    socketState.socket.disconnect.mockClear()
+
+    act(() => {
+      socketState.ioHandlers.get('open')?.forEach((handler) => {
+        handler()
+      })
+    })
+    act(() => {
+      vi.advanceTimersByTime(10_000)
+    })
+    expect(socketState.socket.disconnect).toHaveBeenCalledOnce()
+
+    act(() => {
+      vi.advanceTimersByTime(29_999)
+    })
+    expect(socketState.socket.connect).not.toHaveBeenCalled()
+
+    act(() => {
+      vi.advanceTimersByTime(1)
+    })
+    expect(socketState.socket.connect).toHaveBeenCalledOnce()
+  })
+
+  it('does not let the stale-connection monitor redial while a backoff is running', () => {
+    vi.useFakeTimers()
+    vi.spyOn(Math, 'random').mockReturnValue(1)
+    const socketProps = createSocketProps()
+
+    renderHook(() => {
+      useSocket(socketProps)
+    })
+    socketState.socket.connect.mockClear()
+    socketState.socket.disconnect.mockClear()
+    const openTransport = () => {
+      act(() => {
+        socketState.ioHandlers.get('open')?.forEach((handler) => {
+          handler()
+        })
+      })
+    }
+
+    // The first attempt fails at 10s and redials at 40s; the second fails at 50s and backs off
+    // for 60s. The monitor treats the connection as stale from 85s, while the backoff runs to 110s.
+    openTransport()
+    act(() => {
+      vi.advanceTimersByTime(40_000)
+    })
+    expect(socketState.socket.connect).toHaveBeenCalledTimes(1)
+
+    openTransport()
+    act(() => {
+      vi.advanceTimersByTime(69_000)
+    })
+    expect(socketState.socket.disconnect).toHaveBeenCalledTimes(2)
+    expect(socketState.socket.connect).toHaveBeenCalledTimes(1)
+
+    act(() => {
+      vi.advanceTimersByTime(1000)
+    })
+    expect(socketState.socket.connect).toHaveBeenCalledTimes(2)
+  })
 })
