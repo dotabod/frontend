@@ -47,6 +47,7 @@ const mocks = vi.hoisted(() => ({
     },
     subscription: {
       findFirst: vi.fn(),
+      findMany: vi.fn(),
       updateMany: vi.fn(),
     },
   },
@@ -157,6 +158,7 @@ describe('POST /api/stripe/create-checkout', () => {
     mocks.featureFlags.enableCryptoPayments = true
     mocks.getServerSession.mockResolvedValue(session)
     mocks.getSubscription.mockResolvedValue(null)
+    mocks.prisma.subscription.findMany.mockResolvedValue([])
     mocks.stripe.customers.list.mockResolvedValue({ data: [{ id: 'cus_1' }] })
     mocks.stripe.customers.retrieve.mockResolvedValue({ id: 'cus_1' })
     mocks.stripe.prices.retrieve.mockResolvedValue({
@@ -375,6 +377,115 @@ describe('POST /api/stripe/create-checkout', () => {
         'https://checkout.stripe.com/no-crypto',
       )
       expect(mocks.createNowPaymentsInvoice).not.toHaveBeenCalled()
+    })
+  })
+
+  describe('live subscription guard', () => {
+    // A renewal that was declined, followed by a fresh checkout, left two card plans billing the
+    // Same customer. A user with a live card plan is sent to the billing portal instead.
+
+    it.each(['ACTIVE', 'TRIALING', 'PAST_DUE'])(
+      'refuses a second card subscription while a %s plan is live',
+      async (status) => {
+        arrangeTransaction([])
+        mocks.prisma.subscription.findMany.mockResolvedValue([
+          { status, stripeSubscriptionId: 'sub_live' },
+        ])
+
+        const { req, res } = buildReq({ priceId: 'price_mo' })
+        await handler(req, res)
+
+        expect(res._getStatusCode()).toBe(409)
+        expect(res._getJSONData()).toMatchObject({ code: 'LIVE_SUBSCRIPTION_EXISTS' })
+        expect(mocks.stripe.checkout.sessions.create).not.toHaveBeenCalled()
+        expect(mocks.stripe.invoices.create).not.toHaveBeenCalled()
+        expect(mocks.prisma.$transaction).not.toHaveBeenCalled()
+      },
+    )
+
+    it('lets a user with only canceled card plans subscribe again', async () => {
+      arrangeTransaction([])
+      mocks.prisma.subscription.findMany.mockResolvedValue([
+        { status: 'CANCELED', stripeSubscriptionId: 'sub_old' },
+      ])
+      mocks.stripe.checkout.sessions.create.mockResolvedValue({
+        url: 'https://checkout.stripe.com/resubscribe',
+      })
+
+      const { req, res } = buildReq({ priceId: 'price_mo' })
+      await handler(req, res)
+
+      expect(res._getStatusCode()).toBe(200)
+      expect(mocks.stripe.checkout.sessions.create).toHaveBeenCalledOnce()
+    })
+
+    it('lets a crypto plan switch to a card subscription', async () => {
+      arrangeTransaction([])
+      mocks.prisma.subscription.findMany.mockResolvedValue([
+        { status: 'ACTIVE', stripeSubscriptionId: 'crypto_cs_1' },
+      ])
+      mocks.stripe.checkout.sessions.create.mockResolvedValue({
+        url: 'https://checkout.stripe.com/from-crypto',
+      })
+
+      const { req, res } = buildReq({ priceId: 'price_mo' })
+      await handler(req, res)
+
+      expect(res._getStatusCode()).toBe(200)
+      expect(mocks.stripe.checkout.sessions.create).toHaveBeenCalledOnce()
+    })
+
+    it('lets a live card plan upgrade to lifetime', async () => {
+      arrangeTransaction([])
+      mocks.prisma.subscription.findMany.mockResolvedValue([
+        { status: 'PAST_DUE', stripeSubscriptionId: 'sub_live' },
+      ])
+      mocks.stripe.prices.retrieve.mockResolvedValue({
+        active: true,
+        currency: 'usd',
+        id: 'price_life',
+        product: 'prod_1',
+        type: 'one_time',
+        unit_amount: 9900,
+      })
+      mocks.stripe.checkout.sessions.create.mockResolvedValue({
+        url: 'https://checkout.stripe.com/lifetime',
+      })
+
+      const { req, res } = buildReq({ priceId: 'price_life' })
+      await handler(req, res)
+
+      expect(res._getStatusCode()).toBe(200)
+      expect(mocks.stripe.checkout.sessions.create).toHaveBeenCalledOnce()
+      expect(mocks.prisma.subscription.findMany).not.toHaveBeenCalled()
+    })
+
+    it('lets a live card plan switch to a crypto invoice', async () => {
+      arrangeTransaction([])
+      mocks.prisma.subscription.findMany.mockResolvedValue([
+        { status: 'ACTIVE', stripeSubscriptionId: 'sub_live' },
+      ])
+      mocks.stripe.invoices.create.mockResolvedValue({ id: 'in_3' })
+      mocks.stripe.invoiceItems.create.mockResolvedValue({})
+      mocks.stripe.invoices.finalizeInvoice.mockResolvedValue({
+        amount_remaining: 1300,
+        currency: 'usd',
+        customer: 'cus_1',
+        id: 'in_3',
+      })
+      mocks.stripe.invoices.update.mockResolvedValue({})
+      mocks.createNowPaymentsInvoice.mockResolvedValue({
+        id: 4242,
+        invoice_url: 'https://nowpayments.io/payment/?iid=4242',
+      })
+      mocks.prisma.nowPaymentsInvoice.create.mockResolvedValue({})
+
+      const { req, res } = buildReq({ paymentMethod: 'crypto', priceId: 'price_mo' })
+      await handler(req, res)
+
+      expect(res._getStatusCode()).toBe(200)
+      expect(mocks.createNowPaymentsInvoice).toHaveBeenCalledOnce()
+      expect(mocks.prisma.subscription.findMany).not.toHaveBeenCalled()
     })
   })
 
