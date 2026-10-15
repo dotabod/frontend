@@ -53,6 +53,24 @@ const hasPriorStripeSubscription = async function hasPriorStripeSubscription(
   }
 }
 
+// A second card subscription next to a live one gets billed twice. Lifetime upgrades and crypto
+// Invoices replace the old plan on purpose, so only a new recurring card checkout is stopped.
+const wouldDoubleBill = async function wouldDoubleBill(params: {
+  isCryptoPayment: boolean
+  isRecurring: boolean
+  userId: string
+}): Promise<boolean> {
+  if (!params.isRecurring || params.isCryptoPayment) {
+    return false
+  }
+
+  const storedSubscriptions = await prisma.subscription.findMany({
+    select: { status: true, stripeSubscriptionId: true },
+    where: { stripeSubscriptionId: { not: null }, userId: params.userId },
+  })
+  return storedSubscriptions.some(isLiveStripeSubscription)
+}
+
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') {
     res.status(405).json({ error: 'Method not allowed' })
@@ -97,21 +115,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     // Check if user wants to pay with crypto and if feature is enabled
     const isCryptoPayment = paymentMethod === 'crypto' && featureFlags.enableCryptoPayments
 
-    // A second card subscription next to a live one gets billed twice. Lifetime upgrades and crypto
-    // Invoices replace the old plan on purpose, so only a new recurring card checkout is stopped.
-    if (isRecurring && !isCryptoPayment) {
-      const storedSubscriptions = await prisma.subscription.findMany({
-        select: { status: true, stripeSubscriptionId: true },
-        where: { stripeSubscriptionId: { not: null }, userId: session.user.id },
+    if (await wouldDoubleBill({ isCryptoPayment, isRecurring, userId: session.user.id })) {
+      res.status(409).json({
+        code: LIVE_SUBSCRIPTION_CODE,
+        error: 'You already have a Dotabod subscription',
+        guidance: 'Update your payment method in billing instead of starting a second plan.',
       })
-      if (storedSubscriptions.some(isLiveStripeSubscription)) {
-        res.status(409).json({
-          code: LIVE_SUBSCRIPTION_CODE,
-          error: 'You already have a Dotabod subscription',
-          guidance: 'Update your payment method in billing instead of starting a second plan.',
-        })
-        return
-      }
+      return
     }
 
     // Keep this transaction narrow: production runs with connection_limit=1, so

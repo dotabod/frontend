@@ -7,7 +7,7 @@ describe(isLiveStripeSubscription, () => {
   it.each([SubscriptionStatus.ACTIVE, SubscriptionStatus.TRIALING, SubscriptionStatus.PAST_DUE])(
     'treats a %s card subscription as live',
     (status) => {
-      expect(isLiveStripeSubscription({ status, stripeSubscriptionId: 'sub_card' })).toBe(true)
+      expect(isLiveStripeSubscription({ status, stripeSubscriptionId: 'sub_card' })).toBeTruthy()
     },
   )
 
@@ -19,7 +19,7 @@ describe(isLiveStripeSubscription, () => {
     SubscriptionStatus.UNPAID,
     null,
   ])('does not treat a %s card subscription as live', (status) => {
-    expect(isLiveStripeSubscription({ status, stripeSubscriptionId: 'sub_card' })).toBe(false)
+    expect(isLiveStripeSubscription({ status, stripeSubscriptionId: 'sub_card' })).toBeFalsy()
   })
 
   it.each([
@@ -29,6 +29,6 @@ describe(isLiveStripeSubscription, () => {
   ])('ignores %s', (_label, stripeSubscriptionId) => {
     expect(
       isLiveStripeSubscription({ status: SubscriptionStatus.ACTIVE, stripeSubscriptionId }),
-    ).toBe(false)
+    ).toBeFalsy()
   })
 })

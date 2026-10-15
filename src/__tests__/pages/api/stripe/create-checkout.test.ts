@@ -11,6 +11,10 @@ vi.stubEnv('NEXT_PUBLIC_STRIPE_PRO_LIFETIME_PRICE_ID', 'price_life')
 vi.stubEnv('NEXT_PUBLIC_STRIPE_PRO_MONTHLY_PRICE_ID', 'price_mo')
 
 type ExistingSubscription = { stripeCustomerId: string } | null
+interface StoredSubscriptionRow {
+  status: string
+  stripeSubscriptionId: string
+}
 interface StripeCustomerCreateInput {
   email?: string
   metadata: Record<string, string>
@@ -46,9 +50,9 @@ const mocks = vi.hoisted(() => ({
       findUnique: vi.fn(),
     },
     subscription: {
-      findFirst: vi.fn(),
-      findMany: vi.fn(),
-      updateMany: vi.fn(),
+      findFirst: vi.fn<() => Promise<ExistingSubscription>>(),
+      findMany: vi.fn<() => Promise<StoredSubscriptionRow[]>>(),
+      updateMany: vi.fn<() => Promise<{ count: number }>>(),
     },
   },
   stripe: {

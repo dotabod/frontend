@@ -3,14 +3,12 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 import { createCheckoutSession } from '@/lib/stripe'
 import { LIVE_SUBSCRIPTION_CODE } from '@/lib/stripe/live-subscription'
 
-const jsonResponse = (status: number, body: unknown) =>
-  new Response(JSON.stringify(body), {
-    headers: { 'Content-Type': 'application/json' },
-    status,
-  })
+type ResponseBody = { code: string } | { error: string } | { url: string }
+
+const jsonResponse = (status: number, body: ResponseBody) => Response.json(body, { status })
 
 const requestedPaths = (fetchSpy: { mock: { calls: Parameters<typeof fetch>[] } }) =>
-  fetchSpy.mock.calls.map(([input]) => String(input))
+  fetchSpy.mock.calls.map(([input]) => input)
 
 describe(createCheckoutSession, () => {
   afterEach(() => {
