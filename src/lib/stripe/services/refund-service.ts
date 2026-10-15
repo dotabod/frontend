@@ -39,25 +39,46 @@ export interface RefundDependencies {
   store: RefundStore
 }
 
-const optionalString = z.string().optional().catch(undefined)
-
 // Lifetime and crypto purchases record the Stripe ids of the payment that bought them.
-const recordedPurchaseSchema = z
-  .object({
-    chargeId: optionalString,
-    checkoutSessionId: optionalString,
-    isCryptoPayment: optionalString,
-    paymentIntentId: optionalString,
-  })
-  .catch({})
+const recordedPurchaseSchema = z.object({
+  chargeId: z.string().optional(),
+  checkoutSessionId: z.string().optional(),
+  isCryptoPayment: z.string().optional(),
+  paymentIntentId: z.string().optional(),
+})
 
-const readRecordedPurchase = function readRecordedPurchase(subscription: RefundableSubscription) {
-  return recordedPurchaseSchema.parse(subscription.metadata)
+const readRecordedPurchase = function readRecordedPurchase(
+  subscription: RefundableSubscription,
+): z.infer<typeof recordedPurchaseSchema> {
+  const parsed = recordedPurchaseSchema.safeParse(subscription.metadata)
+  return parsed.success ? parsed.data : {}
 }
 
 const metadataOf = function metadataOf(subscription: RefundableSubscription): Prisma.JsonObject {
   const { metadata } = subscription
   return metadata instanceof Object && !Array.isArray(metadata) ? metadata : {}
+}
+
+const recordsPayment = function recordsPayment(
+  recorded: z.infer<typeof recordedPurchaseSchema>,
+  charge: RefundedCharge,
+): boolean {
+  return (
+    recorded.chargeId === charge.id ||
+    (charge.paymentIntentId !== null && recorded.paymentIntentId === charge.paymentIntentId)
+  )
+}
+
+const recordsCheckoutSession = function recordsCheckoutSession(
+  subscription: RefundableSubscription,
+  recorded: z.infer<typeof recordedPurchaseSchema>,
+  checkoutSessionId: string | null,
+): boolean {
+  return (
+    checkoutSessionId !== null &&
+    (recorded.checkoutSessionId === checkoutSessionId ||
+      subscription.stripeSubscriptionId === `crypto_${checkoutSessionId}`)
+  )
 }
 
 const recordsOneTimePurchase = function recordsOneTimePurchase(
@@ -66,13 +87,9 @@ const recordsOneTimePurchase = function recordsOneTimePurchase(
   checkoutSessionId: string | null,
 ): boolean {
   const recorded = readRecordedPurchase(subscription)
-
   return (
-    recorded.chargeId === charge.id ||
-    (charge.paymentIntentId !== null && recorded.paymentIntentId === charge.paymentIntentId) ||
-    (checkoutSessionId !== null &&
-      (recorded.checkoutSessionId === checkoutSessionId ||
-        subscription.stripeSubscriptionId === `crypto_${checkoutSessionId}`))
+    recordsPayment(recorded, charge) ||
+    recordsCheckoutSession(subscription, recorded, checkoutSessionId)
   )
 }
 

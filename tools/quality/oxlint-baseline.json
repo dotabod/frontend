@@ -927,26 +927,6 @@
         "severity": "error"
       }
     },
-    "0270a65d4fbbcb5b2f272954f55cae26c0d79b5868b8b5c56daa4c3dd4a4a106": {
-      "count": 1,
-      "summary": {
-        "code": "anti-slop(no-unsafe-dictionary-type)",
-        "file": "src/lib/stripe/handlers/charge-events.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "...(subscription.metadata as Record<string, unknown>),",
-              "next": "partiallyRefundedAt: new Date().toISOString(),",
-              "previous": "metadata: {"
-            },
-            "span": "Record<string, unknown>",
-            "text": ""
-          }
-        ],
-        "message": "This dictionary's unknown value type gives callers no concrete value contract. Use an owner/schema-derived value type; parse external payloads before insertion.",
-        "severity": "error"
-      }
-    },
     "0271def615187dd6bfa1aca7dad88c48f600c2cbcdc994e7dfde5c6d018a4634": {
       "count": 4,
       "summary": {
@@ -2401,26 +2381,6 @@
         "severity": "error"
       }
     },
-    "04d2aefb17f7905b24e8e4cc447631fbd1b0650a205a0fbf0d8e7acdaa05f502": {
-      "count": 1,
-      "summary": {
-        "code": "eslint(no-await-in-loop)",
-        "file": "src/lib/stripe/handlers/charge-events.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "await tx.subscription.update({",
-              "next": "data: {",
-              "previous": "else if (charge.amount_refunded > 0) {"
-            },
-            "span": "await",
-            "text": ""
-          }
-        ],
-        "message": "Unexpected `await` inside a loop.",
-        "severity": "error"
-      }
-    },
     "04e0e7fd9e5fe9affb6b9df0c71306a8313e026af0a707138988e97c21d4aca0": {
       "count": 1,
       "summary": {
@@ -2847,26 +2807,6 @@
           }
         ],
         "message": "Use Array destructuring.",
-        "severity": "error"
-      }
-    },
-    "05ad774b088ddc0c7bb90a67f730d48b4681b8d993042816297a0a1770d1f606": {
-      "count": 1,
-      "summary": {
-        "code": "typescript(no-unsafe-type-assertion)",
-        "file": "src/lib/stripe/handlers/charge-events.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "...(subscription.metadata as Record<string, unknown>),",
-              "next": "refundAmount: charge.amount_refunded > 0 ? charge.amount_refunded.toString() : null,",
-              "previous": "metadata: {"
-            },
-            "span": "subscription.metadata as Record<string, unknown>",
-            "text": ""
-          }
-        ],
-        "message": "Unsafe type assertion: type 'Record<string, unknown>' is more narrow than the original type.",
         "severity": "error"
       }
     },
@@ -10394,26 +10334,6 @@
           }
         ],
         "message": "Unnecessary return statement.",
-        "severity": "error"
-      }
-    },
-    "138b85e5e1f6fae2d736a8cbcbc549f58ceea7f0d8a4872e9e029479542b7f43": {
-      "count": 1,
-      "summary": {
-        "code": "anti-slop(require-safety-comment-for-type-assertion)",
-        "file": "src/lib/stripe/handlers/charge-events.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "(subscription.metadata as Record<string, unknown>)?.isCryptoPayment === 'true' &&",
-              "next": "charge.refunded",
-              "previous": "else if ("
-            },
-            "span": "subscription.metadata as Record<string, unknown>",
-            "text": ""
-          }
-        ],
-        "message": "This type assertion has no `SAFETY:` justification. State the checked invariant immediately before the assertion or its containing statement.",
         "severity": "error"
       }
     },
@@ -31148,26 +31068,6 @@
         "severity": "error"
       }
     },
-    "3cc7d7fdd993b460714ef744bd42ceae2a9d8836ea96a19313eab2ea8c5d915a": {
-      "count": 1,
-      "summary": {
-        "code": "anti-slop(no-unsafe-dictionary-type)",
-        "file": "src/lib/stripe/handlers/charge-events.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "...(subscription.metadata as Record<string, unknown>),",
-              "next": "fullyRefunded: charge.refunded ? 'true' : 'false',",
-              "previous": "metadata: {"
-            },
-            "span": "Record<string, unknown>",
-            "text": ""
-          }
-        ],
-        "message": "This dictionary's unknown value type gives callers no concrete value contract. Use an owner/schema-derived value type; parse external payloads before insertion.",
-        "severity": "error"
-      }
-    },
     "3cd0940558d15248b6d2ee632bfdd6db5b035cf035dba4bb01035c9005dedaf8": {
       "count": 1,
       "summary": {
@@ -32181,26 +32081,6 @@
           }
         ],
         "message": "Replace module mocking with dependency injection through a real interface, service layer, or faithful test implementation.",
-        "severity": "error"
-      }
-    },
-    "3ea6ce44976d4b2b65c54aab39a9b4bd8d7b9b6d68d6892ec46cb9b4698d67c2": {
-      "count": 1,
-      "summary": {
-        "code": "eslint(complexity)",
-        "file": "src/lib/stripe/handlers/charge-events.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "const processSubscriptionRefund = async function processSubscriptionRefund(",
-              "next": "userId: string,",
-              "previous": ""
-            },
-            "span": "async function processSubscriptionRefund(\n  userId: string,\n  charge: Stripe.Charge,\n  tx: Prisma.TransactionClient,\n): Promise<void> {\n  // Get all active subscriptions for this user/customer\n  const subscriptions = await tx.subscription.findMany({\n    where: {\n      stripeCustomerId: charge.customer as string,\n      userId,\n    },\n  })\n\n  if (subscriptions.length === 0) {\n    const customerId =\n      typeof charge.customer === 'string' ? charge.customer : (charge.customer?.id ?? 'null')\n    console.log(`No subscriptions found for user ${userId} with customer ${customerId}`)\n    return\n  }\n\n  // Log what we found\n  console.log(`Found ${subscriptions.length} subscriptions to update for refund`)\n\n  // Update each subscription based on the refund\n  for (const subscription of subscriptions) {\n    // For lifetime or one-time purchases, handle refunds by updating status\n    if (subscription.transactionType === TransactionType.LIFETIME) {\n      // If fully refunded, mark the purchase as canceled\n      if (charge.refunded) {\n        await tx.subscription.update({\n          data: {\n            metadata: {\n              ...(subscription.metadata as Record<string, unknown>),\n              refundAmount: charge.amount_refunded > 0 ? charge.amount_refunded.toString() : null,\n              refundId: charge.refunds?.data?.[0]?.id ?? null,\n              refundedAt: new Date().toISOString(),\n            },\n            status: SubscriptionStatus.CANCELED,\n            updatedAt: new Date(),\n          },\n          where: { id: subscription.id },\n        })\n        console.log(\n          `Marked ${subscription.transactionType} subscription ${subscription.id} as canceled due to full refund`,\n        )\n      }\n      // If partially refunded, update the metadata\n      else if (charge.amount_refunded > 0) {\n        await tx.subscription.update({\n          data: {\n            metadata: {\n              ...(subscription.metadata as Record<string, unknown>),\n              partiallyRefundedAt: new Date().toISOString(),\n              refundAmount: charge.amount_refunded.toString(),\n              refundId: charge.refunds?.data?.[0]?.id ?? null,\n            },\n            updatedAt: new Date(),\n          },\n          where: { id: subscription.id },\n        })\n        console.log(\n          `Updated ${subscription.transactionType} subscription ${subscription.id} metadata for partial refund`,\n        )\n      }\n    }\n    // For crypto payments, we need to manually cancel them since Stripe won't handle it through subscription webhooks\n    else if (\n      (subscription.metadata as Record<string, unknown>)?.isCryptoPayment === 'true' &&\n      charge.refunded\n    ) {\n      await tx.subscription.update({\n        data: {\n          metadata: {\n            ...(subscription.metadata as Record<string, unknown>),\n            fullyRefunded: 'true',\n            refundAmount: charge.amount_refunded > 0 ? charge.amount_refunded.toString() : null,\n            refundId: charge.refunds?.data?.[0]?.id ?? null,\n            refundedAt: new Date().toISOString(),\n          },\n          status: SubscriptionStatus.CANCELED,\n          updatedAt: new Date(),\n        },\n        where: { id: subscription.id },\n      })\n      console.log(`Manually canceled crypto subscription ${subscription.id} due to refund`)\n    }\n    // For recurring subscriptions, just record the refund in metadata\n    // The actual subscription status changes will come from Stripe subscription webhooks\n    else if (subscription.status !== SubscriptionStatus.CANCELED) {\n      await tx.subscription.update({\n        data: {\n          metadata: {\n            ...(subscription.metadata as Record<string, unknown>),\n            fullyRefunded: charge.refunded ? 'true' : 'false',\n            refundAmount: charge.amount_refunded > 0 ? charge.amount_refunded.toString() : null,\n            refundId: charge.refunds?.data?.[0]?.id ?? null,\n            refundRecorded: new Date().toISOString(),\n          },\n          updatedAt: new Date(),\n        },\n        where: { id: subscription.id },\n      })\n      console.log(`Updated recurring subscription ${subscription.id} metadata for refund`)\n    }\n  }\n}",
-            "text": ""
-          }
-        ],
-        "message": "async function `processSubscriptionRefund` has a complexity of 33. Maximum allowed is 20.",
         "severity": "error"
       }
     },
@@ -36351,26 +36231,6 @@
           }
         ],
         "message": "Avoid referencing unbound methods which may cause unintentional scoping of `this`.",
-        "severity": "error"
-      }
-    },
-    "46e073f8ff60e2767533539f3464cbaf3b1adf99576adec95a1f4f005fcc795f": {
-      "count": 1,
-      "summary": {
-        "code": "typescript(no-unsafe-type-assertion)",
-        "file": "src/lib/stripe/handlers/charge-events.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "...(subscription.metadata as Record<string, unknown>),",
-              "next": "fullyRefunded: 'true',",
-              "previous": "metadata: {"
-            },
-            "span": "subscription.metadata as Record<string, unknown>",
-            "text": ""
-          }
-        ],
-        "message": "Unsafe type assertion: type 'Record<string, unknown>' is more narrow than the original type.",
         "severity": "error"
       }
     },
@@ -40791,26 +40651,6 @@
         "severity": "error"
       }
     },
-    "4fa4be1d8783ac921c7415c739aa0cdfb30ad5624f5e46d1ddb145c8149e5004": {
-      "count": 1,
-      "summary": {
-        "code": "anti-slop(no-runtime-typeof)",
-        "file": "src/lib/stripe/handlers/charge-events.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "typeof charge.customer === 'string' ? charge.customer : (charge.customer?.id ?? 'null')",
-              "next": "console.log(`No subscriptions found for user ${userId} with customer ${customerId}`)",
-              "previous": "const customerId ="
-            },
-            "span": "typeof charge.customer",
-            "text": ""
-          }
-        ],
-        "message": "A `typeof` check narrows a representation without establishing its contract. Parse input at its I/O boundary, then branch on the domain value.",
-        "severity": "error"
-      }
-    },
     "4fa628a3b0ac84ead77c9c86f08f06440cda1b51f8580c4d4b96d886cf14d98d": {
       "count": 1,
       "summary": {
@@ -41666,26 +41506,6 @@
           }
         ],
         "message": "Unexpected nullable string value in conditional. Please handle the nullish and empty string cases explicitly.",
-        "severity": "error"
-      }
-    },
-    "51524102682b1b5a9040078361b853047ace457c82bc28e3203dca1518177461": {
-      "count": 1,
-      "summary": {
-        "code": "typescript(no-unsafe-type-assertion)",
-        "file": "src/lib/stripe/handlers/charge-events.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "...(subscription.metadata as Record<string, unknown>),",
-              "next": "fullyRefunded: charge.refunded ? 'true' : 'false',",
-              "previous": "metadata: {"
-            },
-            "span": "subscription.metadata as Record<string, unknown>",
-            "text": ""
-          }
-        ],
-        "message": "Unsafe type assertion: type 'Record<string, unknown>' is more narrow than the original type.",
         "severity": "error"
       }
     },
@@ -43249,26 +43069,6 @@
           }
         ],
         "message": "Enforces a maximum number assertion calls in a test body.",
-        "severity": "error"
-      }
-    },
-    "54dcfe1581838bb69de2d6697910e5fd63729143cb9ff56a0b09c22b6a138c2c": {
-      "count": 1,
-      "summary": {
-        "code": "anti-slop(no-unsafe-dictionary-type)",
-        "file": "src/lib/stripe/handlers/charge-events.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "(subscription.metadata as Record<string, unknown>)?.isCryptoPayment === 'true' &&",
-              "next": "charge.refunded",
-              "previous": "else if ("
-            },
-            "span": "Record<string, unknown>",
-            "text": ""
-          }
-        ],
-        "message": "This dictionary's unknown value type gives callers no concrete value contract. Use an owner/schema-derived value type; parse external payloads before insertion.",
         "severity": "error"
       }
     },
@@ -45494,26 +45294,6 @@
           }
         ],
         "message": "`on` creates a subscription in useEffect without guaranteed cleanup. Return a cleanup function that owns every allocation so it does not leak after unmount.",
-        "severity": "error"
-      }
-    },
-    "5a039ceea980790ea0f589e2ffe328c679fd48052a30e42a638810865af27c05": {
-      "count": 1,
-      "summary": {
-        "code": "anti-slop(no-unsafe-dictionary-type)",
-        "file": "src/lib/stripe/handlers/charge-events.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "...(subscription.metadata as Record<string, unknown>),",
-              "next": "fullyRefunded: 'true',",
-              "previous": "metadata: {"
-            },
-            "span": "Record<string, unknown>",
-            "text": ""
-          }
-        ],
-        "message": "This dictionary's unknown value type gives callers no concrete value contract. Use an owner/schema-derived value type; parse external payloads before insertion.",
         "severity": "error"
       }
     },
@@ -52505,26 +52285,6 @@
           }
         ],
         "message": "Replace module mocking with dependency injection through a real interface, service layer, or faithful test implementation.",
-        "severity": "error"
-      }
-    },
-    "68e68736dc94c5dc863167639d36d33bdb414d65d8c4695394394e6261a2109b": {
-      "count": 1,
-      "summary": {
-        "code": "anti-slop(no-unsafe-dictionary-type)",
-        "file": "src/lib/stripe/handlers/charge-events.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "...(subscription.metadata as Record<string, unknown>),",
-              "next": "refundAmount: charge.amount_refunded > 0 ? charge.amount_refunded.toString() : null,",
-              "previous": "metadata: {"
-            },
-            "span": "Record<string, unknown>",
-            "text": ""
-          }
-        ],
-        "message": "This dictionary's unknown value type gives callers no concrete value contract. Use an owner/schema-derived value type; parse external payloads before insertion.",
         "severity": "error"
       }
     },
@@ -62144,26 +61904,6 @@
           }
         ],
         "message": "Unsafe call of a(n) `any` typed value.",
-        "severity": "error"
-      }
-    },
-    "7c3c39e25395c3ec85a077b178c1cd4521c7f9c1902f9148908d71b9a96e0b19": {
-      "count": 1,
-      "summary": {
-        "code": "anti-slop(require-safety-comment-for-type-assertion)",
-        "file": "src/lib/stripe/handlers/charge-events.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "...(subscription.metadata as Record<string, unknown>),",
-              "next": "partiallyRefundedAt: new Date().toISOString(),",
-              "previous": "metadata: {"
-            },
-            "span": "subscription.metadata as Record<string, unknown>",
-            "text": ""
-          }
-        ],
-        "message": "This type assertion has no `SAFETY:` justification. State the checked invariant immediately before the assertion or its containing statement.",
         "severity": "error"
       }
     },
@@ -78459,26 +78199,6 @@
         "severity": "error"
       }
     },
-    "9c5dfb1bb8bf81fd2e19a4b0890a0e6c375429ad19d2293bed81a443162c3ca2": {
-      "count": 1,
-      "summary": {
-        "code": "anti-slop(require-safety-comment-for-type-assertion)",
-        "file": "src/lib/stripe/handlers/charge-events.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "...(subscription.metadata as Record<string, unknown>),",
-              "next": "fullyRefunded: 'true',",
-              "previous": "metadata: {"
-            },
-            "span": "subscription.metadata as Record<string, unknown>",
-            "text": ""
-          }
-        ],
-        "message": "This type assertion has no `SAFETY:` justification. State the checked invariant immediately before the assertion or its containing statement.",
-        "severity": "error"
-      }
-    },
     "9c6a3f6e9758cfc72282c77c3d1706a09d880ea12956050363e0c542977c8438": {
       "count": 1,
       "summary": {
@@ -81459,26 +81179,6 @@
           }
         ],
         "message": "Unsafe argument of type any assigned to a parameter of type SetStateAction<boolean>.",
-        "severity": "error"
-      }
-    },
-    "a26496ecbd39d4b69225c6419df12d79c82fb89f04c01112f9872a5f86c17b1a": {
-      "count": 1,
-      "summary": {
-        "code": "typescript(no-unsafe-type-assertion)",
-        "file": "src/lib/stripe/handlers/charge-events.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "...(subscription.metadata as Record<string, unknown>),",
-              "next": "partiallyRefundedAt: new Date().toISOString(),",
-              "previous": "metadata: {"
-            },
-            "span": "subscription.metadata as Record<string, unknown>",
-            "text": ""
-          }
-        ],
-        "message": "Unsafe type assertion: type 'Record<string, unknown>' is more narrow than the original type.",
         "severity": "error"
       }
     },
@@ -91874,26 +91574,6 @@
         "severity": "error"
       }
     },
-    "ba2023445a97d1b3b1c4bb95c6906b503dd1208e8068ecaf774f94ace51bf878": {
-      "count": 1,
-      "summary": {
-        "code": "anti-slop(require-safety-comment-for-type-assertion)",
-        "file": "src/lib/stripe/handlers/charge-events.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "stripeCustomerId: charge.customer as string,",
-              "next": "userId,",
-              "previous": "where: {"
-            },
-            "span": "charge.customer as string",
-            "text": ""
-          }
-        ],
-        "message": "This type assertion has no `SAFETY:` justification. State the checked invariant immediately before the assertion or its containing statement.",
-        "severity": "error"
-      }
-    },
     "ba249b69ce87bbe4f6bba37d0abb2fa6283cbb707cde5d6e55edf6c94f428b4e": {
       "count": 1,
       "summary": {
@@ -97365,26 +97045,6 @@
         "severity": "error"
       }
     },
-    "c4f773fe69a039c8906225ca1e32bfb2ae297dee3892ada106af3835ad3e8165": {
-      "count": 1,
-      "summary": {
-        "code": "anti-slop(require-safety-comment-for-type-assertion)",
-        "file": "src/lib/stripe/handlers/charge-events.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "...(subscription.metadata as Record<string, unknown>),",
-              "next": "fullyRefunded: charge.refunded ? 'true' : 'false',",
-              "previous": "metadata: {"
-            },
-            "span": "subscription.metadata as Record<string, unknown>",
-            "text": ""
-          }
-        ],
-        "message": "This type assertion has no `SAFETY:` justification. State the checked invariant immediately before the assertion or its containing statement.",
-        "severity": "error"
-      }
-    },
     "c508db15bab1074b558c9874650cd1db04c786490253f6805b28df0995dfd7f3": {
       "count": 4,
       "summary": {
@@ -97762,26 +97422,6 @@
           }
         ],
         "message": "Missing type parameters on mock function call",
-        "severity": "error"
-      }
-    },
-    "c573e4e5b19cd32bf334965a66cdafc5bf2b4b98af6e8804a66d3d3427f4d626": {
-      "count": 1,
-      "summary": {
-        "code": "typescript(no-unsafe-type-assertion)",
-        "file": "src/lib/stripe/handlers/charge-events.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "(subscription.metadata as Record<string, unknown>)?.isCryptoPayment === 'true' &&",
-              "next": "charge.refunded",
-              "previous": "else if ("
-            },
-            "span": "subscription.metadata as Record<string, unknown>",
-            "text": ""
-          }
-        ],
-        "message": "Unsafe type assertion: type 'Record<string, unknown>' is more narrow than the original type.",
         "severity": "error"
       }
     },
@@ -102490,26 +102130,6 @@
           }
         ],
         "message": "Unexpected any value in conditional. Use a more specific type to ensure type safety.",
-        "severity": "error"
-      }
-    },
-    "cf1ff3e37980863585e751a2bef193d2b89482c495b3d845f9a97aaa4024602f": {
-      "count": 1,
-      "summary": {
-        "code": "react-doctor(async-await-in-loop)",
-        "file": "src/lib/stripe/handlers/charge-events.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "await tx.subscription.update({",
-              "next": "data: {",
-              "previous": "if (charge.refunded) {"
-            },
-            "span": "await tx.subscription.update({\n          data: {\n            metadata: {\n              ...(subscription.metadata as Record<string, unknown>),\n              refundAmount: charge.amount_refunded > 0 ? charge.amount_refunded.toString() : null,\n              refundId: charge.refunds?.data?.[0]?.id ?? null,\n              refundedAt: new Date().toISOString(),\n            },\n            status: SubscriptionStatus.CANCELED,\n            updatedAt: new Date(),\n          },\n          where: { id: subscription.id },\n        })",
-            "text": ""
-          }
-        ],
-        "message": "This makes the for…of loop slow because each await runs one after another, so collect the independent calls & run them together with `await Promise.all(items.map(...))`",
         "severity": "error"
       }
     },
@@ -108599,26 +108219,6 @@
         "severity": "error"
       }
     },
-    "daf4cedd09889ede46e1eab67b5e66e7f477db327069754bc6020b81f1918e6f": {
-      "count": 1,
-      "summary": {
-        "code": "eslint(no-await-in-loop)",
-        "file": "src/lib/stripe/handlers/charge-events.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "await tx.subscription.update({",
-              "next": "data: {",
-              "previous": "else if (subscription.status !== SubscriptionStatus.CANCELED) {"
-            },
-            "span": "await",
-            "text": ""
-          }
-        ],
-        "message": "Unexpected `await` inside a loop.",
-        "severity": "error"
-      }
-    },
     "daf53b5d7e53ebd1bcb85e90d12cf55741a3b0b120b67d75a4a1618df75f1002": {
       "count": 1,
       "summary": {
@@ -111720,26 +111320,6 @@
         "severity": "error"
       }
     },
-    "e12c6a37f4e94579b4d97dac1c643aa3bc7822fef7322df48cbd701cd3416618": {
-      "count": 1,
-      "summary": {
-        "code": "eslint(no-await-in-loop)",
-        "file": "src/lib/stripe/handlers/charge-events.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "await tx.subscription.update({",
-              "next": "data: {",
-              "previous": "if (charge.refunded) {"
-            },
-            "span": "await",
-            "text": ""
-          }
-        ],
-        "message": "Unexpected `await` inside a loop.",
-        "severity": "error"
-      }
-    },
     "e1390a1c231a6e06b49034576c17594c33a81e830b5dbc399ee33c05110a96e4": {
       "count": 1,
       "summary": {
@@ -112204,26 +111784,6 @@
           }
         ],
         "message": "This type assertion has no `SAFETY:` justification. State the checked invariant immediately before the assertion or its containing statement.",
-        "severity": "error"
-      }
-    },
-    "e22899e4e1263e71dee0e9c7bab3dab875d0857fab3072189b60724eda819129": {
-      "count": 1,
-      "summary": {
-        "code": "eslint(no-await-in-loop)",
-        "file": "src/lib/stripe/handlers/charge-events.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "await tx.subscription.update({",
-              "next": "data: {",
-              "previous": ") {"
-            },
-            "span": "await",
-            "text": ""
-          }
-        ],
-        "message": "Unexpected `await` inside a loop.",
         "severity": "error"
       }
     },
@@ -114704,26 +114264,6 @@
         "severity": "error"
       }
     },
-    "e69538e4bc42253b99b427af5aa489082cfd099070329eda699896faad5f170a": {
-      "count": 1,
-      "summary": {
-        "code": "sonarjs(cognitive-complexity)",
-        "file": "src/lib/stripe/handlers/charge-events.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "const processSubscriptionRefund = async function processSubscriptionRefund(",
-              "next": "userId: string,",
-              "previous": ""
-            },
-            "span": "function",
-            "text": ""
-          }
-        ],
-        "message": "Refactor this function to reduce its Cognitive Complexity from 26 to the 20 allowed.",
-        "severity": "error"
-      }
-    },
     "e69baa6a47fc6a906f3ad7de45e6c82d03509c1ac323e813bc81b4d21da84d77": {
       "count": 1,
       "summary": {
@@ -116726,26 +116266,6 @@
           }
         ],
         "message": "Missing type parameters on mock function call",
-        "severity": "error"
-      }
-    },
-    "ea48680868cf02738ca80f95ef78d2fb8898143766f7bc2e839faa1096ea1f28": {
-      "count": 1,
-      "summary": {
-        "code": "anti-slop(require-safety-comment-for-type-assertion)",
-        "file": "src/lib/stripe/handlers/charge-events.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "...(subscription.metadata as Record<string, unknown>),",
-              "next": "refundAmount: charge.amount_refunded > 0 ? charge.amount_refunded.toString() : null,",
-              "previous": "metadata: {"
-            },
-            "span": "subscription.metadata as Record<string, unknown>",
-            "text": ""
-          }
-        ],
-        "message": "This type assertion has no `SAFETY:` justification. State the checked invariant immediately before the assertion or its containing statement.",
         "severity": "error"
       }
     },
@@ -120176,26 +119696,6 @@
           }
         ],
         "message": "(BuildHIR::lowerStatement) Handle TryStatement with a finalizer ('finally') clause",
-        "severity": "error"
-      }
-    },
-    "f0ae30cb96bfa10e303140af9ea1df9f97885f95c326dfa19c7035d014bc2c2d": {
-      "count": 1,
-      "summary": {
-        "code": "typescript(no-unsafe-type-assertion)",
-        "file": "src/lib/stripe/handlers/charge-events.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "stripeCustomerId: charge.customer as string,",
-              "next": "userId,",
-              "previous": "where: {"
-            },
-            "span": "charge.customer as string",
-            "text": ""
-          }
-        ],
-        "message": "Unsafe type assertion: type 'string' is more narrow than the original type.",
         "severity": "error"
       }
     },

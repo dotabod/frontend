@@ -532,6 +532,10 @@ const getUserIdFromPaymentIntent = async function getUserIdFromPaymentIntent(
   }
 }
 
+const stripeIdOf = function stripeIdOf(reference: string | { id: string }): string {
+  return reference instanceof Object ? reference.id : reference
+}
+
 const toRefundedCharge = function toRefundedCharge(charge: Stripe.Charge): RefundedCharge {
   return {
     amountRefunded: charge.amount_refunded,
@@ -568,9 +572,7 @@ const createRefundDependencies = function createRefundDependencies(
           return null
         }
 
-        const invoice = await stripe.invoices.retrieve(
-          reference instanceof Object ? reference.id : reference,
-        )
+        const invoice = await stripe.invoices.retrieve(stripeIdOf(reference))
         return findInvoiceSubscriptionId(invoice)
       },
     },

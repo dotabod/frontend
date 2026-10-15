@@ -52,25 +52,21 @@ const charge = (overrides: Partial<RefundedCharge> = {}): RefundedCharge => ({
   ...overrides,
 })
 
-const createFakes = (
-  subscriptions: RefundableSubscription[],
-  evidence: {
-    invoiceSubscriptions?: Map<string, string>
-    checkoutSessions?: Map<string, string>
-  } = {},
-) => {
+// What Stripe reports about the payment intent of the refunded charge.
+interface Evidence {
+  checkoutSessionId?: string
+  invoiceSubscriptionId?: string
+}
+
+const createFakes = (subscriptions: RefundableSubscription[], evidence: Evidence = {}) => {
   const findSubscriptions = vi.fn<Store['findSubscriptions']>().mockResolvedValue(subscriptions)
   const updateSubscription = vi.fn<Store['updateSubscription']>().mockResolvedValue()
   const findInvoiceSubscriptionId = vi
     .fn<Lookups['findInvoiceSubscriptionId']>()
-    .mockImplementation((paymentIntentId) =>
-      Promise.resolve(evidence.invoiceSubscriptions?.get(paymentIntentId) ?? null),
-    )
+    .mockResolvedValue(evidence.invoiceSubscriptionId ?? null)
   const findCheckoutSessionId = vi
     .fn<Lookups['findCheckoutSessionId']>()
-    .mockImplementation((paymentIntentId) =>
-      Promise.resolve(evidence.checkoutSessions?.get(paymentIntentId) ?? null),
-    )
+    .mockResolvedValue(evidence.checkoutSessionId ?? null)
 
   const dependencies: Dependencies = {
     lookups: { findCheckoutSessionId, findInvoiceSubscriptionId },
@@ -80,12 +76,14 @@ const createFakes = (
   return { dependencies, findCheckoutSessionId, findInvoiceSubscriptionId, updateSubscription }
 }
 
-const refund = async (
-  refundedCharge: RefundedCharge,
-  fakes: ReturnType<typeof createFakes>,
-): Promise<void> => {
+type Fakes = ReturnType<typeof createFakes>
+
+const refund = async (refundedCharge: RefundedCharge, fakes: Fakes): Promise<void> => {
   await applyChargeRefund({ charge: refundedCharge, userId: 'user_1' }, fakes.dependencies)
 }
+
+const recordedUpdates = (fakes: Fakes) =>
+  fakes.updateSubscription.mock.calls.map(([id, update]) => ({ id, ...update }))
 
 describe(applyChargeRefund, () => {
   beforeEach(() => {
@@ -99,42 +97,35 @@ describe(applyChargeRefund, () => {
 
   it('leaves a lifetime plan and a crypto plan alone when a card subscription charge is refunded', async () => {
     const fakes = createFakes([lifetimePlan, cryptoPlan, cardPlan], {
-      invoiceSubscriptions: new Map([['pi_1', 'sub_card']]),
+      invoiceSubscriptionId: 'sub_card',
     })
 
     await refund(charge(), fakes)
 
-    expect(fakes.updateSubscription).toHaveBeenCalledExactlyOnceWith(
-      'row_card',
-      expect.objectContaining({
-        metadata: expect.objectContaining({
-          fullyRefunded: 'true',
-          refundAmount: '600',
-          refundId: 're_1',
-        }),
-      }),
-    )
-    expect(fakes.updateSubscription.mock.calls[0]?.[1]).not.toHaveProperty('status')
+    expect(recordedUpdates(fakes)).toMatchObject([
+      {
+        id: 'row_card',
+        metadata: { fullyRefunded: 'true', refundAmount: '600', refundId: 're_1' },
+      },
+    ])
+    expect(recordedUpdates(fakes).at(0)).not.toHaveProperty('status')
   })
 
   it('records the refund only on the subscription the refunded invoice billed', async () => {
     const fakes = createFakes([cardPlan, secondCardPlan], {
-      invoiceSubscriptions: new Map([['pi_1', 'sub_card_second']]),
+      invoiceSubscriptionId: 'sub_card_second',
     })
 
     await refund(charge({ refunded: false }), fakes)
 
-    expect(fakes.updateSubscription).toHaveBeenCalledExactlyOnceWith(
-      'row_card_second',
-      expect.objectContaining({
-        metadata: expect.objectContaining({ fullyRefunded: 'false' }),
-      }),
-    )
+    expect(recordedUpdates(fakes)).toMatchObject([
+      { id: 'row_card_second', metadata: { fullyRefunded: 'false' } },
+    ])
   })
 
   it('does not touch a canceled card subscription whose invoice was refunded', async () => {
     const fakes = createFakes([lifetimePlan, canceledCardPlan], {
-      invoiceSubscriptions: new Map([['pi_1', 'sub_card_canceled']]),
+      invoiceSubscriptionId: 'sub_card_canceled',
     })
 
     await refund(charge(), fakes)
@@ -144,50 +135,45 @@ describe(applyChargeRefund, () => {
 
   it('cancels only the lifetime plan when its own purchase is fully refunded', async () => {
     const fakes = createFakes([lifetimePlan, cryptoPlan, cardPlan], {
-      checkoutSessions: new Map([['pi_1', 'cs_lifetime']]),
+      checkoutSessionId: 'cs_lifetime',
     })
 
     await refund(charge(), fakes)
 
-    expect(fakes.updateSubscription).toHaveBeenCalledExactlyOnceWith(
-      'row_lifetime',
-      expect.objectContaining({
-        metadata: expect.objectContaining({ checkoutSessionId: 'cs_lifetime', refundId: 're_1' }),
+    expect(recordedUpdates(fakes)).toMatchObject([
+      {
+        id: 'row_lifetime',
+        metadata: { checkoutSessionId: 'cs_lifetime', refundId: 're_1' },
         status: SubscriptionStatus.CANCELED,
-      }),
-    )
+      },
+    ])
   })
 
   it('annotates a partly refunded lifetime plan without canceling it', async () => {
-    const fakes = createFakes([lifetimePlan, cardPlan], {
-      checkoutSessions: new Map([['pi_1', 'cs_lifetime']]),
-    })
+    const fakes = createFakes([lifetimePlan, cardPlan], { checkoutSessionId: 'cs_lifetime' })
 
     await refund(charge({ amountRefunded: 1000, refunded: false }), fakes)
 
-    expect(fakes.updateSubscription).toHaveBeenCalledExactlyOnceWith(
-      'row_lifetime',
-      expect.objectContaining({
-        metadata: expect.objectContaining({ refundAmount: '1000' }),
-      }),
-    )
-    expect(fakes.updateSubscription.mock.calls[0]?.[1]).not.toHaveProperty('status')
+    expect(recordedUpdates(fakes)).toMatchObject([
+      { id: 'row_lifetime', metadata: { refundAmount: '1000' } },
+    ])
+    expect(recordedUpdates(fakes).at(0)).not.toHaveProperty('status')
   })
 
   it('cancels only the crypto plan when its own payment is fully refunded', async () => {
     const fakes = createFakes([lifetimePlan, cryptoPlan, cardPlan], {
-      checkoutSessions: new Map([['pi_1', 'cs_crypto']]),
+      checkoutSessionId: 'cs_crypto',
     })
 
     await refund(charge(), fakes)
 
-    expect(fakes.updateSubscription).toHaveBeenCalledExactlyOnceWith(
-      'row_crypto',
-      expect.objectContaining({
-        metadata: expect.objectContaining({ fullyRefunded: 'true' }),
+    expect(recordedUpdates(fakes)).toMatchObject([
+      {
+        id: 'row_crypto',
+        metadata: { fullyRefunded: 'true' },
         status: SubscriptionStatus.CANCELED,
-      }),
-    )
+      },
+    ])
   })
 
   it('matches a plan that recorded the refunded charge id', async () => {
@@ -196,10 +182,9 @@ describe(applyChargeRefund, () => {
 
     await refund(charge({ paymentIntentId: null }), fakes)
 
-    expect(fakes.updateSubscription).toHaveBeenCalledExactlyOnceWith(
-      'row_lifetime',
-      expect.objectContaining({ status: SubscriptionStatus.CANCELED }),
-    )
+    expect(recordedUpdates(fakes)).toMatchObject([
+      { id: 'row_lifetime', status: SubscriptionStatus.CANCELED },
+    ])
   })
 
   it('changes nothing and logs when the charge cannot be tied to a plan', async () => {
@@ -215,8 +200,8 @@ describe(applyChargeRefund, () => {
 
   it('changes nothing when the refunded invoice belongs to a subscription we do not have', async () => {
     const fakes = createFakes([lifetimePlan, cardPlan], {
-      checkoutSessions: new Map([['pi_1', 'cs_lifetime']]),
-      invoiceSubscriptions: new Map([['pi_1', 'sub_elsewhere']]),
+      checkoutSessionId: 'cs_lifetime',
+      invoiceSubscriptionId: 'sub_elsewhere',
     })
 
     await refund(charge(), fakes)
@@ -227,9 +212,7 @@ describe(applyChargeRefund, () => {
 
   it('does not guess between two plans that record the same purchase', async () => {
     const duplicate: RefundableSubscription = { ...lifetimePlan, id: 'row_lifetime_duplicate' }
-    const fakes = createFakes([lifetimePlan, duplicate], {
-      checkoutSessions: new Map([['pi_1', 'cs_lifetime']]),
-    })
+    const fakes = createFakes([lifetimePlan, duplicate], { checkoutSessionId: 'cs_lifetime' })
 
     await refund(charge(), fakes)
 
