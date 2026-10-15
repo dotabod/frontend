@@ -30,13 +30,15 @@ export const SubscriptionAlerts = ({
     subscription,
     isLifetimePlan,
     inGracePeriod,
-    hasActivePlan,
     creditBalance,
     formattedCreditBalance,
     isLoading: subContextIsLoading,
   } = useSubscriptionContext()
   const [isApplyingCredits, setIsApplyingCredits] = useState(false)
   const hasStripeCustomer = Boolean(subscription?.stripeCustomerId)
+  // A past due plan still carries a Stripe subscription id, but credit cannot go toward it, so the
+  // Member needs the credit alert and its button to start a fresh plan.
+  const hasLivePlan = isLifetimePlan || isSubscriptionActive(subscription)
 
   const isVirtualGracePeriodSubscription =
     (subscription !== null &&
@@ -108,10 +110,6 @@ export const SubscriptionAlerts = ({
       return null
     }
 
-    // A past due plan still carries a Stripe subscription id, but it is not a plan the credit can
-    // Go toward, so the member needs the button to start a fresh one.
-    const hasLivePlan = isLifetimePlan || isSubscriptionActive(subscription)
-
     return (
       <BillingNotice
         tone='info'
@@ -155,7 +153,7 @@ export const SubscriptionAlerts = ({
   return (
     <div className='flex flex-col gap-4'>
       {creditBalance > 0 &&
-        !hasActivePlan &&
+        !hasLivePlan &&
         !isVirtualGracePeriodSubscription &&
         createCreditAlert()}
 
