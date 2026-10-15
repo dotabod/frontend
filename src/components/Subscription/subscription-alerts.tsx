@@ -4,7 +4,7 @@ import { useState } from 'react'
 
 import { BillingNotice } from '@/components/Billing/billing-notice'
 import { useSubscriptionContext } from '@/contexts/subscription-context'
-import { GRACE_PERIOD_END, isInGracePeriod } from '@/utils/subscription'
+import { GRACE_PERIOD_END, isInGracePeriod, isSubscriptionActive } from '@/utils/subscription'
 
 import type { GiftInfo, GiftSubInfo, StatusInfo } from './types'
 
@@ -108,13 +108,17 @@ export const SubscriptionAlerts = ({
       return null
     }
 
+    // A past due plan still carries a Stripe subscription id, but it is not a plan the credit can
+    // Go toward, so the member needs the button to start a fresh one.
+    const hasLivePlan = isLifetimePlan || isSubscriptionActive(subscription)
+
     return (
       <BillingNotice
         tone='info'
         icon={<GiftIcon size={18} />}
         title='Credit balance available'
         action={
-          hasActivePlan ? undefined : (
+          hasLivePlan ? undefined : (
             <Button
               type='primary'
               size='small'
@@ -132,7 +136,7 @@ export const SubscriptionAlerts = ({
           automatically.
         </p>
         <p className='mt-1'>
-          {hasActivePlan
+          {hasLivePlan
             ? 'It goes toward your next invoice.'
             : 'It gets applied at checkout when you subscribe.'}
         </p>

@@ -86,6 +86,35 @@ describe(SubscriptionAlerts, () => {
     expect(screen.getByRole('button', { name: /apply credits now/iu })).toBeInTheDocument()
   })
 
+  it('offers to apply credit when the only subscription is past due', () => {
+    useSubscriptionContextMock.mockReturnValue({
+      creditBalance: 600,
+      formattedCreditBalance: '$6.00',
+      hasActivePlan: true,
+      inGracePeriod: false,
+      isLifetimePlan: false,
+      isLoading: false,
+      subscription: {
+        cancelAtPeriodEnd: false,
+        currentPeriodEnd: new Date('2026-11-01T00:00:00.000Z'),
+        status: 'PAST_DUE',
+        stripeCustomerId: 'cus_123',
+        stripeSubscriptionId: 'sub_past_due',
+      },
+    })
+
+    render(
+      <SubscriptionAlerts
+        giftInfo={giftInfo}
+        statusInfo={null}
+        handlePortalAccess={vi.fn()}
+        isLoading={false}
+      />,
+    )
+
+    expect(screen.getByRole('button', { name: /apply credits now/iu })).toBeInTheDocument()
+  })
+
   it('shows Update Payment action for PAST_DUE with Stripe customer and no stripeSubscriptionId', () => {
     useSubscriptionContextMock.mockReturnValue({
       creditBalance: 0,

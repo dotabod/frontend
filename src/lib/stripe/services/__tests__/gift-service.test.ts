@@ -3,33 +3,46 @@ import { describe, expect, it, vi } from 'vitest'
 
 import { scheduleGiftCreditAutoApply } from '../gift-service'
 
+type Apply = NonNullable<Parameters<typeof scheduleGiftCreditAutoApply>[1]>
+
+const input = { stripeCustomerId: 'cus_recipient', userId: 'user_recipient' }
+
+const scheduleInWorker = async (apply: Apply): Promise<Promise<unknown>[]> => {
+  const backgroundTasks: Promise<unknown>[] = []
+
+  await runWithExecutionContext(
+    {
+      waitUntil: (task: Promise<unknown>) => {
+        backgroundTasks.push(task)
+      },
+    },
+    async () => {
+      await scheduleGiftCreditAutoApply(input, apply)
+    },
+  )
+
+  return backgroundTasks
+}
+
 describe('gift credit auto-apply', () => {
-  it('registers the delayed apply call with the Worker so it outlives the response', async () => {
-    vi.stubEnv('NEXTAUTH_URL', 'https://dotabod.test')
-    const fetchMock = vi.fn<typeof fetch>().mockResolvedValue(Response.json({ success: true }))
-    vi.stubGlobal('fetch', fetchMock)
-    const backgroundTasks: Promise<unknown>[] = []
+  it('applies the recipient credit in this invocation and registers it with the Worker', async () => {
+    const apply = vi
+      .fn<Apply>()
+      .mockResolvedValue({ creditApplied: 6, kind: 'applied', priceId: 'price_monthly' })
 
-    await runWithExecutionContext(
-      {
-        waitUntil: (task: Promise<unknown>) => {
-          backgroundTasks.push(task)
-        },
-      },
-      async () => {
-        await scheduleGiftCreditAutoApply('user_recipient')
-      },
-    )
+    const backgroundTasks = await scheduleInWorker(apply)
 
-    expect(fetchMock).not.toHaveBeenCalled()
     expect(backgroundTasks).toHaveLength(1)
     await Promise.all(backgroundTasks)
-    expect(fetchMock).toHaveBeenCalledExactlyOnceWith(
-      'https://dotabod.test/api/stripe/apply-gift-credit',
-      expect.objectContaining({
-        body: JSON.stringify({ userId: 'user_recipient' }),
-        method: 'POST',
-      }),
-    )
+    expect(apply).toHaveBeenCalledExactlyOnceWith(input)
+  })
+
+  it('keeps the webhook successful when applying the credit fails', async () => {
+    const apply = vi.fn<Apply>().mockRejectedValue(new Error('stripe unavailable'))
+
+    const backgroundTasks = await scheduleInWorker(apply)
+
+    await expect(Promise.all(backgroundTasks)).resolves.toHaveLength(1)
+    expect(apply).toHaveBeenCalledOnce()
   })
 })

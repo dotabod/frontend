@@ -1,5 +1,3 @@
-import { setTimeout as sleep } from 'node:timers/promises'
-
 import { SubscriptionStatus, TransactionType } from '@prisma/client'
 import type { Prisma } from '@prisma/client'
 import type Stripe from 'stripe'
@@ -10,37 +8,34 @@ import { getSubscriptionTier } from '@/utils/subscription'
 
 import { withErrorHandling } from '../utils/error-handling'
 import { CustomerService } from './customer-service'
+import { applyGiftCredit, createGiftCreditDependencies } from './gift-credit-service'
+import type { GiftCreditInput, GiftCreditResult } from './gift-credit-service'
+
+const applyWithLiveDependencies = async function applyWithLiveDependencies(
+  input: GiftCreditInput,
+): Promise<GiftCreditResult> {
+  return await applyGiftCredit(input, createGiftCreditDependencies())
+}
 
 /**
- * Applies a gift recipient's credit after the webhook transaction commits. Workers end the request
- * once the response is sent, so the delayed call must be registered as background work or it never
- * runs.
+ * Applies a gift recipient's credit inside this invocation. It used to POST to our own
+ * /api/stripe/apply-gift-credit, but a Worker's fetch() to its own hostname never reaches the
+ * Worker, so that call failed for every gift. Workers also end the request once the response is
+ * sent, so the work is registered as background work or it may never finish.
  */
 export const scheduleGiftCreditAutoApply = async function scheduleGiftCreditAutoApply(
-  recipientUserId: string,
+  input: GiftCreditInput,
+  apply: (input: GiftCreditInput) => Promise<GiftCreditResult> = applyWithLiveDependencies,
 ): Promise<void> {
   const autoApply = async () => {
-    // Small delay to ensure transaction completes
-    await sleep(500)
     try {
-      // Call the apply-gift-credit API endpoint
-      const autoApplyResponse = await fetch(
-        `${process.env.NEXTAUTH_URL ?? 'https://dotabod.com'}/api/stripe/apply-gift-credit`,
-        {
-          body: JSON.stringify({
-            userId: recipientUserId,
-          }),
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          method: 'POST',
-        },
-      )
-
-      const _result = await autoApplyResponse.json()
+      const result = await apply(input)
+      if (result.kind !== 'applied') {
+        console.log(`Gift credit not applied for user ${input.userId}: ${result.kind}`)
+      }
     } catch (autoApplyError) {
-      console.error('Failed to auto-apply gift credits:', autoApplyError)
       // Don't fail the overall process if auto-apply fails
+      console.error(`Failed to auto-apply gift credits for user ${input.userId}:`, autoApplyError)
     }
   }
   await runBackgroundTask(autoApply())
@@ -203,10 +198,14 @@ export class GiftService {
             },
           })
 
-          // If the user doesn't have an active subscription, attempt to apply the credits automatically
-          // We'll do this after the transaction completes to avoid complications
+          // If the user doesn't have an active subscription, attempt to apply the credits automatically.
+          // The apply reads nothing this transaction writes (the credit is already in Stripe and the
+          // Customer id is passed along), so it does not need to wait for the commit.
           if (!existingSubscription) {
-            void scheduleGiftCreditAutoApply(recipientUserId)
+            void scheduleGiftCreditAutoApply({
+              stripeCustomerId: recipientCustomerId,
+              userId: recipientUserId,
+            })
           }
 
           return true
