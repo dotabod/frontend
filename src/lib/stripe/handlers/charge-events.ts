@@ -1,9 +1,12 @@
 import type { Prisma } from '@prisma/client'
-import { SubscriptionStatus, TransactionType } from '@prisma/client'
+import { SubscriptionStatus } from '@prisma/client'
 import type Stripe from 'stripe'
 
 import { stripe } from '@/lib/stripe-server'
 
+import type { RefundDependencies, RefundedCharge } from '../services/refund-service'
+import { applyChargeRefund } from '../services/refund-service'
+import { findInvoiceSubscriptionId } from '../utils/billing-facts'
 import { withErrorHandling } from '../utils/error-handling'
 import {
   createLifetimePurchase,
@@ -529,109 +532,77 @@ const getUserIdFromPaymentIntent = async function getUserIdFromPaymentIntent(
   }
 }
 
+const toRefundedCharge = function toRefundedCharge(charge: Stripe.Charge): RefundedCharge {
+  return {
+    amountRefunded: charge.amount_refunded,
+    customerId: charge.customer instanceof Object ? charge.customer.id : charge.customer,
+    id: charge.id,
+    paymentIntentId:
+      charge.payment_intent instanceof Object ? charge.payment_intent.id : charge.payment_intent,
+    refundId: charge.refunds?.data.at(0)?.id ?? null,
+    refunded: charge.refunded,
+  }
+}
+
+const createRefundDependencies = function createRefundDependencies(
+  tx: Prisma.TransactionClient,
+): RefundDependencies {
+  return {
+    lookups: {
+      findCheckoutSessionId: async (paymentIntentId) => {
+        const sessions = await stripe.checkout.sessions.list({
+          limit: 1,
+          payment_intent: paymentIntentId,
+        })
+        return sessions.data.at(0)?.id ?? null
+      },
+      // The charge no longer links to its invoice in the pinned API version, so go through the
+      // Invoice payment that settled the charge's payment intent.
+      findInvoiceSubscriptionId: async (paymentIntentId) => {
+        const payments = await stripe.invoicePayments.list({
+          limit: 1,
+          payment: { payment_intent: paymentIntentId, type: 'payment_intent' },
+        })
+        const reference = payments.data.at(0)?.invoice
+        if (reference === undefined) {
+          return null
+        }
+
+        const invoice = await stripe.invoices.retrieve(
+          reference instanceof Object ? reference.id : reference,
+        )
+        return findInvoiceSubscriptionId(invoice)
+      },
+    },
+    store: {
+      findSubscriptions: async (userId, customerId) =>
+        await tx.subscription.findMany({
+          select: {
+            id: true,
+            metadata: true,
+            status: true,
+            stripeSubscriptionId: true,
+            transactionType: true,
+          },
+          where: { stripeCustomerId: customerId, userId },
+        }),
+      updateSubscription: async (id, update) => {
+        await tx.subscription.update({
+          data: { ...update, updatedAt: new Date() },
+          where: { id },
+        })
+      },
+    },
+  }
+}
+
 const processSubscriptionRefund = async function processSubscriptionRefund(
   userId: string,
   charge: Stripe.Charge,
   tx: Prisma.TransactionClient,
 ): Promise<void> {
-  // Get all active subscriptions for this user/customer
-  const subscriptions = await tx.subscription.findMany({
-    where: {
-      stripeCustomerId: charge.customer as string,
-      userId,
-    },
-  })
-
-  if (subscriptions.length === 0) {
-    const customerId =
-      typeof charge.customer === 'string' ? charge.customer : (charge.customer?.id ?? 'null')
-    console.log(`No subscriptions found for user ${userId} with customer ${customerId}`)
-    return
-  }
-
-  // Log what we found
-  console.log(`Found ${subscriptions.length} subscriptions to update for refund`)
-
-  // Update each subscription based on the refund
-  for (const subscription of subscriptions) {
-    // For lifetime or one-time purchases, handle refunds by updating status
-    if (subscription.transactionType === TransactionType.LIFETIME) {
-      // If fully refunded, mark the purchase as canceled
-      if (charge.refunded) {
-        await tx.subscription.update({
-          data: {
-            metadata: {
-              ...(subscription.metadata as Record<string, unknown>),
-              refundAmount: charge.amount_refunded > 0 ? charge.amount_refunded.toString() : null,
-              refundId: charge.refunds?.data?.[0]?.id ?? null,
-              refundedAt: new Date().toISOString(),
-            },
-            status: SubscriptionStatus.CANCELED,
-            updatedAt: new Date(),
-          },
-          where: { id: subscription.id },
-        })
-        console.log(
-          `Marked ${subscription.transactionType} subscription ${subscription.id} as canceled due to full refund`,
-        )
-      }
-      // If partially refunded, update the metadata
-      else if (charge.amount_refunded > 0) {
-        await tx.subscription.update({
-          data: {
-            metadata: {
-              ...(subscription.metadata as Record<string, unknown>),
-              partiallyRefundedAt: new Date().toISOString(),
-              refundAmount: charge.amount_refunded.toString(),
-              refundId: charge.refunds?.data?.[0]?.id ?? null,
-            },
-            updatedAt: new Date(),
-          },
-          where: { id: subscription.id },
-        })
-        console.log(
-          `Updated ${subscription.transactionType} subscription ${subscription.id} metadata for partial refund`,
-        )
-      }
-    }
-    // For crypto payments, we need to manually cancel them since Stripe won't handle it through subscription webhooks
-    else if (
-      (subscription.metadata as Record<string, unknown>)?.isCryptoPayment === 'true' &&
-      charge.refunded
-    ) {
-      await tx.subscription.update({
-        data: {
-          metadata: {
-            ...(subscription.metadata as Record<string, unknown>),
-            fullyRefunded: 'true',
-            refundAmount: charge.amount_refunded > 0 ? charge.amount_refunded.toString() : null,
-            refundId: charge.refunds?.data?.[0]?.id ?? null,
-            refundedAt: new Date().toISOString(),
-          },
-          status: SubscriptionStatus.CANCELED,
-          updatedAt: new Date(),
-        },
-        where: { id: subscription.id },
-      })
-      console.log(`Manually canceled crypto subscription ${subscription.id} due to refund`)
-    }
-    // For recurring subscriptions, just record the refund in metadata
-    // The actual subscription status changes will come from Stripe subscription webhooks
-    else if (subscription.status !== SubscriptionStatus.CANCELED) {
-      await tx.subscription.update({
-        data: {
-          metadata: {
-            ...(subscription.metadata as Record<string, unknown>),
-            fullyRefunded: charge.refunded ? 'true' : 'false',
-            refundAmount: charge.amount_refunded > 0 ? charge.amount_refunded.toString() : null,
-            refundId: charge.refunds?.data?.[0]?.id ?? null,
-            refundRecorded: new Date().toISOString(),
-          },
-          updatedAt: new Date(),
-        },
-        where: { id: subscription.id },
-      })
-      console.log(`Updated recurring subscription ${subscription.id} metadata for refund`)
-    }
-  }
+  await applyChargeRefund(
+    { charge: toRefundedCharge(charge), userId },
+    createRefundDependencies(tx),
+  )
 }

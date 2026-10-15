@@ -95,7 +95,7 @@ const isPresentStripeId = function isPresentStripeId(
   return value !== null && value !== undefined && value !== ''
 }
 
-const findInvoiceSubscriptionId = function findInvoiceSubscriptionId(
+export const findInvoiceSubscriptionId = function findInvoiceSubscriptionId(
   invoice: Stripe.Invoice,
 ): string | null {
   if (invoice.parent?.type === 'subscription_details') {
