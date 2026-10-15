@@ -42,4 +42,4 @@ const languageNames: Record<SupportedLocale, string> = {
 
 export const languageOptions = localePatchSchema.options
   .map((value) => ({ label: languageNames[value], value }))
-  .sort((a, b) => a.label.localeCompare(b.label))
+  .toSorted((a, b) => a.label.localeCompare(b.label))

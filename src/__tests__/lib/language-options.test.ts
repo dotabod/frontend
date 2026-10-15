@@ -5,7 +5,7 @@ import { localePatchSchema } from '@/lib/validations/setting'
 
 const labels = languageOptions.map((option) => option.label)
 
-describe('languageOptions', () => {
+describe('language options', () => {
   it('offers exactly the locales the settings API accepts, with no Crowdin data', () => {
     const offered = languageOptions.map((option) => option.value)
 
@@ -26,6 +26,6 @@ describe('languageOptions', () => {
   })
 
   it('lists the languages alphabetically by label', () => {
-    expect(labels).toStrictEqual([...labels].sort((a, b) => a.localeCompare(b)))
+    expect(labels).toStrictEqual(labels.toSorted((a, b) => a.localeCompare(b)))
   })
 })
