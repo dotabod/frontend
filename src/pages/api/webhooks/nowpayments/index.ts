@@ -7,6 +7,7 @@ import {
   verifyNowPaymentsSignature,
 } from '@/lib/nowpayments'
 import { processConfirmedNowPaymentsPayment } from '@/lib/nowpayments-payment'
+import { recordNowPaymentsProgress } from '@/lib/nowpayments-progress'
 
 export const runtime = 'nodejs'
 
@@ -75,17 +76,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         return
       }
     } else {
-      await prisma.nowPaymentsInvoice.update({
-        data: {
-          actuallyPaid: payment.actually_paid,
-          lastWebhookAt: new Date(),
-          payAmount: payment.pay_amount,
-          payCurrency: payment.pay_currency,
-          paymentId: String(payment.payment_id),
-          status: payment.payment_status,
-        },
-        where: { nowPaymentsId: invoice.nowPaymentsId },
-      })
+      await recordNowPaymentsProgress(invoice, payment)
     }
 
     res.status(200).json({ message: 'OK' })
