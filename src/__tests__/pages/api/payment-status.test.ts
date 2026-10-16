@@ -1,7 +1,18 @@
+import type { NowPaymentsInvoice, Prisma } from '@prisma/client'
+import type { NextApiRequest, NextApiResponse } from 'next'
 import { createMocks } from 'node-mocks-http'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import handler from '@/pages/api/payment-status'
+
+interface NowPaymentsRow {
+  createdAt: Date
+  nowPaymentsId: string
+  priceAmount: number
+  priceCurrency: string
+  status: NowPaymentsInvoice['status']
+  stripeInvoiceId: string
+}
 
 const mocks = vi.hoisted(() => {
   const openNodeCharge = {
@@ -25,9 +36,19 @@ const mocks = vi.hoisted(() => {
     getServerSession: vi.fn(),
     openNodeCharge,
     prisma: {
+      nowPaymentsInvoice: {
+        findUnique:
+          vi.fn<
+            (args: Prisma.NowPaymentsInvoiceFindUniqueArgs) => Promise<NowPaymentsRow | null>
+          >(),
+      },
       openNodeCharge: {
         findUnique: vi.fn(),
         update: vi.fn(),
+      },
+      subscription: {
+        findFirst:
+          vi.fn<(args: Prisma.SubscriptionFindFirstArgs) => Promise<{ id: string } | null>>(),
       },
     },
     processConfirmedOpenNodePayment: vi.fn(),
@@ -130,6 +151,34 @@ describe('payment-status API', () => {
       },
       invoiceId: 'in_1',
       status: 'paid',
+    })
+  })
+
+  it('reports a NOWPayments invoice instead of answering 404 when there is no OpenNode charge', async () => {
+    mocks.prisma.openNodeCharge.findUnique.mockResolvedValue(null)
+    mocks.prisma.nowPaymentsInvoice.findUnique.mockResolvedValue({
+      createdAt: new Date('2026-10-14T20:00:00.000Z'),
+      nowPaymentsId: 'np_inv_1',
+      priceAmount: 99,
+      priceCurrency: 'usd',
+      status: 'finished',
+      stripeInvoiceId: 'in_1',
+    })
+    mocks.prisma.subscription.findFirst.mockResolvedValue({ id: 'sub_1' })
+    const { req, res } = createMocks<NextApiRequest, NextApiResponse>({
+      method: 'GET',
+      query: { invoiceId: 'in_1' },
+    })
+
+    await handler(req, res)
+
+    expect(res.statusCode).toBe(200)
+    expect(mocks.getOpenNodeChargeStatus).not.toHaveBeenCalled()
+    expect(res._getJSONData()).toMatchObject({
+      chargeId: 'np_inv_1',
+      invoiceId: 'in_1',
+      status: 'finished',
+      statusInfo: { type: 'success' },
     })
   })
 })
