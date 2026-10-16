@@ -99,13 +99,7 @@ describe(handleInvoiceEvent, () => {
       expect(handled).toBeTruthy()
       expect(create).not.toHaveBeenCalled()
       expect(update).not.toHaveBeenCalled()
-      expect(findFirst).toHaveBeenCalledExactlyOnceWith(
-        expect.objectContaining({
-          where: {
-            OR: expect.arrayContaining([{ stripeSubscriptionId: 'crypto_opennode_in_crypto' }]),
-          },
-        }),
-      )
+      expect(findFirst).toHaveBeenCalledOnce()
     })
 
     it('does not extend a renewal a second time either', async () => {

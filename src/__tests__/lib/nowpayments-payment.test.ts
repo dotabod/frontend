@@ -188,11 +188,17 @@ describe('processConfirmedNowPaymentsPayment', () => {
 
     expect(result.reason).toBe('processed')
     expect(result.subscriptionCreated).toBeFalsy()
-    expect(mocks.prisma.subscription.findFirst).toHaveBeenCalledExactlyOnceWith(
-      expect.objectContaining({
-        where: { OR: expect.arrayContaining([{ stripeSubscriptionId: 'crypto_opennode_in_1' }]) },
-      }),
-    )
+    expect(mocks.prisma.subscription.findFirst).toHaveBeenCalledExactlyOnceWith({
+      select: { id: true },
+      where: {
+        OR: [
+          { stripeSubscriptionId: 'crypto_opennode_in_1' },
+          { metadata: { equals: 'in_1', path: ['openNodeInvoiceId'] } },
+          { metadata: { equals: 'in_1', path: ['lastRenewalInvoiceId'] } },
+          { metadata: { equals: 'in_1', path: ['previousRenewalInvoiceId'] } },
+        ],
+      },
+    })
   })
 
   it('writes failure metadata and rethrows when the invoice handler fails', async () => {
