@@ -6,6 +6,7 @@ import NumberTicker from '@/components/magicui/number-ticker'
 import useLanguageTranslations, { getLanguageProgress } from '@/lib/hooks/use-language-translation'
 import type { CrowdinLanguage } from '@/lib/hooks/use-language-translation'
 import { useUpdateLocale } from '@/lib/hooks/use-update-setting'
+import { languageOptions } from '@/lib/language-options'
 import { Card } from '@/ui/card'
 
 interface ItemProps extends React.ComponentPropsWithoutRef<'div'> {
@@ -66,44 +67,6 @@ const LanguageCard = () => {
     languageId,
   )
 
-  const arr = (data?.languageProgress ? Object.values(data.languageProgress) : []).map((x) => {
-    const fullLanguage = data?.project?.targetLanguages?.find((t) => t.id === x.data.languageId)
-
-    if (!fullLanguage) {
-      return {
-        id: 'en-US',
-        label: 'English',
-        value: 'en',
-      }
-    }
-
-    return {
-      id: fullLanguage.id,
-      label: data?.project?.targetLanguages ? fullLanguage.name : 'Unknown',
-      value: fullLanguage.locale,
-    }
-  })
-
-  arr.push({
-    id: 'en-US',
-    label: 'English',
-    value: 'en',
-  })
-
-  arr.sort((a, b) => {
-    // Ignore upper and lowercase
-    const nameA = a.label.toUpperCase()
-    // Ignore upper and lowercase
-    const nameB = b.label.toUpperCase()
-    if (nameA < nameB) {
-      return -1
-    }
-    if (nameA > nameB) {
-      return 1
-    }
-    return 0
-  })
-
   return (
     <Card>
       <div className='title'>
@@ -125,7 +88,7 @@ const LanguageCard = () => {
           showSearch
           filterOption={(input, option) =>
             option
-              ? (arr.find((a) => a.value === option.value)?.label ?? '')
+              ? (languageOptions.find((a) => a.value === option.value)?.label ?? '')
                   .toLowerCase()
                   .includes(input?.toLowerCase() ?? '')
               : false
@@ -133,11 +96,11 @@ const LanguageCard = () => {
           loading={loadingLocale || isLoading}
           placeholder='Language selector'
           className='w-full transition-all'
-          options={arr.map((x) => ({
+          options={languageOptions.map((x) => ({
             label: (
               <SelectItem
                 label={x.label}
-                code={x.id}
+                code={x.value}
                 translation={getLanguageProgress(
                   data && {
                     ...data,

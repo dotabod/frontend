@@ -58159,26 +58159,6 @@
         "severity": "error"
       }
     },
-    "74fad4c9adf9cd9e22948366d7ea0f6d9a9d2e303d211b592e5f6d32283cea76": {
-      "count": 1,
-      "summary": {
-        "code": "eslint(complexity)",
-        "file": "src/components/Dashboard/Features/language-card.tsx",
-        "labels": [
-          {
-            "context": {
-              "current": "const LanguageCard = () => {",
-              "next": "const { data: localeOption, loading: loadingLocale, update: updateLocale } = useUpdateLocale()",
-              "previous": ""
-            },
-            "span": "() => {\n  const { data: localeOption, loading: loadingLocale, update: updateLocale } = useUpdateLocale()\n\n  const languageId = localeOption?.locale ?? 'en-US'\n  const { isLoading, data } = useLanguageTranslations({\n    languageId,\n  })\n  const languageProgress = getLanguageProgress(\n    data && {\n      ...data,\n      // Provide default value of 0 for undefined total\n      total: data.total ?? 0,\n    },\n    languageId,\n  )\n\n  const arr = (data?.languageProgress ? Object.values(data.languageProgress) : []).map((x) => {\n    const fullLanguage = data?.project?.targetLanguages?.find((t) => t.id === x.data.languageId)\n\n    if (!fullLanguage) {\n      return {\n        id: 'en-US',\n        label: 'English',\n        value: 'en',\n      }\n    }\n\n    return {\n      id: fullLanguage.id,\n      label: data?.project?.targetLanguages ? fullLanguage.name : 'Unknown',\n      value: fullLanguage.locale,\n    }\n  })\n\n  arr.push({\n    id: 'en-US',\n    label: 'English',\n    value: 'en',\n  })\n\n  arr.sort((a, b) => {\n    // Ignore upper and lowercase\n    const nameA = a.label.toUpperCase()\n    // Ignore upper and lowercase\n    const nameB = b.label.toUpperCase()\n    if (nameA < nameB) {\n      return -1\n    }\n    if (nameA > nameB) {\n      return 1\n    }\n    return 0\n  })\n\n  return (\n    <Card>\n      <div className='title'>\n        <h3>Language</h3>\n      </div>\n      <div className='subtitle mb-2'>The @dotabod Twitch chat bot will speak in this language.</div>\n      {languageProgress?.data ? (\n        <div className='mt-4'>\n          <div className='flex flex-col sm:flex-row sm:items-center sm:justify-between'>\n            <span>\n              <NumberTicker value={languageProgress?.data?.translationProgress || 0} />\n              <span>% translated</span>\n            </span>\n          </div>\n        </div>\n      ) : null}\n      <div>\n        <Select\n          showSearch\n          filterOption={(input, option) =>\n            option\n              ? (arr.find((a) => a.value === option.value)?.label ?? '')\n                  .toLowerCase()\n                  .includes(input?.toLowerCase() ?? '')\n              : false\n          }\n          loading={loadingLocale || isLoading}\n          placeholder='Language selector'\n          className='w-full transition-all'\n          options={arr.map((x) => ({\n            label: (\n              <SelectItem\n                label={x.label}\n                code={x.id}\n                translation={getLanguageProgress(\n                  data && {\n                    ...data,\n                    total: data.total ?? 0,\n                  },\n                  x.value,\n                )}\n              />\n            ),\n            value: x.value,\n          }))}\n          value={localeOption?.locale}\n          onChange={(value) => {\n            updateLocale(value)\n          }}\n        />\n      </div>\n\n      <div className='mt-2'>\n        <Button\n          loading={isLoading}\n          href='https://crowdin.com/project/dotabod'\n          target='_blank'\n          type='link'\n        >\n          {languageProgress?.data?.translationProgress !== null &&\n          languageProgress?.data?.translationProgress !== undefined &&\n          languageProgress.data.translationProgress < 100\n            ? 'Help complete on Crowdin'\n            : 'Fix locale issues on Crowdin'}\n        </Button>\n      </div>\n    </Card>\n  )\n}",
-            "text": ""
-          }
-        ],
-        "message": "function has a complexity of 21. Maximum allowed is 20.",
-        "severity": "error"
-      }
-    },
     "750f6a53750739fe67f9966539b791ee0e54531555bd9c7acf19d2f4cb737943": {
       "count": 1,
       "summary": {
