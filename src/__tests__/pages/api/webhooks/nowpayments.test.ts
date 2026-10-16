@@ -15,6 +15,7 @@ const mocks = vi.hoisted(() => ({
   prisma: {
     nowPaymentsInvoice: {
       findUnique: vi.fn(),
+      update: vi.fn(),
       updateMany:
         vi.fn<(args: Prisma.NowPaymentsInvoiceUpdateManyArgs) => Promise<{ count: number }>>(),
     },
@@ -167,6 +168,7 @@ describe('POST /api/webhooks/nowpayments', () => {
     const write = mocks.prisma.nowPaymentsInvoice.updateMany.mock.calls[0]?.[0]
     expect(res._getStatusCode()).toBe(200)
     expect(write?.where).toStrictEqual({ nowPaymentsId: 'np_inv_1', status: { not: 'finished' } })
+    expect(mocks.prisma.nowPaymentsInvoice.update).not.toHaveBeenCalled()
   })
 
   it('skips a duplicate non-confirmed webhook (same status, already seen)', async () => {

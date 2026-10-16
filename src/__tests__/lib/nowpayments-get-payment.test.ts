@@ -2,8 +2,16 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import { getNowPaymentsPayment } from '@/lib/nowpayments'
 
-const respondWith = (body: object, status = 200) =>
-  vi.spyOn(globalThis, 'fetch').mockResolvedValue(new Response(JSON.stringify(body), { status }))
+interface PaymentBody {
+  actually_paid?: number
+  message?: string
+  order_id?: string
+  payment_id?: number
+  payment_status?: string
+}
+
+const respondWith = (body: PaymentBody, status = 200) =>
+  vi.spyOn(globalThis, 'fetch').mockResolvedValue(Response.json(body, { status }))
 
 describe(getNowPaymentsPayment, () => {
   afterEach(() => {
