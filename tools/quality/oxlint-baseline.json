@@ -2999,26 +2999,6 @@
         "severity": "error"
       }
     },
-    "05fc07202ec653b0c7eeec5802697809cbf23a73d391c7fe35a1dacbacb1b6b1": {
-      "count": 1,
-      "summary": {
-        "code": "vitest(require-mock-type-parameters)",
-        "file": "src/__tests__/pages/api/stripe/create-checkout.test.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "findFirst: vi.fn(),",
-              "next": "updateMany: vi.fn(),",
-              "previous": "subscription: {"
-            },
-            "span": "fn",
-            "text": ""
-          }
-        ],
-        "message": "Missing type parameters on mock function call",
-        "severity": "error"
-      }
-    },
     "06062776a3855139234e6ece943e65a159bba9d84178468243854bbcfd368e5d": {
       "count": 1,
       "summary": {
@@ -80713,26 +80693,6 @@
               "current": "retrieve: vi.fn(),",
               "next": "},",
               "previous": "pay: vi.fn(),"
-            },
-            "span": "fn",
-            "text": ""
-          }
-        ],
-        "message": "Missing type parameters on mock function call",
-        "severity": "error"
-      }
-    },
-    "a0ec7cc349efd83b858e56dc56973b854b080f44e9616157fad213c10e5ef8af": {
-      "count": 1,
-      "summary": {
-        "code": "vitest(require-mock-type-parameters)",
-        "file": "src/__tests__/pages/api/stripe/create-checkout.test.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "updateMany: vi.fn(),",
-              "next": "},",
-              "previous": "findFirst: vi.fn(),"
             },
             "span": "fn",
             "text": ""

@@ -10,6 +10,7 @@ import { featureFlags } from '@/lib/feature-flags'
 import { createAndStoreCryptoInvoice } from '@/lib/nowpayments-checkout'
 import { stripe } from '@/lib/stripe-server'
 import { getCheckoutPricePeriod } from '@/lib/stripe/checkout-prices'
+import { LIVE_SUBSCRIPTION_CODE, isLiveStripeSubscription } from '@/lib/stripe/live-subscription'
 import { GRACE_PERIOD_END, getSubscription, isInGracePeriod } from '@/utils/subscription'
 
 interface CheckoutRequestBody {
@@ -50,6 +51,24 @@ const hasPriorStripeSubscription = async function hasPriorStripeSubscription(
     console.error('Unable to verify prior Stripe subscriptions for trial eligibility:', error)
     return true
   }
+}
+
+// A second card subscription next to a live one gets billed twice. Lifetime upgrades and crypto
+// Invoices replace the old plan on purpose, so only a new recurring card checkout is stopped.
+const wouldDoubleBill = async function wouldDoubleBill(params: {
+  isCryptoPayment: boolean
+  isRecurring: boolean
+  userId: string
+}): Promise<boolean> {
+  if (!params.isRecurring || params.isCryptoPayment) {
+    return false
+  }
+
+  const storedSubscriptions = await prisma.subscription.findMany({
+    select: { status: true, stripeSubscriptionId: true },
+    where: { stripeSubscriptionId: { not: null }, userId: params.userId },
+  })
+  return storedSubscriptions.some(isLiveStripeSubscription)
 }
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
@@ -95,6 +114,15 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const isLifetime = !isRecurring
     // Check if user wants to pay with crypto and if feature is enabled
     const isCryptoPayment = paymentMethod === 'crypto' && featureFlags.enableCryptoPayments
+
+    if (await wouldDoubleBill({ isCryptoPayment, isRecurring, userId: session.user.id })) {
+      res.status(409).json({
+        code: LIVE_SUBSCRIPTION_CODE,
+        error: 'You already have a Dotabod subscription',
+        guidance: 'Update your payment method in billing instead of starting a second plan.',
+      })
+      return
+    }
 
     // Keep this transaction narrow: production runs with connection_limit=1, so
     // Any external API call inside the callback holds the only pool connection
