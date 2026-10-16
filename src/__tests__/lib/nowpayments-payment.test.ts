@@ -174,6 +174,33 @@ describe('processConfirmedNowPaymentsPayment', () => {
     expect(mocks.handleInvoiceEvent).toHaveBeenCalledWith(paidInvoice, mocks.tx)
   })
 
+  it('reports no subscription when nothing was credited for this invoice', async () => {
+    const paidInvoice = {
+      customer: 'cus_1',
+      id: 'in_1',
+      metadata: { isCryptoPayment: 'true', paymentProvider: 'nowpayments' },
+      status: 'paid',
+    }
+    mocks.stripe.invoices.retrieve.mockResolvedValue(paidInvoice)
+    mocks.prisma.subscription.findFirst.mockResolvedValue(null)
+
+    const result = await processConfirmedNowPaymentsPayment(baseInvoice, basePayment)
+
+    expect(result.reason).toBe('processed')
+    expect(result.subscriptionCreated).toBeFalsy()
+    expect(mocks.prisma.subscription.findFirst).toHaveBeenCalledExactlyOnceWith({
+      select: { id: true },
+      where: {
+        OR: [
+          { stripeSubscriptionId: 'crypto_opennode_in_1' },
+          { metadata: { equals: 'in_1', path: ['openNodeInvoiceId'] } },
+          { metadata: { equals: 'in_1', path: ['lastRenewalInvoiceId'] } },
+          { metadata: { equals: 'in_1', path: ['previousRenewalInvoiceId'] } },
+        ],
+      },
+    })
+  })
+
   it('writes failure metadata and rethrows when the invoice handler fails', async () => {
     mocks.stripe.invoices.retrieve.mockResolvedValue({ id: 'in_1', status: 'open' })
     mocks.stripe.invoices.pay.mockResolvedValue({ id: 'in_1', status: 'paid' })
