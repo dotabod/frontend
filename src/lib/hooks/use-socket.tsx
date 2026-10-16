@@ -23,6 +23,7 @@ import { reportOverlayPage } from '@/lib/diagnostics/report-overlay-page'
 import { fetcher } from '@/lib/fetcher'
 import { getMatchData } from '@/lib/hooks/open-dota-api'
 import type { AegisState, RoshanState } from '@/lib/hooks/rosh'
+import { createHandshakeGuard } from '@/lib/hooks/socket-handshake-guard'
 import { useUpdateSetting } from '@/lib/hooks/use-update-setting'
 import { getRankImage } from '@/lib/ranks'
 import type { RankType } from '@/lib/ranks'
@@ -161,7 +162,6 @@ const socketEventNames = [
   'aegis-picked-up',
   'chatMessage',
   'roshan-killed',
-  'auth_error',
   'refresh-settings',
   'diagnostic-overlay-probe',
   'channelPollOrBet',
@@ -237,6 +237,7 @@ export const useSocket = ({
       console.log('Socket instance created:', Boolean(socket))
     }
     const activeSocket = socket
+    const handshakeGuard = createHandshakeGuard(activeSocket)
 
     // Use socket.io's built-in ping event to track connection health
     const handlePing = () => {
@@ -246,7 +247,7 @@ export const useSocket = ({
 
     // Monitor for stale connections
     const connectionMonitor = setInterval(() => {
-      if (Date.now() - lastReceivedTime > 45_000) {
+      if (Date.now() - lastReceivedTime > 45_000 && !handshakeGuard.isBackingOff()) {
         // 45s = 3 missed pings
         console.log('Connection appears stale, reconnecting...')
         socket?.disconnect()
@@ -264,6 +265,13 @@ export const useSocket = ({
     const updateLastReceived = () => {
       lastReceivedTime = Date.now()
     }
+
+    const handleTransportOpen = () => {
+      updateLastReceived()
+      handshakeGuard.opened()
+    }
+    activeSocket.io.on('open', handleTransportOpen)
+    activeSocket.io.on('close', handshakeGuard.closed)
 
     // Add handlers for all existing events
     socket.on('DATA_buildings', (data) => {
@@ -415,13 +423,13 @@ export const useSocket = ({
       }
       setRoshan(data)
     })
-    socket.on('auth_error', (message) => {
-      console.error('Authentication failed:', message)
-      socket?.disconnect()
-    })
+    // There is deliberately no `auth_error` listener. The server emits it before the namespace
+    // connects, so socket.io buffers it and replays it after the next successful connect, where
+    // disconnecting would kill a healthy connection. The handshake guard covers rejections.
     socket.on('connect', () => {
       console.log('Socket connected event fired')
       updateLastReceived()
+      handshakeGuard.connected()
       refreshSettingsRef.current()
       setConnected(true)
     })
@@ -495,6 +503,9 @@ export const useSocket = ({
         clearTimeout(blockTimeout)
       }
       activeSocket.io.off('ping', handlePing)
+      activeSocket.io.off('open', handleTransportOpen)
+      activeSocket.io.off('close', handshakeGuard.closed)
+      handshakeGuard.dispose()
 
       for (const eventName of socketEventNames) {
         activeSocket.off(eventName)
