@@ -159,3 +159,20 @@ export const isNowPaymentsPaymentStatus = function isNowPaymentsPaymentStatus(
     isNowPaymentsStatus(body.payment_status)
   )
 }
+
+/**
+ * Current state of one payment, read with the API key alone. The reconciliation job uses it to
+ * catch up on IPNs that never arrived; the body has the same fields an IPN carries.
+ */
+export const getNowPaymentsPayment = async function getNowPaymentsPayment(
+  paymentId: string,
+): Promise<NowPaymentsPaymentStatus> {
+  const payment = await request<NowPaymentsPaymentStatus>(
+    'GET',
+    `/payment/${encodeURIComponent(paymentId)}`,
+  )
+  if (!isNowPaymentsPaymentStatus(payment)) {
+    throw new Error(`NOWPayments returned an unexpected body for payment ${paymentId}`)
+  }
+  return payment
+}

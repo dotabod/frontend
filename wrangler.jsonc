@@ -46,9 +46,15 @@
     ],
   },
   "main": "src/cloudflare-worker.ts",
+  "triggers": {
+    "crons": ["*/15 * * * *"],
+  },
   "env": {
     "dev": {
       "name": "frontend-dev",
+      "triggers": {
+        "crons": [],
+      },
       "vars": {
         "DOTABOD_RUNTIME": "cloudflare",
         "VERCEL_ENV": "preview",

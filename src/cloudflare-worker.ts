@@ -14,6 +14,10 @@ interface VinextWorker {
   ) => Promise<Response> | Response
 }
 
+interface ScheduledControllerLike {
+  cron: string
+}
+
 // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- SAFETY: vinext/server/fetch-handler is the generated Worker entry and exposes the standard fetch handler at runtime.
 const worker = vinextWorker as VinextWorker
 
@@ -34,5 +38,19 @@ export default {
       context,
       async () => await worker.fetch(request, env, context),
     )
+  },
+
+  // Runs on the cron trigger in wrangler.jsonc. The job is imported here, not at the top of the
+  // File, so the database client is only created once the bindings and process.env are in place.
+  async scheduled(
+    _controller: ScheduledControllerLike,
+    env: DotabodCloudflareEnv,
+    context: ExecutionContextLike,
+  ): Promise<void> {
+    globalThis.hyperdriveGlobal = env.HYPERDRIVE
+    await runWithExecutionContext(context, async () => {
+      const { reconcileNowPaymentsInvoices } = await import('./lib/nowpayments-reconcile')
+      await reconcileNowPaymentsInvoices()
+    })
   },
 }
