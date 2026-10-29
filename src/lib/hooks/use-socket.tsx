@@ -459,7 +459,8 @@ export const useSocket = ({
     socket.on('disconnect', (reason) => {
       console.log('Socket disconnected event fired:', reason)
       setConnected(false)
-      linkLossTimeout ??= setTimeout(() => {
+      clearLinkLossTimeout()
+      linkLossTimeout = setTimeout(() => {
         linkLossTimeout = null
         setBlock(expirePickScreenBlock)
       }, PICK_SCREEN_LINK_LOSS_GRACE_MS)
