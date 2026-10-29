@@ -2,6 +2,7 @@ import { act, cleanup, render, renderHook } from '@testing-library/react'
 import { useState } from 'react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
+import type { blockType } from '@/lib/dev-consts'
 import { useAegis, useRoshan } from '@/lib/hooks/rosh'
 import { useSocket } from '@/lib/hooks/use-socket'
 import type { ChatMessage } from '@/lib/hooks/use-socket'
@@ -78,6 +79,16 @@ const createSocketProps = (overrides: Partial<SocketProps> = {}): SocketProps =>
   setWL: vi.fn<SocketProps['setWL']>(),
   ...overrides,
 })
+
+const renderBlockState = () => {
+  const socketProps = createSocketProps()
+
+  return renderHook(() => {
+    const [block, setBlock] = useState<blockType>({ matchId: null, team: null, type: null })
+    useSocket({ ...socketProps, setBlock })
+    return block
+  })
+}
 
 const openTransport = () => {
   act(() => {
@@ -275,6 +286,55 @@ describe(useSocket, () => {
       team: 'radiant',
       type: 'strategy',
     })
+  })
+
+  it('clears a pick screen blocker once the connection has been down for ten seconds', () => {
+    vi.useFakeTimers()
+    const { result } = renderBlockState()
+
+    act(() => {
+      socketState.handlers.get('connect')?.()
+      socketState.handlers.get('block')?.({ matchId: 1, team: 'radiant', type: 'strategy' })
+      socketState.handlers.get('disconnect')?.('transport close')
+      vi.advanceTimersByTime(9999)
+    })
+    expect(result.current.type).toBe('strategy')
+
+    act(() => {
+      vi.advanceTimersByTime(1)
+    })
+    expect(result.current).toStrictEqual({ matchId: null, team: null, type: null })
+  })
+
+  it('keeps the pick screen blocker when the connection comes back quickly', () => {
+    vi.useFakeTimers()
+    const { result } = renderBlockState()
+
+    act(() => {
+      socketState.handlers.get('connect')?.()
+      socketState.handlers.get('block')?.({ matchId: 1, team: 'radiant', type: 'strategy' })
+      socketState.handlers.get('disconnect')?.('transport close')
+      vi.advanceTimersByTime(5000)
+      socketState.handlers.get('connect')?.()
+      vi.advanceTimersByTime(10_000)
+    })
+
+    expect(result.current.type).toBe('strategy')
+  })
+
+  it('keeps in-game blockers up while the connection is down', () => {
+    vi.useFakeTimers()
+    const { result } = renderBlockState()
+
+    act(() => {
+      socketState.handlers.get('connect')?.()
+      socketState.handlers.get('block')?.({ matchId: 1, team: 'radiant', type: 'playing' })
+      vi.advanceTimersByTime(5000)
+      socketState.handlers.get('disconnect')?.('transport close')
+      vi.advanceTimersByTime(60_000)
+    })
+
+    expect(result.current.type).toBe('playing')
   })
 
   it('reports the OBS overlay page once when diagnostics requests a probe', () => {

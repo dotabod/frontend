@@ -39,6 +39,16 @@ import {
 
 let socket: Socket | null = null
 
+// Hero selection moves on within minutes, so a pick screen blocker that outlives a dropped
+// connection ends up covering the match. In-game blockers last the whole match, so they stay up
+// until the server resends the current state on reconnect.
+const PICK_SCREEN_LINK_LOSS_GRACE_MS = 10_000
+const pickScreenBlockTypes = new Set<blockType['type']>(['picks', 'strategy', 'strategy-2'])
+
+const expirePickScreenBlock = function expirePickScreenBlock(block: blockType): blockType {
+  return pickScreenBlockTypes.has(block.type) ? { matchId: null, team: null, type: null } : block
+}
+
 const handleOverlayDiagnosticProbe = function handleOverlayDiagnosticProbe(
   userId: string | string[] | undefined,
 ): void {
@@ -211,7 +221,7 @@ export const useSocket = ({
     }
   }, [])
 
-  // oxlint-disable-next-line react-doctor/effect-needs-cleanup -- Chat timers are owned by the unmount-only effect above; this effect cleans its intervals, block timer, manager listener, and socket listeners below.
+  // oxlint-disable-next-line react-doctor/effect-needs-cleanup -- Chat timers are owned by the unmount-only effect above; this effect cleans its intervals, block and link-loss timers, manager listener, and socket listeners below.
   useEffect(() => {
     if (!userId) {
       return
@@ -220,6 +230,14 @@ export const useSocket = ({
     let lastReceivedTime = Date.now()
     let blockTimeout: NodeJS.Timeout | null = null
     let pendingPlayingBlock: blockType | null = null
+    let linkLossTimeout: NodeJS.Timeout | null = null
+
+    const clearLinkLossTimeout = () => {
+      if (linkLossTimeout !== null) {
+        clearTimeout(linkLossTimeout)
+        linkLossTimeout = null
+      }
+    }
 
     console.log('Connecting to socket init...', { userId })
 
@@ -430,6 +448,7 @@ export const useSocket = ({
       console.log('Socket connected event fired')
       updateLastReceived()
       handshakeGuard.connected()
+      clearLinkLossTimeout()
       refreshSettingsRef.current()
       setConnected(true)
     })
@@ -440,6 +459,10 @@ export const useSocket = ({
     socket.on('disconnect', (reason) => {
       console.log('Socket disconnected event fired:', reason)
       setConnected(false)
+      linkLossTimeout ??= setTimeout(() => {
+        linkLossTimeout = null
+        setBlock(expirePickScreenBlock)
+      }, PICK_SCREEN_LINK_LOSS_GRACE_MS)
     })
 
     socket.on('refresh-settings', (_key: typeof Settings) => {
@@ -499,6 +522,7 @@ export const useSocket = ({
     return () => {
       clearInterval(connectionMonitor)
       clearInterval(diagnosticHeartbeat)
+      clearLinkLossTimeout()
       if (blockTimeout !== null) {
         clearTimeout(blockTimeout)
       }
