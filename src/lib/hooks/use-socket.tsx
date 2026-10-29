@@ -39,6 +39,28 @@ import {
 
 let socket: Socket | null = null
 
+// While the connection is down the game can move on without the overlay hearing about it. Two
+// blockers would then cover the match the streamer loads into: strategy-2, the last one in hero
+// selection, and the main menu's queue blocker. Past this grace period strategy-2 gives way to
+// the in-game blockers and the main menu blockers are hidden. Earlier draft blockers stay up so
+// picks remain hidden.
+const LINK_LOSS_GRACE_MS = 10_000
+// On reconnect the server resends any active blocker but sends nothing for the main menu, so
+// hearing nothing this long after reconnecting from a long outage means there is no blocker.
+const RECONNECT_RESYNC_MS = 5000
+
+const noBlock: blockType = { matchId: null, team: null, type: null }
+
+const expireStaleBlock = function expireStaleBlock(block: blockType): blockType {
+  if (block.type === 'strategy-2') {
+    return { ...block, type: 'playing' }
+  }
+  if (block.type === null) {
+    return { ...block, type: 'empty' }
+  }
+  return block
+}
+
 const handleOverlayDiagnosticProbe = function handleOverlayDiagnosticProbe(
   userId: string | string[] | undefined,
 ): void {
@@ -211,7 +233,7 @@ export const useSocket = ({
     }
   }, [])
 
-  // oxlint-disable-next-line react-doctor/effect-needs-cleanup -- Chat timers are owned by the unmount-only effect above; this effect cleans its intervals, block timer, manager listener, and socket listeners below.
+  // oxlint-disable-next-line react-doctor/effect-needs-cleanup -- Chat timers are owned by the unmount-only effect above; this effect cleans its intervals, block, link-loss and resync timers, manager listener, and socket listeners below.
   useEffect(() => {
     if (!userId) {
       return
@@ -220,6 +242,24 @@ export const useSocket = ({
     let lastReceivedTime = Date.now()
     let blockTimeout: NodeJS.Timeout | null = null
     let pendingPlayingBlock: blockType | null = null
+    let linkLossTimeout: NodeJS.Timeout | null = null
+    let resyncTimeout: NodeJS.Timeout | null = null
+    // Set once an outage outlasts the grace period, until the server sends a blocker again
+    let isAwaitingResync = false
+
+    const clearLinkLossTimeout = () => {
+      if (linkLossTimeout !== null) {
+        clearTimeout(linkLossTimeout)
+        linkLossTimeout = null
+      }
+    }
+
+    const clearResyncTimeout = () => {
+      if (resyncTimeout !== null) {
+        clearTimeout(resyncTimeout)
+        resyncTimeout = null
+      }
+    }
 
     console.log('Connecting to socket init...', { userId })
 
@@ -349,6 +389,8 @@ export const useSocket = ({
 
     socket.on('block', (data: WireBlockType) => {
       updateLastReceived()
+      isAwaitingResync = false
+      clearResyncTimeout()
       const isMainScreenState = [
         'DOTA_GAMERULES_STATE_INIT',
         'DOTA_GAMERULES_STATE_POST_GAME',
@@ -430,6 +472,14 @@ export const useSocket = ({
       console.log('Socket connected event fired')
       updateLastReceived()
       handshakeGuard.connected()
+      clearLinkLossTimeout()
+      if (isAwaitingResync) {
+        resyncTimeout = setTimeout(() => {
+          resyncTimeout = null
+          isAwaitingResync = false
+          setBlock(noBlock)
+        }, RECONNECT_RESYNC_MS)
+      }
       refreshSettingsRef.current()
       setConnected(true)
     })
@@ -440,6 +490,13 @@ export const useSocket = ({
     socket.on('disconnect', (reason) => {
       console.log('Socket disconnected event fired:', reason)
       setConnected(false)
+      clearLinkLossTimeout()
+      clearResyncTimeout()
+      linkLossTimeout = setTimeout(() => {
+        linkLossTimeout = null
+        isAwaitingResync = true
+        setBlock(expireStaleBlock)
+      }, LINK_LOSS_GRACE_MS)
     })
 
     socket.on('refresh-settings', (_key: typeof Settings) => {
@@ -499,6 +556,8 @@ export const useSocket = ({
     return () => {
       clearInterval(connectionMonitor)
       clearInterval(diagnosticHeartbeat)
+      clearLinkLossTimeout()
+      clearResyncTimeout()
       if (blockTimeout !== null) {
         clearTimeout(blockTimeout)
       }

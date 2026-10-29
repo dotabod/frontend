@@ -2,6 +2,7 @@ import { act, cleanup, render, renderHook } from '@testing-library/react'
 import { useState } from 'react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
+import type { blockType } from '@/lib/dev-consts'
 import { useAegis, useRoshan } from '@/lib/hooks/rosh'
 import { useSocket } from '@/lib/hooks/use-socket'
 import type { ChatMessage } from '@/lib/hooks/use-socket'
@@ -78,6 +79,16 @@ const createSocketProps = (overrides: Partial<SocketProps> = {}): SocketProps =>
   setWL: vi.fn<SocketProps['setWL']>(),
   ...overrides,
 })
+
+const renderBlockState = () => {
+  const socketProps = createSocketProps()
+
+  return renderHook(() => {
+    const [block, setBlock] = useState<blockType>({ matchId: null, team: null, type: null })
+    useSocket({ ...socketProps, setBlock })
+    return block
+  })
+}
 
 const openTransport = () => {
   act(() => {
@@ -275,6 +286,112 @@ describe(useSocket, () => {
       team: 'radiant',
       type: 'strategy',
     })
+  })
+
+  it('swaps the final draft blocker for the in-game blockers after ten seconds offline', () => {
+    vi.useFakeTimers()
+    const { result } = renderBlockState()
+
+    act(() => {
+      socketState.handlers.get('connect')?.()
+      socketState.handlers.get('block')?.({ matchId: 1, team: 'radiant', type: 'strategy-2' })
+      socketState.handlers.get('disconnect')?.('transport close')
+      vi.advanceTimersByTime(9999)
+    })
+    expect(result.current.type).toBe('strategy-2')
+
+    act(() => {
+      vi.advanceTimersByTime(1)
+    })
+    expect(result.current).toStrictEqual({ matchId: 1, team: 'radiant', type: 'playing' })
+  })
+
+  it('keeps the final draft blocker when the connection comes back quickly', () => {
+    vi.useFakeTimers()
+    const { result } = renderBlockState()
+
+    act(() => {
+      socketState.handlers.get('connect')?.()
+      socketState.handlers.get('block')?.({ matchId: 1, team: 'radiant', type: 'strategy-2' })
+      socketState.handlers.get('disconnect')?.('transport close')
+      vi.advanceTimersByTime(5000)
+      socketState.handlers.get('connect')?.()
+      vi.advanceTimersByTime(10_000)
+    })
+
+    expect(result.current.type).toBe('strategy-2')
+  })
+
+  it.each(['picks', 'strategy'] as const)(
+    'keeps the %s blocker up through a long outage so picks stay hidden',
+    (type) => {
+      vi.useFakeTimers()
+      const { result } = renderBlockState()
+
+      act(() => {
+        socketState.handlers.get('connect')?.()
+        socketState.handlers.get('block')?.({ matchId: 1, team: 'radiant', type })
+        socketState.handlers.get('disconnect')?.('transport close')
+        vi.advanceTimersByTime(60_000)
+      })
+
+      expect(result.current.type).toBe(type)
+    },
+  )
+
+  it('keeps in-game blockers up while the connection is down', () => {
+    vi.useFakeTimers()
+    const { result } = renderBlockState()
+
+    act(() => {
+      socketState.handlers.get('connect')?.()
+      socketState.handlers.get('block')?.({ matchId: 1, team: 'radiant', type: 'playing' })
+      vi.advanceTimersByTime(5000)
+      socketState.handlers.get('disconnect')?.('transport close')
+      vi.advanceTimersByTime(60_000)
+    })
+
+    expect(result.current.type).toBe('playing')
+  })
+
+  it('hides the main menu blockers during a long outage until the server confirms the main menu', () => {
+    vi.useFakeTimers()
+    const { result } = renderBlockState()
+
+    act(() => {
+      socketState.handlers.get('connect')?.()
+      socketState.handlers.get('disconnect')?.('transport close')
+      vi.advanceTimersByTime(10_000)
+    })
+    expect(result.current.type).toBe('empty')
+
+    // The server sends nothing for the main menu, so silence after reconnecting confirms it
+    act(() => {
+      socketState.handlers.get('connect')?.()
+      vi.advanceTimersByTime(4999)
+    })
+    expect(result.current.type).toBe('empty')
+
+    act(() => {
+      vi.advanceTimersByTime(1)
+    })
+    expect(result.current).toStrictEqual({ matchId: null, team: null, type: null })
+  })
+
+  it('shows the blocker the server resends after a long outage', () => {
+    vi.useFakeTimers()
+    const { result } = renderBlockState()
+
+    act(() => {
+      socketState.handlers.get('connect')?.()
+      socketState.handlers.get('disconnect')?.('transport close')
+      vi.advanceTimersByTime(10_000)
+      socketState.handlers.get('connect')?.()
+      socketState.handlers.get('block')?.({ matchId: 2, team: 'dire', type: 'picks' })
+      vi.advanceTimersByTime(10_000)
+    })
+
+    expect(result.current).toStrictEqual({ matchId: 2, team: 'dire', type: 'picks' })
   })
 
   it('reports the OBS overlay page once when diagnostics requests a probe', () => {
