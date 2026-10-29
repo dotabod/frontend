@@ -288,39 +288,56 @@ describe(useSocket, () => {
     })
   })
 
-  it('clears a pick screen blocker once the connection has been down for ten seconds', () => {
+  it('swaps the final draft blocker for the in-game blockers after ten seconds offline', () => {
     vi.useFakeTimers()
     const { result } = renderBlockState()
 
     act(() => {
       socketState.handlers.get('connect')?.()
-      socketState.handlers.get('block')?.({ matchId: 1, team: 'radiant', type: 'strategy' })
+      socketState.handlers.get('block')?.({ matchId: 1, team: 'radiant', type: 'strategy-2' })
       socketState.handlers.get('disconnect')?.('transport close')
       vi.advanceTimersByTime(9999)
     })
-    expect(result.current.type).toBe('strategy')
+    expect(result.current.type).toBe('strategy-2')
 
     act(() => {
       vi.advanceTimersByTime(1)
     })
-    expect(result.current).toStrictEqual({ matchId: null, team: null, type: null })
+    expect(result.current).toStrictEqual({ matchId: 1, team: 'radiant', type: 'playing' })
   })
 
-  it('keeps the pick screen blocker when the connection comes back quickly', () => {
+  it('keeps the final draft blocker when the connection comes back quickly', () => {
     vi.useFakeTimers()
     const { result } = renderBlockState()
 
     act(() => {
       socketState.handlers.get('connect')?.()
-      socketState.handlers.get('block')?.({ matchId: 1, team: 'radiant', type: 'strategy' })
+      socketState.handlers.get('block')?.({ matchId: 1, team: 'radiant', type: 'strategy-2' })
       socketState.handlers.get('disconnect')?.('transport close')
       vi.advanceTimersByTime(5000)
       socketState.handlers.get('connect')?.()
       vi.advanceTimersByTime(10_000)
     })
 
-    expect(result.current.type).toBe('strategy')
+    expect(result.current.type).toBe('strategy-2')
   })
+
+  it.each(['picks', 'strategy'] as const)(
+    'keeps the %s blocker up through a long outage so picks stay hidden',
+    (type) => {
+      vi.useFakeTimers()
+      const { result } = renderBlockState()
+
+      act(() => {
+        socketState.handlers.get('connect')?.()
+        socketState.handlers.get('block')?.({ matchId: 1, team: 'radiant', type })
+        socketState.handlers.get('disconnect')?.('transport close')
+        vi.advanceTimersByTime(60_000)
+      })
+
+      expect(result.current.type).toBe(type)
+    },
+  )
 
   it('keeps in-game blockers up while the connection is down', () => {
     vi.useFakeTimers()
@@ -335,6 +352,46 @@ describe(useSocket, () => {
     })
 
     expect(result.current.type).toBe('playing')
+  })
+
+  it('hides the main menu blockers during a long outage until the server confirms the main menu', () => {
+    vi.useFakeTimers()
+    const { result } = renderBlockState()
+
+    act(() => {
+      socketState.handlers.get('connect')?.()
+      socketState.handlers.get('disconnect')?.('transport close')
+      vi.advanceTimersByTime(10_000)
+    })
+    expect(result.current.type).toBe('empty')
+
+    // The server sends nothing for the main menu, so silence after reconnecting confirms it
+    act(() => {
+      socketState.handlers.get('connect')?.()
+      vi.advanceTimersByTime(4999)
+    })
+    expect(result.current.type).toBe('empty')
+
+    act(() => {
+      vi.advanceTimersByTime(1)
+    })
+    expect(result.current).toStrictEqual({ matchId: null, team: null, type: null })
+  })
+
+  it('shows the blocker the server resends after a long outage', () => {
+    vi.useFakeTimers()
+    const { result } = renderBlockState()
+
+    act(() => {
+      socketState.handlers.get('connect')?.()
+      socketState.handlers.get('disconnect')?.('transport close')
+      vi.advanceTimersByTime(10_000)
+      socketState.handlers.get('connect')?.()
+      socketState.handlers.get('block')?.({ matchId: 2, team: 'dire', type: 'picks' })
+      vi.advanceTimersByTime(10_000)
+    })
+
+    expect(result.current).toStrictEqual({ matchId: 2, team: 'dire', type: 'picks' })
   })
 
   it('reports the OBS overlay page once when diagnostics requests a probe', () => {

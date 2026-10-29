@@ -39,14 +39,26 @@ import {
 
 let socket: Socket | null = null
 
-// Hero selection moves on within minutes, so a pick screen blocker that outlives a dropped
-// connection ends up covering the match. In-game blockers last the whole match, so they stay up
-// until the server resends the current state on reconnect.
-const PICK_SCREEN_LINK_LOSS_GRACE_MS = 10_000
-const pickScreenBlockTypes = new Set<blockType['type']>(['picks', 'strategy', 'strategy-2'])
+// While the connection is down the game can move on without the overlay hearing about it. Two
+// blockers would then cover the match the streamer loads into: strategy-2, the last one in hero
+// selection, and the main menu's queue blocker. Past this grace period strategy-2 gives way to
+// the in-game blockers and the main menu blockers are hidden. Earlier draft blockers stay up so
+// picks remain hidden.
+const LINK_LOSS_GRACE_MS = 10_000
+// On reconnect the server resends any active blocker but sends nothing for the main menu, so
+// hearing nothing this long after reconnecting from a long outage means there is no blocker.
+const RECONNECT_RESYNC_MS = 5000
 
-const expirePickScreenBlock = function expirePickScreenBlock(block: blockType): blockType {
-  return pickScreenBlockTypes.has(block.type) ? { matchId: null, team: null, type: null } : block
+const noBlock: blockType = { matchId: null, team: null, type: null }
+
+const expireStaleBlock = function expireStaleBlock(block: blockType): blockType {
+  if (block.type === 'strategy-2') {
+    return { ...block, type: 'playing' }
+  }
+  if (block.type === null) {
+    return { ...block, type: 'empty' }
+  }
+  return block
 }
 
 const handleOverlayDiagnosticProbe = function handleOverlayDiagnosticProbe(
@@ -221,7 +233,7 @@ export const useSocket = ({
     }
   }, [])
 
-  // oxlint-disable-next-line react-doctor/effect-needs-cleanup -- Chat timers are owned by the unmount-only effect above; this effect cleans its intervals, block and link-loss timers, manager listener, and socket listeners below.
+  // oxlint-disable-next-line react-doctor/effect-needs-cleanup -- Chat timers are owned by the unmount-only effect above; this effect cleans its intervals, block, link-loss and resync timers, manager listener, and socket listeners below.
   useEffect(() => {
     if (!userId) {
       return
@@ -231,11 +243,21 @@ export const useSocket = ({
     let blockTimeout: NodeJS.Timeout | null = null
     let pendingPlayingBlock: blockType | null = null
     let linkLossTimeout: NodeJS.Timeout | null = null
+    let resyncTimeout: NodeJS.Timeout | null = null
+    // Set once an outage outlasts the grace period, until the server sends a blocker again
+    let isAwaitingResync = false
 
     const clearLinkLossTimeout = () => {
       if (linkLossTimeout !== null) {
         clearTimeout(linkLossTimeout)
         linkLossTimeout = null
+      }
+    }
+
+    const clearResyncTimeout = () => {
+      if (resyncTimeout !== null) {
+        clearTimeout(resyncTimeout)
+        resyncTimeout = null
       }
     }
 
@@ -367,6 +389,8 @@ export const useSocket = ({
 
     socket.on('block', (data: WireBlockType) => {
       updateLastReceived()
+      isAwaitingResync = false
+      clearResyncTimeout()
       const isMainScreenState = [
         'DOTA_GAMERULES_STATE_INIT',
         'DOTA_GAMERULES_STATE_POST_GAME',
@@ -449,6 +473,13 @@ export const useSocket = ({
       updateLastReceived()
       handshakeGuard.connected()
       clearLinkLossTimeout()
+      if (isAwaitingResync) {
+        resyncTimeout = setTimeout(() => {
+          resyncTimeout = null
+          isAwaitingResync = false
+          setBlock(noBlock)
+        }, RECONNECT_RESYNC_MS)
+      }
       refreshSettingsRef.current()
       setConnected(true)
     })
@@ -460,10 +491,12 @@ export const useSocket = ({
       console.log('Socket disconnected event fired:', reason)
       setConnected(false)
       clearLinkLossTimeout()
+      clearResyncTimeout()
       linkLossTimeout = setTimeout(() => {
         linkLossTimeout = null
-        setBlock(expirePickScreenBlock)
-      }, PICK_SCREEN_LINK_LOSS_GRACE_MS)
+        isAwaitingResync = true
+        setBlock(expireStaleBlock)
+      }, LINK_LOSS_GRACE_MS)
     })
 
     socket.on('refresh-settings', (_key: typeof Settings) => {
@@ -524,6 +557,7 @@ export const useSocket = ({
       clearInterval(connectionMonitor)
       clearInterval(diagnosticHeartbeat)
       clearLinkLossTimeout()
+      clearResyncTimeout()
       if (blockTimeout !== null) {
         clearTimeout(blockTimeout)
       }
