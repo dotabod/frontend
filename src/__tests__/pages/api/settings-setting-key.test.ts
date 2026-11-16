@@ -1,5 +1,5 @@
 import { Prisma } from '@prisma/client'
-import type { NextApiHandler } from 'next'
+import type { NextApiHandler, NextApiRequest, NextApiResponse } from 'next'
 import type { Session } from 'next-auth'
 import { createMocks } from 'node-mocks-http'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
@@ -168,27 +168,40 @@ describe('settings/[setting-key] API', () => {
 
     it.each([true, false])('persists discardZeroBets=%s for the signed-in user', async (value) => {
       mockSession()
-      const { req, res } = patchRequest('discardZeroBets', value)
+      const { req, res } = createMocks<NextApiRequest, NextApiResponse>({
+        body: JSON.stringify({ value }),
+        method: 'PATCH',
+        query: { 'setting-key': 'discardZeroBets' },
+      })
 
       await handler(req, res)
 
       expect(res.statusCode).toBe(200)
-      expect(prisma.setting.upsert).toHaveBeenCalledWith({
-        create: { key: 'discardZeroBets', updatedAt: expect.any(Date), userId: USER_ID, value },
-        update: { updatedAt: expect.any(Date), value },
+      const calls = vi.mocked(prisma.setting).upsert.mock.calls
+      expect(calls).toHaveLength(1)
+      const [args] = calls[0]
+      expect(args).toMatchObject({
+        create: { key: 'discardZeroBets', userId: USER_ID, value },
+        update: { value },
         where: { key_userId: { key: 'discardZeroBets', userId: USER_ID } },
       })
+      expect(args.create.updatedAt).toBeInstanceOf(Date)
+      expect(args.update.updatedAt).toBeInstanceOf(Date)
     })
 
     it('does not save discardZeroBets when subscription access is denied', async () => {
       mockSession()
       vi.mocked(canAccessFeature).mockReturnValue({ hasAccess: false, requiredTier: 'PRO' })
-      const { req, res } = patchRequest('discardZeroBets', true)
+      const { req, res } = createMocks<NextApiRequest, NextApiResponse>({
+        body: JSON.stringify({ value: true }),
+        method: 'PATCH',
+        query: { 'setting-key': 'discardZeroBets' },
+      })
 
       await handler(req, res)
 
       expect(res.statusCode).toBe(422)
-      expect(prisma.setting.upsert).not.toHaveBeenCalled()
+      expect(vi.mocked(prisma.setting).upsert.mock.calls).toHaveLength(0)
     })
 
     it('accepts a WL stats window from 1 to 365 days', async () => {
