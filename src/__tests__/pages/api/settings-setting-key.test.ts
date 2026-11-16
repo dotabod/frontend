@@ -169,17 +169,17 @@ describe('settings/[setting-key] API', () => {
     it.each([true, false])('persists discardZeroBets=%s for the signed-in user', async (value) => {
       mockSession()
       const { req, res } = createMocks<NextApiRequest, NextApiResponse>({
-        body: JSON.stringify({ value }),
         method: 'PATCH',
         query: { 'setting-key': 'discardZeroBets' },
       })
+      req.body = JSON.stringify({ value })
 
       await handler(req, res)
 
       expect(res.statusCode).toBe(200)
-      const calls = vi.mocked(prisma.setting).upsert.mock.calls
+      const { calls } = vi.mocked(prisma.setting).upsert.mock
       expect(calls).toHaveLength(1)
-      const [args] = calls[0]
+      const [[args]] = calls
       expect(args).toMatchObject({
         create: { key: 'discardZeroBets', userId: USER_ID, value },
         update: { value },
@@ -193,15 +193,16 @@ describe('settings/[setting-key] API', () => {
       mockSession()
       vi.mocked(canAccessFeature).mockReturnValue({ hasAccess: false, requiredTier: 'PRO' })
       const { req, res } = createMocks<NextApiRequest, NextApiResponse>({
-        body: JSON.stringify({ value: true }),
         method: 'PATCH',
         query: { 'setting-key': 'discardZeroBets' },
       })
+      req.body = JSON.stringify({ value: true })
 
       await handler(req, res)
 
       expect(res.statusCode).toBe(422)
-      expect(vi.mocked(prisma.setting).upsert.mock.calls).toHaveLength(0)
+      const { calls } = vi.mocked(prisma.setting).upsert.mock
+      expect(calls).toStrictEqual([])
     })
 
     it('accepts a WL stats window from 1 to 365 days', async () => {
