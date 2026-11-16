@@ -166,6 +166,31 @@ describe('settings/[setting-key] API', () => {
       expect(prisma.setting.findMany).not.toHaveBeenCalled()
     })
 
+    it.each([true, false])('persists discardZeroBets=%s for the signed-in user', async (value) => {
+      mockSession()
+      const { req, res } = patchRequest('discardZeroBets', value)
+
+      await handler(req, res)
+
+      expect(res.statusCode).toBe(200)
+      expect(prisma.setting.upsert).toHaveBeenCalledWith({
+        create: { key: 'discardZeroBets', updatedAt: expect.any(Date), userId: USER_ID, value },
+        update: { updatedAt: expect.any(Date), value },
+        where: { key_userId: { key: 'discardZeroBets', userId: USER_ID } },
+      })
+    })
+
+    it('does not save discardZeroBets when subscription access is denied', async () => {
+      mockSession()
+      vi.mocked(canAccessFeature).mockReturnValue({ hasAccess: false, requiredTier: 'PRO' })
+      const { req, res } = patchRequest('discardZeroBets', true)
+
+      await handler(req, res)
+
+      expect(res.statusCode).toBe(422)
+      expect(prisma.setting.upsert).not.toHaveBeenCalled()
+    })
+
     it('accepts a WL stats window from 1 to 365 days', async () => {
       mockSession()
       const { req, res } = patchRequest('wlStatsDays', 30)

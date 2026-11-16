@@ -36,12 +36,16 @@ const BetsCard = () => {
         <TierSwitch hideTierBadge settingKey={Settings.bets} label='Enable auto gamba' />
       </div>
 
-      <div className={clsx(!isEnabled && 'opacity-40', 'mt-5 flex items-center space-x-2')}>
+      <div className={clsx(!isEnabled && 'opacity-40', 'mt-5')}>
         <TierSwitch
           hideTierBadge
           settingKey={Settings.discardZeroBets}
-          label='Discard predictions when one side has zero predictions'
+          label='Refund predictions when one side has no bets'
         />
+        <p className='mt-2 text-sm text-gray-400'>
+          When resolving a prediction, if either outcome has no participants, cancel it and return
+          all channel points to viewers. Off by default.
+        </p>
       </div>
 
       <div className={clsx(!isEnabled && 'opacity-40', 'mt-6')}>
