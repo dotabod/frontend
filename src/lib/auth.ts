@@ -9,6 +9,7 @@ import TwitchProvider from 'next-auth/providers/twitch'
 import prisma from '@/lib/db'
 import { getTwitchTokens } from '@/lib/get-twitch-tokens'
 import { reconcileTwitchProfile } from '@/lib/reconcile-twitch-profile'
+import { releaseRecycledTwitchLogin } from '@/lib/release-recycled-twitch-login'
 import { twitchHelixProfile } from '@/lib/twitch-helix-profile'
 import { getModeratedChannels } from '@/lib/twitch-moderated-channels'
 import { parseTwitchProfile } from '@/types/twitch'
@@ -571,8 +572,14 @@ export const authOptions: NextAuthOptions = {
       // created with the correct `name` and `displayName` from the first
       // INSERT — eliminating the window where the backend's twitch-events
       // watcher had to retroactively fix the row.
+      //
+      // The release runs before NextAuth creates or updates the row, so a
+      // login recycled from a deleted Twitch account doesn't fail the
+      // unique constraints on users.name and users.displayName.
       async profile(profile, tokens) {
-        return await twitchHelixProfile(profile, tokens.access_token ?? '')
+        const user = await twitchHelixProfile(profile, tokens.access_token ?? '')
+        await releaseRecycledTwitchLogin(user)
+        return user
       },
     }),
   ],
