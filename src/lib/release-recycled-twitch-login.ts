@@ -18,7 +18,7 @@ interface LoginHolder {
   displayName: string | null
   id: string
   name: string
-  twitchId: string | undefined
+  twitchId: string | null
 }
 
 interface ReleaseStore {
@@ -41,7 +41,7 @@ const prismaStore: ReleaseStore = {
       displayName: user.displayName,
       id: user.id,
       name: user.name,
-      twitchId: user.Account?.providerAccountId,
+      twitchId: user.Account?.providerAccountId ?? null,
     }))
   },
   rename: async (userId, names) => {

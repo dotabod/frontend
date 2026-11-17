@@ -42,7 +42,7 @@ describe(releaseRecycledTwitchLogin, () => {
   it('renames only the column each stale row holds', async () => {
     const { rename, store } = createStore([
       { displayName: 'OldName', id: 'user_a', name: 'arteezy', twitchId: '100' },
-      { displayName: 'Arteezy', id: 'user_b', name: 'someoneelse', twitchId: undefined },
+      { displayName: 'Arteezy', id: 'user_b', name: 'someoneelse', twitchId: null },
     ])
 
     await releaseRecycledTwitchLogin(newOwner, store)
