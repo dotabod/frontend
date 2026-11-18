@@ -46,7 +46,7 @@ const handler = async function handler(req: NextApiRequest, res: NextApiResponse
   try {
     const client = new GraphQLClient('https://7tv.io/v3/gql', {
       headers: {
-        Cookie: `seventv-auth=${process.env.SEVENTV_AUTH}`,
+        Authorization: `Bearer ${process.env.SEVENTV_AUTH}`,
       },
     })
 

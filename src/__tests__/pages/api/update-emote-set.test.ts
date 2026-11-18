@@ -588,6 +588,10 @@ describe('update-emote-set API', () => {
 
     expect(res.statusCode).toBe(200)
     expect(res._getJSONData().message).toBe('Emote set updated successfully')
+    // 7TV rejects cookie auth from server origins, so the token must go in the Authorization header.
+    expect(GraphQLClient).toHaveBeenCalledWith('https://7tv.io/v3/gql', {
+      headers: { Authorization: 'Bearer test-auth-token' },
+    })
     const addEmoteCalls = mockRequest.mock.calls.filter(([query]) =>
       String(query).includes('ChangeEmoteInSet'),
     )

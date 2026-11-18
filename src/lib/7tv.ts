@@ -58,7 +58,7 @@ export const create7TVClient = function create7TVClient(authToken?: string) {
 
   return new GraphQLClient('https://7tv.io/v3/gql', {
     headers: {
-      Cookie: `seventv-auth=${authToken}`,
+      Authorization: `Bearer ${authToken}`,
     },
   })
 }
