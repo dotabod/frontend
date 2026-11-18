@@ -677,5 +677,9 @@ describe('update-emote-set API', () => {
       message: 'Failed to add some emotes',
       missingEmotes: ['Emote1', 'Emote2'],
     })
+    // 7TV rejects cookie auth from server origins, so the token must go in the Authorization header.
+    expect(GraphQLClient).toHaveBeenCalledWith('https://7tv.io/v3/gql', {
+      headers: { Authorization: 'Bearer test-auth-token' },
+    })
   })
 })

@@ -1,5 +1,7 @@
 import { PrismaClient } from '@prisma/client'
 
+import { retryReadOnDroppedConnection } from '@/lib/dropped-connection-retry'
+
 import { PrismaClient as PrismaMongo } from '.prisma-mongo/client'
 
 // Extend the global object for TypeScript so the singletons survive hot reloads
@@ -24,7 +26,16 @@ const createCloudflarePrismaClient = () => {
 
   const adapter = adapterFactory(hyperdrive.connectionString)
 
-  return new PrismaClient({ adapter })
+  return new PrismaClient({ adapter }).$extends({
+    name: 'retry-reads-on-dropped-connection',
+    query: {
+      $allModels: {
+        // oxlint-disable-next-line sonarjs/function-name -- Prisma's query extension API fixes this hook name.
+        $allOperations: async ({ args, operation, query }) =>
+          await retryReadOnDroppedConnection(operation, async () => await query(args)),
+      },
+    },
+  })
 }
 
 const createCloudflarePrismaProxy = () =>

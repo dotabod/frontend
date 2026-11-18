@@ -4,12 +4,14 @@
 
 import * as Sentry from '@sentry/nextjs'
 
+import { reloadOverlayOnChunkError } from '@/lib/overlay-chunk-reload'
 import { dropExtensionNoise } from '@/lib/sentry-client-filters'
 import { guardDomAgainstTranslation } from '@/lib/translate-dom-guard'
 
 export const onRouterTransitionStart = Sentry.captureRouterTransitionStart
 
 guardDomAgainstTranslation()
+reloadOverlayOnChunkError()
 
 const SENTRY_DSN = process.env.SENTRY_DSN ?? process.env.NEXT_PUBLIC_SENTRY_DSN
 
