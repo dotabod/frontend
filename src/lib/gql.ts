@@ -62,3 +62,13 @@ export const GET_USER_BY_TWITCH_ID = gql`
     }
   }
 `
+
+export const GET_EMOTE_SET_EMOTE_NAMES = gql`
+  query GetEmoteSetEmoteNames($id: ObjectID!) {
+    emoteSet(id: $id) {
+      emotes {
+        name
+      }
+    }
+  }
+`

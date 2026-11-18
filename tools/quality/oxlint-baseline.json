@@ -3019,26 +3019,6 @@
         "severity": "error"
       }
     },
-    "060eb78d6212e4aafc213e0bbfe1d998610b87024db35e5567e24689b89ac941": {
-      "count": 1,
-      "summary": {
-        "code": "typescript(no-unsafe-return)",
-        "file": "src/__tests__/pages/api/test-emote-set.test.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "expect(mutationCalls.map(([, variables]) => variables.action)).toStrictEqual([",
-              "next": "'REMOVE',",
-              "previous": ")"
-            },
-            "span": "variables.action",
-            "text": ""
-          }
-        ],
-        "message": "Unsafe return of a value of type `any`.",
-        "severity": "error"
-      }
-    },
     "0619e8509697a8dce2de48b7536a891bd244ef158dde95fbe2a5dfcc6c5c77b2": {
       "count": 1,
       "summary": {
@@ -9625,26 +9605,6 @@
           }
         ],
         "message": "Unsafe member access .statusCode on an `error` typed value.",
-        "severity": "error"
-      }
-    },
-    "120d6511e338c78f45ce8fec2c704daeb9cd3043dc325d0ebbd2807c974927c7": {
-      "count": 1,
-      "summary": {
-        "code": "typescript(no-unsafe-argument)",
-        "file": "src/pages/api/test-emote-set.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "if (!hasTestEmote(emoteSet)) {",
-              "next": "throw new Error(`Emote ${TEST_EMOTE_NAME} not found in set`)",
-              "previous": "const emoteSet = await getEmoteSet(client, stvResponse.emote_set.id)"
-            },
-            "span": "emoteSet",
-            "text": ""
-          }
-        ],
-        "message": "Unsafe argument of type any assigned to a parameter of type EmoteSetResponse.",
         "severity": "error"
       }
     },
@@ -17372,26 +17332,6 @@
           }
         ],
         "message": "Unsafe type assertion: type 'InputJsonValue' is more narrow than the original type.",
-        "severity": "error"
-      }
-    },
-    "22974add2480297afa74d5e0dae04d2ea8d271cf89ca287f2b4f2510a4fa4c55": {
-      "count": 1,
-      "summary": {
-        "code": "eslint(complexity)",
-        "file": "src/pages/api/test-emote-set.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "const handler = async function handler(req: NextApiRequest, res: NextApiResponse) {",
-              "next": "const authHeader = req.headers?.authorization",
-              "previous": ""
-            },
-            "span": "async function handler(req: NextApiRequest, res: NextApiResponse) {\n  const authHeader = req.headers?.authorization\n  if (\n    process.env.NODE_ENV !== 'development' &&\n    process.env.VERCEL_ENV !== 'development' &&\n    (!process.env.CRON_SECRET || authHeader !== `Bearer ${process.env.CRON_SECRET}`)\n  ) {\n    res.status(401).json({ success: false })\n    return\n  }\n\n  if (req.method !== 'GET') {\n    console.log('Invalid method:', req.method)\n    res.status(405).json({ message: 'Method not allowed' })\n    return\n  }\n\n  const twitchId = process.env.CRON_TWITCH_ID\n\n  if (!twitchId) {\n    console.log('No Twitch ID found')\n    res.status(403).json({ message: 'Forbidden' })\n    return\n  }\n\n  const authToken = process.env.SEVENTV_AUTH\n  if (!authToken) {\n    console.log('No 7TV auth token found')\n    res.status(500).json({ message: 'Server configuration error' })\n    return\n  }\n\n  const client = create7TVClient(authToken)\n  let userId = 'N/A'\n  let activeEmoteSetId = 'N/A'\n  let addedTestEmote = false\n\n  try {\n    const stvResponse = await get7TVUser(twitchId)\n    userId = stvResponse.user?.id ?? ''\n    activeEmoteSetId = stvResponse.emote_set?.id ?? 'N/A'\n\n    if (!stvResponse.emote_set?.id) {\n      throw new Error('No active 7TV emote set found')\n    }\n\n    console.log('Removing stale test emote if needed...')\n    await removeTestEmoteIfPresent(client, stvResponse.emote_set.id)\n\n    console.log('Adding test emote to active emote set...')\n    await client.request(CHANGE_EMOTE_IN_SET, {\n      action: 'ADD',\n      emote_id: TEST_EMOTE_ID,\n      id: stvResponse.emote_set.id,\n      name: TEST_EMOTE_NAME,\n    })\n    addedTestEmote = true\n\n    console.log('Verifying test emote addition...')\n    const emoteSet = await getEmoteSet(client, stvResponse.emote_set.id)\n    if (!hasTestEmote(emoteSet)) {\n      throw new Error(`Emote ${TEST_EMOTE_NAME} not found in set`)\n    }\n\n    console.log('Removing test emote from active emote set...')\n    await removeTestEmoteIfPresent(client, stvResponse.emote_set.id)\n    addedTestEmote = false\n\n    console.log('Emote set write test completed successfully')\n\n    res.status(200).json({ message: 'Emote set test completed successfully' })\n  } catch (error: unknown) {\n    console.error('Error during emote set test:', error)\n    Sentry.withScope((scope) => {\n      scope.setTag('test-related', 'true')\n      scope.setContext('testDetails', {\n        emoteSetId: activeEmoteSetId,\n        twitchId,\n        userId,\n      })\n      Sentry.captureException(error)\n    })\n    const errorMessage = error instanceof Error ? error.message : String(error)\n    res.status(500).json({ error: errorMessage, message: 'Internal server error' })\n  } finally {\n    if (addedTestEmote && activeEmoteSetId !== 'N/A') {\n      try {\n        await removeTestEmoteIfPresent(client, activeEmoteSetId)\n      } catch (error) {\n        console.error(`Failed to remove test emote from set ID ${activeEmoteSetId}:`, error)\n        Sentry.captureException(error)\n      }\n    }\n  }\n}",
-            "text": ""
-          }
-        ],
-        "message": "async function `handler` has a complexity of 21. Maximum allowed is 20.",
         "severity": "error"
       }
     },
@@ -33869,6 +33809,26 @@
         "severity": "error"
       }
     },
+    "42791e6859ff375267cf9e036ede3abbc5b6879bc3794718ba24d14ed91538b2": {
+      "count": 1,
+      "summary": {
+        "code": "eslint(complexity)",
+        "file": "src/pages/api/test-emote-set.ts",
+        "labels": [
+          {
+            "context": {
+              "current": "const handler = async function handler(req: NextApiRequest, res: NextApiResponse) {",
+              "next": "const authHeader = req.headers?.authorization",
+              "previous": ""
+            },
+            "span": "async function handler(req: NextApiRequest, res: NextApiResponse) {\n  const authHeader = req.headers?.authorization\n  if (\n    process.env.NODE_ENV !== 'development' &&\n    process.env.VERCEL_ENV !== 'development' &&\n    (!process.env.CRON_SECRET || authHeader !== `Bearer ${process.env.CRON_SECRET}`)\n  ) {\n    res.status(401).json({ success: false })\n    return\n  }\n\n  if (req.method !== 'GET') {\n    console.log('Invalid method:', req.method)\n    res.status(405).json({ message: 'Method not allowed' })\n    return\n  }\n\n  const twitchId = process.env.CRON_TWITCH_ID\n\n  if (!twitchId) {\n    console.log('No Twitch ID found')\n    res.status(403).json({ message: 'Forbidden' })\n    return\n  }\n\n  const authToken = process.env.SEVENTV_AUTH\n  if (!authToken) {\n    console.log('No 7TV auth token found')\n    res.status(500).json({ message: 'Server configuration error' })\n    return\n  }\n\n  const client = create7TVClient(authToken)\n  let userId = 'N/A'\n  let activeEmoteSetId = 'N/A'\n  // Set before the add is sent, so the finally block removes the test emote whenever it might be\n  // in the set: an add that times out can still land, and an add that fails because an earlier\n  // run left the emote behind clears the way for the next run.\n  let testEmoteMayBeInSet = false\n\n  try {\n    const stvResponse = await get7TVUser(twitchId)\n    userId = stvResponse.user?.id ?? ''\n    activeEmoteSetId = stvResponse.emote_set?.id ?? 'N/A'\n\n    if (!stvResponse.emote_set?.id) {\n      throw new Error('No active 7TV emote set found')\n    }\n\n    console.log('Adding test emote to active emote set...')\n    testEmoteMayBeInSet = true\n    await changeTestEmote(client, stvResponse.emote_set.id, 'ADD')\n\n    console.log('Verifying test emote addition...')\n    if (!(await hasTestEmote(client, stvResponse.emote_set.id))) {\n      throw new Error(`Emote ${TEST_EMOTE_NAME} not found in set`)\n    }\n\n    console.log('Removing test emote from active emote set...')\n    await changeTestEmote(client, stvResponse.emote_set.id, 'REMOVE')\n    testEmoteMayBeInSet = false\n\n    console.log('Emote set write test completed successfully')\n\n    res.status(200).json({ message: 'Emote set test completed successfully' })\n  } catch (error: unknown) {\n    console.error('Error during emote set test:', error)\n    Sentry.withScope((scope) => {\n      scope.setTag('test-related', 'true')\n      scope.setContext('testDetails', {\n        emoteSetId: activeEmoteSetId,\n        twitchId,\n        userId,\n      })\n      Sentry.captureException(error)\n    })\n    const errorMessage = error instanceof Error ? error.message : String(error)\n    res.status(500).json({ error: errorMessage, message: 'Internal server error' })\n  } finally {\n    if (testEmoteMayBeInSet && activeEmoteSetId !== 'N/A') {\n      try {\n        await changeTestEmote(client, activeEmoteSetId, 'REMOVE')\n      } catch (error) {\n        console.error(`Failed to remove test emote from set ID ${activeEmoteSetId}:`, error)\n        Sentry.captureException(error)\n      }\n    }\n  }\n}",
+            "text": ""
+          }
+        ],
+        "message": "async function `handler` has a complexity of 21. Maximum allowed is 20.",
+        "severity": "error"
+      }
+    },
     "42970e5472612e1d0b73df99aac0af325d7c6797017d9bfd728715e70d53c016": {
       "count": 1,
       "summary": {
@@ -34164,26 +34124,6 @@
           }
         ],
         "message": "Calling setState synchronously within an effect can trigger cascading renders",
-        "severity": "error"
-      }
-    },
-    "437ba220d61eeca00a08b57c154867b42fd5168a863c3fb9f3a23714bdc415ab": {
-      "count": 1,
-      "summary": {
-        "code": "typescript(no-unsafe-member-access)",
-        "file": "src/__tests__/pages/api/test-emote-set.test.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "expect(mutationCalls.map(([, variables]) => variables.action)).toStrictEqual([",
-              "next": "'REMOVE',",
-              "previous": ")"
-            },
-            "span": "action",
-            "text": ""
-          }
-        ],
-        "message": "Unsafe member access .action on an `any` value.",
         "severity": "error"
       }
     },
@@ -38674,26 +38614,6 @@
           }
         ],
         "message": "Replace module mocking with dependency injection through a real interface, service layer, or faithful test implementation.",
-        "severity": "error"
-      }
-    },
-    "4bc0cd1fee2038749365bf67c3d718dbc37b86c9bd3f56fae156fd3fdb2f25f2": {
-      "count": 1,
-      "summary": {
-        "code": "typescript(no-unsafe-assignment)",
-        "file": "src/pages/api/test-emote-set.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "const emoteSet = await getEmoteSet(client, emoteSetId)",
-              "next": "",
-              "previous": ") {"
-            },
-            "span": "emoteSet = await getEmoteSet(client, emoteSetId)",
-            "text": ""
-          }
-        ],
-        "message": "Unsafe assignment of an any value.",
         "severity": "error"
       }
     },
@@ -53093,6 +53013,35 @@
         "severity": "error"
       }
     },
+    "6a6d13463a79f99e0b5c913fc96dafd823002ee174a9034ba437067c6b11c8b5": {
+      "count": 1,
+      "summary": {
+        "code": "eslint(no-shadow)",
+        "file": "src/__tests__/pages/api/test-emote-set.test.ts",
+        "labels": [
+          {
+            "context": {
+              "current": "withMethods: (methods, handler) => (req, res) => {",
+              "next": "if (!methods.includes(req.method)) {",
+              "previous": "vi.mock('@/lib/api-middlewares/with-methods', () => ({"
+            },
+            "span": "handler",
+            "text": "'handler' is declared here"
+          },
+          {
+            "context": {
+              "current": "import handler from '@/pages/api/test-emote-set'",
+              "next": "",
+              "previous": "import { CHANGE_EMOTE_IN_SET, GET_EMOTE_SET_EMOTE_NAMES } from '@/lib/gql'"
+            },
+            "span": "handler",
+            "text": "shadowed declaration is here"
+          }
+        ],
+        "message": "'handler' is already declared in the upper scope.",
+        "severity": "error"
+      }
+    },
     "6a7bc6dc434048d416ad1b28ff893a3b25d06ba9c6c0f03c9f0a2a143d4d26ca": {
       "count": 1,
       "summary": {
@@ -60662,26 +60611,6 @@
         "severity": "error"
       }
     },
-    "7a898f272576febf29f44d70ad7beb63322473d8b057b8436c3a40f286fb604d": {
-      "count": 1,
-      "summary": {
-        "code": "vitest(require-mock-type-parameters)",
-        "file": "src/__tests__/pages/api/test-emote-set.test.ts",
-        "labels": [
-          {
-            "context": {
-              "current": ".fn()",
-              "next": ".mockResolvedValueOnce(mockEmoteSet([{ name: TEST_EMOTE_NAME }]))",
-              "previous": "request: vi"
-            },
-            "span": "fn",
-            "text": ""
-          }
-        ],
-        "message": "Missing type parameters on mock function call",
-        "severity": "error"
-      }
-    },
     "7a8a3ce5cff97bc23ceca3ae14fcf8174c8618da8cc0dfd6c9fd5a84b57bef72": {
       "count": 1,
       "summary": {
@@ -62462,26 +62391,6 @@
           }
         ],
         "message": "Unsafe array destructuring of a tuple element with an error typed value.",
-        "severity": "error"
-      }
-    },
-    "7db36f9f1f566cf6fda779c84bcabad54fe5da78fa38fb4f9f1738db5d8e119b": {
-      "count": 1,
-      "summary": {
-        "code": "vitest(max-expects)",
-        "file": "src/__tests__/pages/api/test-emote-set.test.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "expect(mockClient.request).toHaveBeenCalledWith('mock-change-emote-query', {",
-              "next": "action: 'REMOVE',",
-              "previous": "})"
-            },
-            "span": "expect",
-            "text": ""
-          }
-        ],
-        "message": "Enforces a maximum number assertion calls in a test body.",
         "severity": "error"
       }
     },
@@ -67120,26 +67029,6 @@
         "severity": "error"
       }
     },
-    "86dcf23cb82e92bb1676a5e85072cce997edf01dfa578e3ca92fada5605ba013": {
-      "count": 1,
-      "summary": {
-        "code": "typescript(no-unsafe-return)",
-        "file": "src/pages/api/test-emote-set.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "return await client.request(GET_EMOTE_SET_FOR_CARD, {",
-              "next": "id: emoteSetId,",
-              "previous": "const getEmoteSet = async function getEmoteSet(client: GraphQLClient, emoteSetId: string) {"
-            },
-            "span": "return await client.request(GET_EMOTE_SET_FOR_CARD, {\n    id: emoteSetId,\n    limit: 1000,\n  })",
-            "text": ""
-          }
-        ],
-        "message": "Unsafe return of a value of type `any`.",
-        "severity": "error"
-      }
-    },
     "86e39fb89108a9190feeb3ce9c672cf31faf8902d91c1008bc5d3638e8fa8312": {
       "count": 1,
       "summary": {
@@ -68973,26 +68862,6 @@
           }
         ],
         "message": "Unexpected nullable number value in conditional. Please handle the nullish and zero cases explicitly.",
-        "severity": "error"
-      }
-    },
-    "8a913ac9dd348aad7e8a54c6e88f1474d9a6b555807ff8bf2047d30b81d43d83": {
-      "count": 1,
-      "summary": {
-        "code": "typescript(no-unsafe-argument)",
-        "file": "src/pages/api/test-emote-set.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "if (!hasTestEmote(emoteSet)) {",
-              "next": "return",
-              "previous": ""
-            },
-            "span": "emoteSet",
-            "text": ""
-          }
-        ],
-        "message": "Unsafe argument of type any assigned to a parameter of type EmoteSetResponse.",
         "severity": "error"
       }
     },
@@ -72183,6 +72052,26 @@
           }
         ],
         "message": "Unsafe call of a(n) `error` type typed value.",
+        "severity": "error"
+      }
+    },
+    "90ffb2af401177e35ec14299da8aab7af3b15f9bd8cf72cb7c3086fad248acb2": {
+      "count": 1,
+      "summary": {
+        "code": "typescript(no-unsafe-member-access)",
+        "file": "src/__tests__/pages/api/test-emote-set.test.ts",
+        "labels": [
+          {
+            "context": {
+              "current": "expect(res.statusCode).toBe(500)",
+              "next": "expect(mockClient.request.mock.calls.map(([, variables]) => variables?.action)).toStrictEqual([",
+              "previous": ""
+            },
+            "span": "statusCode",
+            "text": ""
+          }
+        ],
+        "message": "Unsafe member access .statusCode on an `error` typed value.",
         "severity": "error"
       }
     },
@@ -75671,35 +75560,6 @@
           }
         ],
         "message": "Unsafe assignment of an any value.",
-        "severity": "error"
-      }
-    },
-    "9818ef7bd79dab9f569f30e2be78d8ec943a4254ef1d20dc2fd99700a1b1f39f": {
-      "count": 1,
-      "summary": {
-        "code": "eslint(no-shadow)",
-        "file": "src/__tests__/pages/api/test-emote-set.test.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "withMethods: (methods, handler) => (req, res) => {",
-              "next": "if (!methods.includes(req.method)) {",
-              "previous": "vi.mock('@/lib/api-middlewares/with-methods', () => ({"
-            },
-            "span": "handler",
-            "text": "'handler' is declared here"
-          },
-          {
-            "context": {
-              "current": "import handler from '@/pages/api/test-emote-set'",
-              "next": "",
-              "previous": "import { create7TVClient, get7TVUser } from '@/lib/7tv'"
-            },
-            "span": "handler",
-            "text": "shadowed declaration is here"
-          }
-        ],
-        "message": "'handler' is already declared in the upper scope.",
         "severity": "error"
       }
     },
@@ -88795,26 +88655,6 @@
           }
         ],
         "message": "Unexpected nullable string value in conditional. Please handle the nullish and empty string cases explicitly.",
-        "severity": "error"
-      }
-    },
-    "b384745ca2d75ef4136ba6428f3babaebcef818844d4ed14d9fd0254293494fe": {
-      "count": 1,
-      "summary": {
-        "code": "vitest(prefer-import-in-mock)",
-        "file": "src/__tests__/pages/api/test-emote-set.test.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "vi.mock('@/lib/gql', () => ({",
-              "next": "CHANGE_EMOTE_IN_SET: 'mock-change-emote-query',",
-              "previous": ""
-            },
-            "span": "'@/lib/gql', () => ({\n  CHANGE_EMOTE_IN_SET: 'mock-change-emote-query',\n  GET_EMOTE_SET_FOR_CARD: 'mock-get-emote-set-query',\n})",
-            "text": ""
-          }
-        ],
-        "message": "Mocked modules must be dynamic imported.",
         "severity": "error"
       }
     },
@@ -107419,26 +107259,6 @@
         "severity": "error"
       }
     },
-    "da39b239a76cae0b95ea6041ecd74d923ea22b1b025ea5b91f51fdb786f677b7": {
-      "count": 1,
-      "summary": {
-        "code": "anti-slop(no-module-mocking)",
-        "file": "src/__tests__/pages/api/test-emote-set.test.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "vi.mock('@/lib/gql', () => ({",
-              "next": "CHANGE_EMOTE_IN_SET: 'mock-change-emote-query',",
-              "previous": ""
-            },
-            "span": "vi.mock('@/lib/gql', () => ({\n  CHANGE_EMOTE_IN_SET: 'mock-change-emote-query',\n  GET_EMOTE_SET_FOR_CARD: 'mock-get-emote-set-query',\n}))",
-            "text": ""
-          }
-        ],
-        "message": "Replace module mocking with dependency injection through a real interface, service layer, or faithful test implementation.",
-        "severity": "error"
-      }
-    },
     "da5b3ad6876620cb1977e0f00e63742e21719ee228dea5aed33ea56841dc1d5a": {
       "count": 2,
       "summary": {
@@ -107536,26 +107356,6 @@
           }
         ],
         "message": "React Compiler can cache this function automatically. Verify that removing `useCallback` preserves behavior before simplifying it.",
-        "severity": "error"
-      }
-    },
-    "da7b5b43926e6e5fbe75ecd716f36c1aba26f3e7769e306bc15ae900ac5f2497": {
-      "count": 1,
-      "summary": {
-        "code": "typescript(no-unsafe-member-access)",
-        "file": "src/__tests__/pages/api/test-emote-set.test.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "expect(res.statusCode).toBe(200)",
-              "next": "const mutationCalls = mockClient.request.mock.calls.filter(",
-              "previous": ""
-            },
-            "span": "statusCode",
-            "text": ""
-          }
-        ],
-        "message": "Unsafe member access .statusCode on an `error` typed value.",
         "severity": "error"
       }
     },
@@ -111196,26 +110996,6 @@
         "severity": "error"
       }
     },
-    "e19748d3e002c3fb78e06fefce444830e14caa0dcad650f566251b7f5c4c5803": {
-      "count": 2,
-      "summary": {
-        "code": "vitest(require-mock-type-parameters)",
-        "file": "src/__tests__/pages/api/test-emote-set.test.ts",
-        "labels": [
-          {
-            "context": {
-              "current": ".fn()",
-              "next": ".mockResolvedValueOnce(mockEmoteSet())",
-              "previous": "request: vi"
-            },
-            "span": "fn",
-            "text": ""
-          }
-        ],
-        "message": "Missing type parameters on mock function call",
-        "severity": "error"
-      }
-    },
     "e1a0edca354e8092bd8e3f09f1b35f3cef703f27a4f29f7bd412e235d5650b32": {
       "count": 1,
       "summary": {
@@ -112852,26 +112632,6 @@
           }
         ],
         "message": "Calling setState synchronously within an effect can trigger cascading renders",
-        "severity": "error"
-      }
-    },
-    "e485850ea4076e4bc0ed920eefa722086aaa225ba9b1eb4331875921af670a17": {
-      "count": 1,
-      "summary": {
-        "code": "typescript(no-unsafe-assignment)",
-        "file": "src/pages/api/test-emote-set.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "const emoteSet = await getEmoteSet(client, stvResponse.emote_set.id)",
-              "next": "if (!hasTestEmote(emoteSet)) {",
-              "previous": "console.log('Verifying test emote addition...')"
-            },
-            "span": "emoteSet = await getEmoteSet(client, stvResponse.emote_set.id)",
-            "text": ""
-          }
-        ],
-        "message": "Unsafe assignment of an any value.",
         "severity": "error"
       }
     },

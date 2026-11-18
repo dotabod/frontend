@@ -2,41 +2,39 @@ import * as Sentry from '@sentry/nextjs'
 import type { GraphQLClient } from 'graphql-request'
 import type { NextApiRequest, NextApiResponse } from 'next'
 
-import type { EmoteSetResponse } from '@/lib/7tv'
 import { create7TVClient, get7TVUser } from '@/lib/7tv'
 import { withMethods } from '@/lib/api-middlewares/with-methods'
-import { CHANGE_EMOTE_IN_SET, GET_EMOTE_SET_FOR_CARD } from '@/lib/gql'
+import { CHANGE_EMOTE_IN_SET, GET_EMOTE_SET_EMOTE_NAMES } from '@/lib/gql'
 
 const TEST_EMOTE_ID = '60ae4ec30e35477634988c18'
 const TEST_EMOTE_NAME = 'DOTABOD_TEST'
 
-const getEmoteSet = async function getEmoteSet(client: GraphQLClient, emoteSetId: string) {
-  return await client.request(GET_EMOTE_SET_FOR_CARD, {
-    id: emoteSetId,
-    limit: 1000,
-  })
+interface EmoteSetNamesResponse {
+  emoteSet: {
+    emotes: { name: string }[]
+  }
 }
 
-const hasTestEmote = function hasTestEmote(emoteSet: EmoteSetResponse) {
-  return emoteSet.emoteSet.emotes.some((emote) => emote.name === TEST_EMOTE_NAME)
-}
-
-const removeTestEmoteIfPresent = async function removeTestEmoteIfPresent(
+const changeTestEmote = async function changeTestEmote(
   client: GraphQLClient,
   emoteSetId: string,
+  action: 'ADD' | 'REMOVE',
 ) {
-  const emoteSet = await getEmoteSet(client, emoteSetId)
-
-  if (!hasTestEmote(emoteSet)) {
-    return
-  }
-
   await client.request(CHANGE_EMOTE_IN_SET, {
-    action: 'REMOVE',
+    action,
     emote_id: TEST_EMOTE_ID,
     id: emoteSetId,
     name: TEST_EMOTE_NAME,
   })
+}
+
+// Reads only the emote names: the full set is several megabytes, and 7TV can take 20 seconds
+// to send it.
+const hasTestEmote = async function hasTestEmote(client: GraphQLClient, emoteSetId: string) {
+  const { emoteSet } = await client.request<EmoteSetNamesResponse>(GET_EMOTE_SET_EMOTE_NAMES, {
+    id: emoteSetId,
+  })
+  return emoteSet.emotes.some((emote) => emote.name === TEST_EMOTE_NAME)
 }
 
 const handler = async function handler(req: NextApiRequest, res: NextApiResponse) {
@@ -74,7 +72,10 @@ const handler = async function handler(req: NextApiRequest, res: NextApiResponse
   const client = create7TVClient(authToken)
   let userId = 'N/A'
   let activeEmoteSetId = 'N/A'
-  let addedTestEmote = false
+  // Set before the add is sent, so the finally block removes the test emote whenever it might be
+  // in the set: an add that times out can still land, and an add that fails because an earlier
+  // run left the emote behind clears the way for the next run.
+  let testEmoteMayBeInSet = false
 
   try {
     const stvResponse = await get7TVUser(twitchId)
@@ -85,27 +86,18 @@ const handler = async function handler(req: NextApiRequest, res: NextApiResponse
       throw new Error('No active 7TV emote set found')
     }
 
-    console.log('Removing stale test emote if needed...')
-    await removeTestEmoteIfPresent(client, stvResponse.emote_set.id)
-
     console.log('Adding test emote to active emote set...')
-    await client.request(CHANGE_EMOTE_IN_SET, {
-      action: 'ADD',
-      emote_id: TEST_EMOTE_ID,
-      id: stvResponse.emote_set.id,
-      name: TEST_EMOTE_NAME,
-    })
-    addedTestEmote = true
+    testEmoteMayBeInSet = true
+    await changeTestEmote(client, stvResponse.emote_set.id, 'ADD')
 
     console.log('Verifying test emote addition...')
-    const emoteSet = await getEmoteSet(client, stvResponse.emote_set.id)
-    if (!hasTestEmote(emoteSet)) {
+    if (!(await hasTestEmote(client, stvResponse.emote_set.id))) {
       throw new Error(`Emote ${TEST_EMOTE_NAME} not found in set`)
     }
 
     console.log('Removing test emote from active emote set...')
-    await removeTestEmoteIfPresent(client, stvResponse.emote_set.id)
-    addedTestEmote = false
+    await changeTestEmote(client, stvResponse.emote_set.id, 'REMOVE')
+    testEmoteMayBeInSet = false
 
     console.log('Emote set write test completed successfully')
 
@@ -124,9 +116,9 @@ const handler = async function handler(req: NextApiRequest, res: NextApiResponse
     const errorMessage = error instanceof Error ? error.message : String(error)
     res.status(500).json({ error: errorMessage, message: 'Internal server error' })
   } finally {
-    if (addedTestEmote && activeEmoteSetId !== 'N/A') {
+    if (testEmoteMayBeInSet && activeEmoteSetId !== 'N/A') {
       try {
-        await removeTestEmoteIfPresent(client, activeEmoteSetId)
+        await changeTestEmote(client, activeEmoteSetId, 'REMOVE')
       } catch (error) {
         console.error(`Failed to remove test emote from set ID ${activeEmoteSetId}:`, error)
         Sentry.captureException(error)
