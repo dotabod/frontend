@@ -5,6 +5,7 @@ import { runWithExecutionContext } from 'vinext/shims/request-context'
 
 import { createInstallResponse } from './lib/install-script'
 import installScript from './lib/private/install.ps1?raw'
+import { runScheduledJobs } from './lib/scheduled-jobs'
 
 interface VinextWorker {
   fetch: (
@@ -49,14 +50,15 @@ export default {
   ): Promise<void> {
     globalThis.hyperdriveGlobal = env.HYPERDRIVE
     await runWithExecutionContext(context, async () => {
-      const [{ reconcileNowPaymentsInvoices }, { expireLapsedSubscriptions }] = await Promise.all([
-        import('./lib/nowpayments-reconcile'),
-        import('./lib/expire-lapsed-subscriptions'),
-      ])
-      // Payments reconcile first, so a crypto payment that just confirmed is credited before
-      // The expiry pass looks at its subscription.
-      await reconcileNowPaymentsInvoices()
-      await expireLapsedSubscriptions()
+      await runScheduledJobs(async () => {
+        const [{ reconcileNowPaymentsInvoices }, { expireLapsedSubscriptions }] = await Promise.all(
+          [import('./lib/nowpayments-reconcile'), import('./lib/expire-lapsed-subscriptions')],
+        )
+        // Payments reconcile first, so a crypto payment that just confirmed is credited before
+        // The expiry pass looks at its subscription.
+        await reconcileNowPaymentsInvoices()
+        await expireLapsedSubscriptions()
+      })
     })
   },
 }
