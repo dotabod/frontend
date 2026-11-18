@@ -1,9 +1,11 @@
 import { clsx } from 'clsx'
 import { AnimatePresence, LayoutGroup, motion, useReducedMotion } from 'framer-motion'
 import { Bitcoin, CreditCard, Wallet } from 'lucide-react'
-import { memo, useId } from 'react'
+import { useId } from 'react'
 
 import type { PricePeriod } from '@/utils/subscription'
+
+import { noteFor } from './payment-method-note'
 
 export type PaymentMethod = 'card' | 'paypal' | 'crypto'
 
@@ -13,6 +15,7 @@ interface PaymentMethodPickerProps {
   activePeriod: PricePeriod
   cryptoEnabled: boolean
   paypalEnabled: boolean
+  warnCardDeclines?: boolean
 }
 
 const META: Record<PaymentMethod, { label: string; Icon: typeof CreditCard }> = {
@@ -24,32 +27,14 @@ const META: Record<PaymentMethod, { label: string; Icon: typeof CreditCard }> = 
 // Ease-out-quint: confident deceleration, no overshoot
 const EASE = [0.22, 1, 0.36, 1] as const
 
-const noteFor = function noteFor(method: PaymentMethod, period: PricePeriod): string {
-  const isLifetime = period === 'lifetime'
-  switch (method) {
-    case 'paypal': {
-      return isLifetime
-        ? 'One-time payment through your PayPal account.'
-        : 'Renews automatically through your PayPal account.'
-    }
-    case 'crypto': {
-      return isLifetime
-        ? 'One-time payment in BTC, USDT, ETH, and 100+ other coins.'
-        : "You'll get an invoice each period to pay in BTC, USDT, ETH, and 100+ other coins."
-    }
-    default: {
-      return isLifetime ? 'One-time card payment.' : 'Renews automatically. Cancel anytime.'
-    }
-  }
-}
-
-const PaymentMethodPicker = memo(function PaymentMethodPicker({
+const PaymentMethodPicker = ({
   value,
   onChange,
   activePeriod,
   cryptoEnabled,
   paypalEnabled,
-}: PaymentMethodPickerProps) {
+  warnCardDeclines = false,
+}: PaymentMethodPickerProps) => {
   const reduce = useReducedMotion()
   const groupId = useId()
 
@@ -128,13 +113,13 @@ const PaymentMethodPicker = memo(function PaymentMethodPicker({
             exit={reduce ? { opacity: 0 } : { opacity: 0, y: -4 }}
             transition={reduce ? { duration: 0 } : { duration: 0.2, ease: EASE }}
           >
-            {noteFor(value, activePeriod)}
+            {noteFor(value, activePeriod, warnCardDeclines)}
           </motion.p>
         </AnimatePresence>
       </div>
     </div>
   )
-})
+}
 
 PaymentMethodPicker.displayName = 'PaymentMethodPicker'
 
