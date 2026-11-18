@@ -1,9 +1,9 @@
 // Supabase Edge Function: sync-hubspot
 //
 // Invoked hourly by pg_cron (see supabase/migrations/20260528_hubspot_sync_cron.sql)
-// via pg_net on the internal docker network. Syncs every user whose own row or
-// whose subscription changed within the lookback window into HubSpot as a CRM
-// contact. Deno port of frontend src/lib/hubspot.ts — keeps the property-ensure →
+// via pg_net on the internal docker network. Syncs every user whose own row,
+// subscription, or Dota 2 connection changed within the lookback window into HubSpot
+// as a CRM contact. Deno port of frontend src/lib/hubspot.ts — keeps the property-ensure →
 // PATCH-by-email → create-on-404 → retry-on-409 logic that pg_net alone can't do.
 //
 // Reads from the in-network Supabase Postgres using the edge runtime's existing
@@ -43,6 +43,17 @@ const CONTACT_PROPERTIES = [
     options: SUBSCRIPTION_OPTIONS,
     type: 'enumeration',
   },
+  {
+    fieldType: 'booleancheckbox',
+    label: 'Dotabod Dota 2 Connected',
+    name: 'dotabod_dota_connected',
+    options: [
+      { displayOrder: 0, label: 'Yes', value: 'true' },
+      { displayOrder: 1, label: 'No', value: 'false' },
+    ],
+    type: 'bool',
+  },
+  { fieldType: 'text', label: 'Dotabod Locale', name: 'dotabod_locale', type: 'string' },
 ]
 
 const hsHeaders = function hsHeaders(token: string) {
@@ -102,7 +113,9 @@ const ensureContactProperties = async function ensureContactProperties(token: st
 }
 
 interface Contact {
+  dotaConnected: boolean
   email: string
+  locale: string
   username: string
   subscription: string
 }
@@ -120,16 +133,28 @@ const secretRowsSchema = z
   }))
   .array()
 const contactRowsSchema = z
-  .object({ email: z.string(), subscription: z.string(), username: z.string() })
+  .object({
+    dota_connected: z.boolean(),
+    email: z.string(),
+    locale: z.string(),
+    subscription: z.string(),
+    username: z.string(),
+  })
+  .transform(({ dota_connected: dotaConnected, ...rest }): Contact => ({ dotaConnected, ...rest }))
   .array()
 
 // Mirrors syncHubSpotContact in src/lib/hubspot.ts: PATCH by email, create on 404,
 // retry PATCH on a create-409 race.
 const syncContact = async function syncContact(
   token: string,
-  { email, username, subscription }: Contact,
+  { dotaConnected, email, locale, username, subscription }: Contact,
 ) {
-  const properties = { dotabod_subscription: subscription, twitch_username: username }
+  const properties = {
+    dotabod_dota_connected: String(dotaConnected),
+    dotabod_locale: locale,
+    dotabod_subscription: subscription,
+    twitch_username: username,
+  }
   const patchUrl = `${CRM_BASE}/objects/contacts/${encodeURIComponent(email)}?idProperty=email`
   const patch = () =>
     hsFetch(patchUrl, {
@@ -215,7 +240,15 @@ const fetchChanged = async function fetchChanged(
     )
     select u.email as email,
            coalesce(u."displayName", '') as username,
-           coalesce(p.sub_value, 'free') as subscription
+           coalesce(p.sub_value, 'free') as subscription,
+           coalesce(u.locale, '') as locale,
+           -- gsi_first_seen_at only exists since May 2026, so members who connected
+           -- earlier count through a linked Steam account or a tracked match.
+           (
+             exists (select 1 from settings st where st."userId" = u.id and st.key = 'gsi_first_seen_at')
+             or exists (select 1 from steam_accounts sa where sa."userId" = u.id)
+             or exists (select 1 from matches m where m."userId" = u.id)
+           ) as dota_connected
     from users u
     left join picked p on p."userId" = u.id
     where u.email is not null
@@ -224,6 +257,12 @@ const fetchChanged = async function fetchChanged(
         or exists (
           select 1 from subscriptions s2
           where s2."userId" = u.id and s2.updated_at > now() - ${hours}::float8 * interval '1 hour'
+        )
+        -- The first Game State Integration payload flips dotabod_dota_connected to true.
+        or exists (
+          select 1 from settings st2
+          where st2."userId" = u.id and st2.key = 'gsi_first_seen_at'
+            and st2.created_at > now() - ${hours}::float8 * interval '1 hour'
         )
       )
   `
@@ -255,7 +294,15 @@ const fetchByEmails = async function fetchByEmails(
     )
     select u.email as email,
            coalesce(u."displayName", '') as username,
-           coalesce(p.sub_value, 'free') as subscription
+           coalesce(p.sub_value, 'free') as subscription,
+           coalesce(u.locale, '') as locale,
+           -- gsi_first_seen_at only exists since May 2026, so members who connected
+           -- earlier count through a linked Steam account or a tracked match.
+           (
+             exists (select 1 from settings st where st."userId" = u.id and st.key = 'gsi_first_seen_at')
+             or exists (select 1 from steam_accounts sa where sa."userId" = u.id)
+             or exists (select 1 from matches m where m."userId" = u.id)
+           ) as dota_connected
     from users u
     left join picked p on p."userId" = u.id
     where u.email = any(${emails})
@@ -302,7 +349,7 @@ Deno.serve(async (req) => {
 
     // Two modes:
     //  - POST { emails: [...] } → targeted reheal of exactly those contacts.
-    //  - otherwise → users/subs changed in the last ?hours= (default 2h).
+    //  - otherwise → users whose row, subs, or Dota connection changed in the last ?hours= (default 2h).
     const body = await req.json().catch(() => ({}))
     const emails: string[] = Array.isArray(body?.emails)
       ? body.emails.filter((e: unknown): e is string => typeof e === 'string' && e.length > 0)
