@@ -1,6 +1,5 @@
 import { Bars3Icon } from '@heroicons/react/24/outline'
 import { CopyButton } from '@mantine/core'
-import { captureException } from '@sentry/nextjs'
 import { Button, Drawer, Layout, Menu, theme } from 'antd'
 import type { MenuProps } from 'antd'
 import { clsx } from 'clsx'
@@ -40,6 +39,16 @@ interface SEOProps {
   canonicalUrl?: string
   ogType?: string
   noindex?: boolean
+}
+
+// Fetch only rejects when the request never completes, which here is almost always the
+// Member leaving the page (e.g. to Stripe checkout), so these stay out of Sentry.
+const runInBackground = async function runInBackground(url: string): Promise<void> {
+  try {
+    await fetch(url)
+  } catch (error: unknown) {
+    console.error(error)
+  }
 }
 
 const DashboardShell = ({ children, seo }: { children: React.ReactElement; seo?: SEOProps }) => {
@@ -92,17 +101,9 @@ const DashboardShell = ({ children, seo }: { children: React.ReactElement; seo?:
     if (!lastUpdate || now.getTime() - Number(lastUpdate) > 24 * 60 * 60 * 1000) {
       localStorage.setItem('lastSingleRunAPI', String(now.getTime()))
 
-      fetch('/api/update-followers').catch((error) => {
-        captureException(error)
-
-        console.error(error)
-      })
+      void runInBackground('/api/update-followers')
       if (hasAutoModeratorAccess) {
-        fetch('/api/make-dotabod-mod').catch((error) => {
-          captureException(error)
-
-          console.error(error)
-        })
+        void runInBackground('/api/make-dotabod-mod')
       }
     }
   }, [hasAutoModeratorAccess])
