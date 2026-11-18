@@ -20,11 +20,11 @@ Install dependencies only when package or lockfile inputs changed, or when the i
 
 ## Production-host resource policy
 
-This checkout shares a host with production services. Builds and repository-wide checks must run only on GitHub-hosted runners.
+This checkout shares a host with production services. Builds, tests, and typechecks must run only on GitHub-hosted runners.
 
-- Never run `pnpm dev`, `pnpm build`, `pnpm build-local`, `next build`, `pnpm test`, `pnpm quality`, `pnpm check`, full-project lint/typecheck, Prisma generation, or the frontend verification harness on this host.
-- Do not substitute a similar local build, test, browser, coverage, or static-analysis command. If GitHub Actions is unavailable, report verification as blocked.
-- Local work is limited to inspection, editing, targeted formatting, `git diff --check`, and other negligible-cost operations.
+- Never run `pnpm dev`, `pnpm build`, `pnpm build-local`, `next build`, `pnpm test`, `pnpm quality`, `pnpm check`, full-project typecheck, standalone Prisma generation, or the frontend verification harness on this host.
+- Do not substitute a similar local build, test, typecheck, browser, or coverage command. If GitHub Actions is unavailable, report verification as blocked.
+- Local work is limited to inspection, editing, targeted formatting, `pnpm lint`, `pnpm install` (its postinstall Prisma generation included), `git diff --check`, and other negligible-cost operations.
 - Commit with `--no-verify` if an older checkout still has resource-intensive hooks.
 - For pre-merge verification, push a feature branch, dispatch `ci.yml` for that branch, and wait for a successful conclusion. Do not merge or push the change to `master` until remote CI passes.
 
