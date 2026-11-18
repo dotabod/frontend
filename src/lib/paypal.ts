@@ -49,6 +49,16 @@ const getAccessToken = async function getAccessToken(): Promise<string> {
   return data.access_token
 }
 
+export class PayPalApiError extends Error {
+  readonly status: number
+
+  constructor(status: number, message: string) {
+    super(message)
+    this.name = 'PayPalApiError'
+    this.status = status
+  }
+}
+
 const authedRequest = async function authedRequest<T>(
   method: 'GET' | 'POST',
   path: string,
@@ -76,7 +86,8 @@ const authedRequest = async function authedRequest<T>(
     parsed = text
   }
   if (!res.ok) {
-    throw new Error(
+    throw new PayPalApiError(
+      res.status,
       `PayPal ${method} ${path} failed: ${res.status} ${typeof parsed === 'string' ? parsed : JSON.stringify(parsed)}`,
     )
   }
