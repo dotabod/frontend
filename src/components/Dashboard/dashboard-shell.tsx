@@ -1,6 +1,5 @@
 import { Bars3Icon } from '@heroicons/react/24/outline'
 import { CopyButton } from '@mantine/core'
-import { captureException } from '@sentry/nextjs'
 import { Button, Drawer, Layout, Menu, theme } from 'antd'
 import type { MenuProps } from 'antd'
 import { clsx } from 'clsx'
@@ -15,12 +14,13 @@ import useSWR from 'swr'
 import Banner from '@/components/banner'
 import CookieConsent from '@/components/cookie-consent'
 import { DisableToggle } from '@/components/Dashboard/disable-toggle'
+import { PastDueNotice } from '@/components/Dashboard/past-due-notice'
 import { SubscriptionBadge } from '@/components/Dashboard/subscription-badge'
 import HubSpot from '@/components/hub-spot'
 import { DarkLogo } from '@/components/logo'
 import GiftNotification from '@/components/Subscription/gift-notification'
 import { UserAccountNav } from '@/components/user-account-nav'
-import { useFeatureAccess } from '@/hooks/use-subscription'
+import { useFeatureAccess, useSubscription } from '@/hooks/use-subscription'
 import { fetcher } from '@/lib/fetcher'
 import { useBaseUrl } from '@/lib/hooks/use-base-url'
 import useMaybeSignout from '@/lib/hooks/use-maybe-signout'
@@ -40,6 +40,16 @@ interface SEOProps {
   canonicalUrl?: string
   ogType?: string
   noindex?: boolean
+}
+
+// Fetch only rejects when the request never completes, which here is almost always the
+// Member leaving the page (e.g. to Stripe checkout), so these stay out of Sentry.
+const runInBackground = async function runInBackground(url: string): Promise<void> {
+  try {
+    await fetch(url)
+  } catch (error: unknown) {
+    console.error(error)
+  }
 }
 
 const DashboardShell = ({ children, seo }: { children: React.ReactElement; seo?: SEOProps }) => {
@@ -77,6 +87,7 @@ const DashboardShell = ({ children, seo }: { children: React.ReactElement; seo?:
   const pageUrl = seo?.canonicalUrl ?? defaultUrl
   const pageType = seo?.ogType ?? 'website'
   const { hasAccess: hasAutoModeratorAccess } = useFeatureAccess('autoModerator')
+  const { subscription } = useSubscription()
 
   // Handle Admin accordion open/close
   const onAdminOpenChange: MenuProps['onOpenChange'] = (keys) => {
@@ -92,17 +103,9 @@ const DashboardShell = ({ children, seo }: { children: React.ReactElement; seo?:
     if (!lastUpdate || now.getTime() - Number(lastUpdate) > 24 * 60 * 60 * 1000) {
       localStorage.setItem('lastSingleRunAPI', String(now.getTime()))
 
-      fetch('/api/update-followers').catch((error) => {
-        captureException(error)
-
-        console.error(error)
-      })
+      void runInBackground('/api/update-followers')
       if (hasAutoModeratorAccess) {
-        fetch('/api/make-dotabod-mod').catch((error) => {
-          captureException(error)
-
-          console.error(error)
-        })
+        void runInBackground('/api/make-dotabod-mod')
       }
     }
   }, [hasAutoModeratorAccess])
@@ -415,6 +418,7 @@ const DashboardShell = ({ children, seo }: { children: React.ReactElement; seo?:
             >
               <div className='flex min-h-full flex-col'>
                 <Content className='w-full flex-1 space-y-6 bg-gray-800 p-4 transition-all md:p-8'>
+                  <PastDueNotice pathname={router.pathname} subscription={subscription} />
                   {children}
                 </Content>
                 <footer className='shrink-0 border-t border-gray-700 bg-gray-900 px-4 pt-4 pb-1 text-center text-xs text-gray-400'>

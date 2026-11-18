@@ -32,6 +32,8 @@ import { FeatureList } from './feature-list'
 import PaymentMethodPicker from './payment-method-picker'
 import type { PaymentMethod } from './payment-method-picker'
 import { PriceDisplay } from './price-display'
+import { resolvePaymentMethod, restoredPaymentMethod } from './resolve-payment-method'
+import { useCardsLikelyDeclined } from './use-cards-likely-declined'
 
 const Plan = ({
   name,
@@ -159,28 +161,17 @@ const Plan = ({
   // `subscription` arrives async after first render.
   const [userPickedMethod, setUserPickedMethod] = useState<PaymentMethod | null>(null)
 
-  const paymentMethod: PaymentMethod = (() => {
-    if (tier !== SUBSCRIPTION_TIERS.PRO) {
-      return 'card'
-    }
-    if (userPickedMethod === 'paypal' && isPaypalPaymentsEnabled) {
-      return 'paypal'
-    }
-    if (userPickedMethod === 'crypto' && isCryptoPaymentsEnabled) {
-      return 'crypto'
-    }
-    if (userPickedMethod === 'card') {
-      return 'card'
-    }
-    // No user pick (or user's pick is no longer enabled) — derive from subscription
-    if (isPaypalPaymentsEnabled && isPaidWithPaypal) {
-      return 'paypal'
-    }
-    if (isCryptoPaymentsEnabled && isPaidWithCrypto) {
-      return 'crypto'
-    }
-    return 'card'
-  })()
+  const cardsLikelyDeclined = useCardsLikelyDeclined(hasActivePlan)
+
+  const paymentMethod = resolvePaymentMethod({
+    cardsLikelyDeclined,
+    cryptoEnabled: isCryptoPaymentsEnabled,
+    isProTier: tier === SUBSCRIPTION_TIERS.PRO,
+    paidWithCrypto: isPaidWithCrypto,
+    paidWithPaypal: isPaidWithPaypal,
+    paypalEnabled: isPaypalPaymentsEnabled,
+    userPicked: userPickedMethod,
+  })
   const payWithCrypto = paymentMethod === 'crypto'
   const payWithPaypal = paymentMethod === 'paypal'
 
@@ -816,9 +807,7 @@ const Plan = ({
       message.success('Redirecting to checkout...')
 
       // Restore the payment method the user chose before signing in.
-      const restoredMethod: PaymentMethod | undefined =
-        crypto === 'true' ? 'crypto' : paypal === 'true' ? 'paypal' : undefined
-      void handleSubscribe(restoredMethod)
+      void handleSubscribe(restoredPaymentMethod({ crypto, paypal }))
     }
   }, [router, session, tier, activePeriod, redirectingToCheckout, message, handleSubscribe])
 
@@ -899,6 +888,7 @@ const Plan = ({
               activePeriod={activePeriod}
               cryptoEnabled={isCryptoPaymentsEnabled}
               paypalEnabled={isPaypalPaymentsEnabled}
+              warnCardDeclines={cardsLikelyDeclined}
             />
           )}
 

@@ -49,8 +49,14 @@ export default {
   ): Promise<void> {
     globalThis.hyperdriveGlobal = env.HYPERDRIVE
     await runWithExecutionContext(context, async () => {
-      const { reconcileNowPaymentsInvoices } = await import('./lib/nowpayments-reconcile')
+      const [{ reconcileNowPaymentsInvoices }, { expireLapsedSubscriptions }] = await Promise.all([
+        import('./lib/nowpayments-reconcile'),
+        import('./lib/expire-lapsed-subscriptions'),
+      ])
+      // Payments reconcile first, so a crypto payment that just confirmed is credited before
+      // The expiry pass looks at its subscription.
       await reconcileNowPaymentsInvoices()
+      await expireLapsedSubscriptions()
     })
   },
 }

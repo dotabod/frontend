@@ -6,6 +6,7 @@ import useSWR from 'swr'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import DashboardShell from '@/components/Dashboard/dashboard-shell'
+import { SubscriptionContext } from '@/hooks/subscription-provider'
 
 vi.mock('next-auth/react', () => ({
   useSession: vi.fn(),
@@ -93,9 +94,6 @@ vi.mock('@/components/logo', () => ({
 }))
 vi.mock('@/components/Subscription/gift-notification', () => ({ default: () => null }))
 vi.mock('@/components/user-account-nav', () => ({ UserAccountNav: () => <div>Account</div> }))
-vi.mock('@/hooks/use-subscription', () => ({
-  useFeatureAccess: () => ({ hasAccess: false }),
-}))
 vi.mock('@/lib/hooks/use-base-url', () => ({
   useBaseUrl: () => 'https://example.com/overlay',
 }))
@@ -104,6 +102,13 @@ vi.mock('@/components/Dashboard/help-menu', () => ({ HelpMenu: () => <div>Help</
 vi.mock('@/components/Dashboard/settings-search', () => ({
   SettingsSearch: () => <div>Search</div>,
 }))
+
+const withoutSubscription = { isLoading: false, isSubscribed: false, subscription: null }
+const withPastDueSubscription = {
+  isLoading: false,
+  isSubscribed: true,
+  subscription: { status: 'PAST_DUE' },
+}
 
 describe('DashboardShell responsive navigation', () => {
   beforeEach(() => {
@@ -127,9 +132,11 @@ describe('DashboardShell responsive navigation', () => {
 
   it('keeps utility navigation visible while the primary links scroll independently', () => {
     render(
-      <DashboardShell>
-        <main>Dashboard content</main>
-      </DashboardShell>,
+      <SubscriptionContext.Provider value={withoutSubscription}>
+        <DashboardShell>
+          <main>Dashboard content</main>
+        </DashboardShell>
+      </SubscriptionContext.Provider>,
     )
 
     expect(screen.getByTestId('dashboard-viewport')).toHaveClass('h-dvh', 'overflow-hidden')
@@ -149,9 +156,11 @@ describe('DashboardShell responsive navigation', () => {
 
   it('renders the short Diagnostics label with a readable New tag', () => {
     render(
-      <DashboardShell>
-        <main>Dashboard content</main>
-      </DashboardShell>,
+      <SubscriptionContext.Provider value={withoutSubscription}>
+        <DashboardShell>
+          <main>Dashboard content</main>
+        </DashboardShell>
+      </SubscriptionContext.Provider>,
     )
 
     const diagnosticsLink = screen.getByRole('link', {
@@ -161,5 +170,17 @@ describe('DashboardShell responsive navigation', () => {
     expect(diagnosticsLink).toHaveClass('min-w-0', 'w-full')
     expect(diagnosticsLink.firstElementChild).toHaveClass('min-w-0', 'truncate')
     expect(screen.getByText('New')).toHaveClass('shrink-0')
+  })
+
+  it('shows the past-due notice above the page content', () => {
+    render(
+      <SubscriptionContext.Provider value={withPastDueSubscription}>
+        <DashboardShell>
+          <main>Dashboard content</main>
+        </DashboardShell>
+      </SubscriptionContext.Provider>,
+    )
+
+    expect(screen.getByRole('alert')).toHaveTextContent('Your Pro payment failed')
   })
 })

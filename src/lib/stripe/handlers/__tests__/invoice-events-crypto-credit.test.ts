@@ -1,8 +1,9 @@
 import { PrismaClient } from '@prisma/client'
 import type { Subscription } from '@prisma/client'
 import { Stripe } from 'stripe'
-import { describe, expect, it, vi } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 
+import { stripe } from '@/lib/stripe-server'
 import { handleInvoiceEvent } from '@/lib/stripe/handlers/invoice-events'
 
 const testStripe = new Stripe('sk_test_dummy')
@@ -47,6 +48,37 @@ const buildInvoice = function buildInvoice(fixture: InvoiceFixture): Stripe.Invo
     throw new Error('fixture must be an invoice.paid event')
   }
   return event.data.object
+}
+
+// Stripe's own event parser types these fixtures, as with the invoice above.
+const signedEvent = function signedEvent(type: string, objectJson: string): Stripe.Event {
+  const payload = `{"data":{"object":${objectJson}},"id":"evt_${type}","object":"event","type":"${type}"}`
+  return testStripe.webhooks.constructEvent(
+    payload,
+    testStripe.webhooks.generateTestHeaderString({ payload, secret: webhookSecret }),
+    webhookSecret,
+  )
+}
+
+const lastResponse = { headers: {}, requestId: 'req_test', statusCode: 200 }
+
+const monthlyPrice = function monthlyPrice(): Stripe.Response<Stripe.Price> {
+  const event = signedEvent(
+    'price.created',
+    '{"id":"price_monthly","object":"price","unit_amount":600}',
+  )
+  if (event.type !== 'price.created') {
+    throw new Error('fixture must be a price.created event')
+  }
+  return { ...event.data.object, lastResponse }
+}
+
+const nextInvoiceItem = function nextInvoiceItem(): Stripe.Response<Stripe.InvoiceItem> {
+  const event = signedEvent('invoiceitem.created', '{"id":"ii_next","object":"invoiceitem"}')
+  if (event.type !== 'invoiceitem.created') {
+    throw new Error('fixture must be an invoiceitem.created event')
+  }
+  return { ...event.data.object, lastResponse }
 }
 
 const firstPurchase = buildInvoice({
@@ -140,6 +172,42 @@ describe(handleInvoiceEvent, () => {
 
       expect(handled).toBeTruthy()
       expect(update).not.toHaveBeenCalled()
+    })
+  })
+
+  describe('a crypto renewal paid after its period lapsed', () => {
+    afterEach(() => {
+      vi.restoreAllMocks()
+      vi.unstubAllEnvs()
+      vi.useRealTimers()
+    })
+
+    it('starts the new period from the payment, not from the old end date', async () => {
+      vi.useFakeTimers({ now: new Date('2026-11-18T12:00:00.000Z'), toFake: ['Date'] })
+      vi.stubEnv('STRIPE_SECRET_KEY', 'sk_test_dummy')
+      vi.spyOn(stripe.invoices, 'create').mockResolvedValue({
+        ...renewal,
+        id: 'in_next',
+        lastResponse,
+      })
+      vi.spyOn(stripe.prices, 'retrieve').mockResolvedValue(monthlyPrice())
+      vi.spyOn(stripe.invoiceItems, 'create').mockResolvedValue(nextInvoiceItem())
+      const lapsed: Subscription = {
+        ...creditedSubscription,
+        currentPeriodEnd: new Date('2026-01-01T00:00:00.000Z'),
+        metadata: { priceType: 'monthly', renewalInvoiceId: 'in_crypto' },
+        status: 'CANCELED',
+      }
+      const { findFirst, tx, update } = createTransaction(null)
+      findFirst.mockResolvedValueOnce(null).mockResolvedValueOnce(lapsed)
+
+      const handled = await handleInvoiceEvent(renewal, tx)
+
+      expect(handled).toBeTruthy()
+      expect(update.mock.calls[0]?.[0].data).toMatchObject({
+        currentPeriodEnd: new Date('2026-12-18T12:00:00.000Z'),
+        status: 'ACTIVE',
+      })
     })
   })
 })
