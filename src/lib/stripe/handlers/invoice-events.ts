@@ -245,6 +245,9 @@ const handleCryptoInvoiceEvent = async function handleCryptoInvoiceEvent(
           } else {
             baseDate = new Date()
           }
+          // A renewal paid after the period lapsed starts a fresh period from today, so it is
+          // Not already over when it begins.
+          baseDate = new Date(Math.max(baseDate.getTime(), Date.now()))
 
           const newPeriodEnd = new Date(baseDate)
 
