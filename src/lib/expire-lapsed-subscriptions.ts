@@ -3,6 +3,7 @@ import type { Prisma } from '@prisma/client'
 import { captureException } from '@sentry/nextjs'
 
 import prisma from '@/lib/db'
+import { PayPalApiError } from '@/lib/paypal'
 import { syncPaypalSubscription } from '@/lib/paypal-subscriptions'
 
 // A crypto renewal invoice falls due at currentPeriodEnd. Three more days cover slow
@@ -88,6 +89,21 @@ const defaultDependencies: ExpireLapsedDependencies = {
   syncPaypal: syncPaypalSubscription,
 }
 
+// PayPal answers 404 for a subscription it has no record of, which leaves nothing to sync from.
+const resyncPaypal = async function resyncPaypal(
+  paypalSubscriptionId: string,
+  syncPaypal: ExpireLapsedDependencies['syncPaypal'],
+): Promise<boolean> {
+  try {
+    return await syncPaypal(paypalSubscriptionId)
+  } catch (error) {
+    if (error instanceof PayPalApiError && error.status === 404) {
+      return false
+    }
+    throw error
+  }
+}
+
 const settleSubscription = async function settleSubscription(
   subscription: LapsedSubscription,
   endedBefore: Date,
@@ -99,7 +115,7 @@ const settleSubscription = async function settleSubscription(
   // Its API decides; only a row with nothing left to sync from is expired here.
   if (
     id.startsWith(PAYPAL_PREFIX) &&
-    (await dependencies.syncPaypal(id.slice(PAYPAL_PREFIX.length)))
+    (await resyncPaypal(id.slice(PAYPAL_PREFIX.length), dependencies.syncPaypal))
   ) {
     return 'resynced'
   }

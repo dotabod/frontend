@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from 'vitest'
 
 import { expireLapsedSubscriptions } from '@/lib/expire-lapsed-subscriptions'
+import { PayPalApiError } from '@/lib/paypal'
 
 type Dependencies = NonNullable<Parameters<typeof expireLapsedSubscriptions>[0]>
 type Lapsed = Awaited<ReturnType<Dependencies['store']['findLapsed']>>[number]
@@ -66,6 +67,29 @@ describe(expireLapsedSubscriptions, () => {
 
     expect(expire).toHaveBeenCalledOnce()
     expect(summary).toMatchObject({ expired: 1, resynced: 0 })
+  })
+
+  it('expires a PayPal row that PayPal has no record of', async () => {
+    const { dependencies, expire, reportFailure, syncPaypal } = createFakes([
+      lapsed('paypal_I-UNKNOWN'),
+    ])
+    syncPaypal.mockRejectedValue(new PayPalApiError(404, 'PayPal GET failed: 404'))
+
+    const summary = await expireLapsedSubscriptions(dependencies)
+
+    expect(expire).toHaveBeenCalledOnce()
+    expect(reportFailure).not.toHaveBeenCalled()
+    expect(summary).toMatchObject({ expired: 1, failed: 0 })
+  })
+
+  it('keeps a PayPal row when PayPal fails for another reason', async () => {
+    const { dependencies, expire, syncPaypal } = createFakes([lapsed('paypal_I-BUSY')])
+    syncPaypal.mockRejectedValue(new PayPalApiError(503, 'PayPal GET failed: 503'))
+
+    const summary = await expireLapsedSubscriptions(dependencies)
+
+    expect(expire).not.toHaveBeenCalled()
+    expect(summary).toMatchObject({ expired: 0, failed: 1 })
   })
 
   it('counts a row renewed since it was read as unchanged', async () => {
