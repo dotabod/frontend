@@ -1,4 +1,8 @@
-import { GraphQLClient } from 'graphql-request'
+import { GraphQLClient, request } from 'graphql-request'
+
+import { GET_USER_BY_TWITCH_ID } from '@/lib/gql'
+
+const SEVENTV_GQL_URL = 'https://7tv.io/v3/gql'
 
 export interface EmoteSetResponse {
   emoteSet: {
@@ -39,16 +43,35 @@ export interface SevenTVUserResponse {
   }
 }
 
-export const get7TVUser = async function get7TVUser(twitchId: string) {
-  const response = await fetch(`https://7tv.io/v3/users/twitch/${twitchId}?cacheBust=${Date.now()}`)
-  if (!response.ok) {
-    throw new Error(`Failed to fetch user data: ${response.statusText}`)
-  }
-  const stvResponse = (await response.json()) as SevenTVUserResponse
-  if (!stvResponse?.user?.id) {
+export interface UserByTwitchIdResponse {
+  userByConnection: {
+    id: string
+    connections: {
+      id: string
+      platform: string
+      emote_set_id: string | null
+    }[]
+  } | null
+}
+
+// GraphQL rather than REST: 7TV's REST user endpoint has stalled for 20-40 seconds at a time,
+// long enough to time out the routes that call this.
+export const get7TVUser = async function get7TVUser(
+  twitchId: string,
+): Promise<SevenTVUserResponse> {
+  const { userByConnection: user } = await request<UserByTwitchIdResponse>(
+    SEVENTV_GQL_URL,
+    GET_USER_BY_TWITCH_ID,
+    { id: twitchId },
+  )
+  // 7TV answers an unknown Twitch ID with a placeholder user that has no connections.
+  const twitch = user?.connections.find(
+    (connection) => connection.platform === 'TWITCH' && connection.id === twitchId,
+  )
+  if (!user || !twitch) {
     throw new Error('7tv user not found')
   }
-  return stvResponse
+  return { emote_set: { id: twitch.emote_set_id ?? undefined }, user: { id: user.id } }
 }
 
 export const create7TVClient = function create7TVClient(authToken?: string) {
@@ -56,7 +79,7 @@ export const create7TVClient = function create7TVClient(authToken?: string) {
     throw new Error('No 7TV auth token provided')
   }
 
-  return new GraphQLClient('https://7tv.io/v3/gql', {
+  return new GraphQLClient(SEVENTV_GQL_URL, {
     headers: {
       Authorization: `Bearer ${authToken}`,
     },

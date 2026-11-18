@@ -49,3 +49,16 @@ export const CHANGE_EMOTE_IN_SET = gql`
     }
   }
 `
+
+export const GET_USER_BY_TWITCH_ID = gql`
+  query GetUserByTwitchId($id: String!) {
+    userByConnection(platform: TWITCH, id: $id) {
+      id
+      connections {
+        id
+        platform
+        emote_set_id
+      }
+    }
+  }
+`

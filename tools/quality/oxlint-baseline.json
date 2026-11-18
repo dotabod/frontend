@@ -19042,26 +19042,6 @@
         "severity": "error"
       }
     },
-    "25a00c252e8d51ab85fdd600a4ff967138fa17cd2d6fd342c569cbc8ac96dcce": {
-      "count": 1,
-      "summary": {
-        "code": "typescript(strict-boolean-expressions)",
-        "file": "src/lib/7tv.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "if (!stvResponse?.user?.id) {",
-              "next": "throw new Error('7tv user not found')",
-              "previous": "const stvResponse = (await response.json()) as SevenTVUserResponse"
-            },
-            "span": "stvResponse?.user?.id",
-            "text": ""
-          }
-        ],
-        "message": "Unexpected nullable string value in conditional. Please handle the nullish and empty string cases explicitly.",
-        "severity": "error"
-      }
-    },
     "25a5b54180474b1faba05d98e4c6407c03c7f9e48c1d730d33b4eab755cd847f": {
       "count": 1,
       "summary": {
@@ -21571,26 +21551,6 @@
           }
         ],
         "message": "Prefer `async`/`await` to the callback pattern",
-        "severity": "error"
-      }
-    },
-    "2a6e2d5b53fab00b85e14827dd566317e37bbd22a8791af9fb9bc2741127244c": {
-      "count": 1,
-      "summary": {
-        "code": "anti-slop(require-safety-comment-for-type-assertion)",
-        "file": "src/lib/7tv.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "const stvResponse = (await response.json()) as SevenTVUserResponse",
-              "next": "if (!stvResponse?.user?.id) {",
-              "previous": "}"
-            },
-            "span": "(await response.json()) as SevenTVUserResponse",
-            "text": ""
-          }
-        ],
-        "message": "This type assertion has no `SAFETY:` justification. State the checked invariant immediately before the assertion or its containing statement.",
         "severity": "error"
       }
     },
@@ -44196,26 +44156,6 @@
           }
         ],
         "message": "Using `<img>` could result in slower LCP and higher bandwidth.",
-        "severity": "error"
-      }
-    },
-    "5766996b693c1df6b8f286c477768ea095d9942a909851b8fbef9efbccded38b": {
-      "count": 1,
-      "summary": {
-        "code": "typescript(no-unsafe-type-assertion)",
-        "file": "src/lib/7tv.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "const stvResponse = (await response.json()) as SevenTVUserResponse",
-              "next": "if (!stvResponse?.user?.id) {",
-              "previous": "}"
-            },
-            "span": "(await response.json()) as SevenTVUserResponse",
-            "text": ""
-          }
-        ],
-        "message": "Unsafe assertion from `any` detected: consider using type guards or a safer assertion.",
         "severity": "error"
       }
     },
