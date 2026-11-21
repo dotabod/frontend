@@ -10,6 +10,24 @@ const webhookOrigin = process.env.NOWPAYMENTS_TEST_WEBHOOK_ORIGIN
 const describePostgres =
   process.env.RUN_NOWPAYMENTS_POSTGRES_TESTS === 'true' ? describe : describe.skip
 
+const partialPayment = (orderId: string): NowPaymentsPaymentStatus => ({
+  actually_paid: 3,
+  created_at: '2026-10-15T00:05:00.000Z',
+  order_description: 'Dotabod monthly subscription',
+  order_id: orderId,
+  outcome_amount: 3,
+  outcome_currency: 'usdttrc20',
+  pay_address: 'test',
+  pay_amount: 6,
+  pay_currency: 'usdttrc20',
+  payment_id: 1234,
+  payment_status: 'partially_paid',
+  price_amount: 6,
+  price_currency: 'usd',
+  purchase_id: 1,
+  updated_at: '2026-10-15T00:06:00.000Z',
+})
+
 describePostgres('NOWPayments invoice progress in PostgreSQL', () => {
   const userIds = new Set<string>()
 
@@ -30,24 +48,6 @@ describePostgres('NOWPayments invoice progress in PostgreSQL', () => {
       },
     })
   }
-
-  const partialPayment = (orderId: string): NowPaymentsPaymentStatus => ({
-    actually_paid: 3,
-    created_at: '2026-10-15T00:05:00.000Z',
-    order_description: 'Dotabod monthly subscription',
-    order_id: orderId,
-    outcome_amount: 3,
-    outcome_currency: 'usdttrc20',
-    pay_address: 'test',
-    pay_amount: 6,
-    pay_currency: 'usdttrc20',
-    payment_id: 1234,
-    payment_status: 'partially_paid',
-    price_amount: 6,
-    price_currency: 'usd',
-    purchase_id: 1,
-    updated_at: '2026-10-15T00:06:00.000Z',
-  })
 
   afterEach(async () => {
     await prisma.user.deleteMany({ where: { id: { in: [...userIds] } } })
@@ -107,32 +107,42 @@ describePostgres('NOWPayments invoice progress in PostgreSQL', () => {
       payment_status: 'confirming',
     })
     const signature = createHmac('sha512', secret).update(body).digest('hex')
-    const send = async (value: string) =>
-      await fetch(endpoint, {
+    const send = async (value: string) => {
+      const response = await fetch(endpoint, {
         body,
         headers: { 'Content-Type': 'application/json', 'x-nowpayments-sig': value },
         method: 'POST',
       })
-    const read = async () =>
-      await prisma.nowPaymentsInvoice.findUniqueOrThrow({ where: { id: waiting.id } })
+      const invoice = await prisma.nowPaymentsInvoice.findUniqueOrThrow({
+        where: { id: waiting.id },
+      })
+      return {
+        actuallyPaid: invoice.actuallyPaid,
+        httpStatus: response.status,
+        status: invoice.status,
+      }
+    }
 
-    const rejected = await send('invalid')
-    expect(rejected.status).toBe(400)
-    expect((await read()).status).toBe('waiting')
-
-    const accepted = await send(signature)
-    expect(accepted.status).toBe(200)
-    expect((await read()).status).toBe('confirming')
+    await expect(send('invalid')).resolves.toStrictEqual({
+      actuallyPaid: null,
+      httpStatus: 400,
+      status: 'waiting',
+    })
+    await expect(send(signature)).resolves.toStrictEqual({
+      actuallyPaid: 3,
+      httpStatus: 200,
+      status: 'confirming',
+    })
 
     await prisma.nowPaymentsInvoice.update({
       data: { actuallyPaid: 6, status: 'finished' },
       where: { id: waiting.id },
     })
 
-    const late = await send(signature)
-    expect(late.status).toBe(200)
-    const finished = await read()
-    expect(finished.status).toBe('finished')
-    expect(finished.actuallyPaid).toBe(6)
+    await expect(send(signature)).resolves.toStrictEqual({
+      actuallyPaid: 6,
+      httpStatus: 200,
+      status: 'finished',
+    })
   })
 })
