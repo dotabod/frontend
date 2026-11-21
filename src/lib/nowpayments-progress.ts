@@ -36,8 +36,8 @@ export const recordNowPaymentsProgress = async function recordNowPaymentsProgres
       status: payment.payment_status,
     },
     where: {
-      nowPaymentsId: invoice.nowPaymentsId,
       OR: [{ lastWebhookAt: null }, { status: { not: payment.payment_status } }],
+      nowPaymentsId: invoice.nowPaymentsId,
       status: { not: 'finished' },
     },
   })
