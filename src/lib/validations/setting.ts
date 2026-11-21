@@ -95,9 +95,9 @@ const explicitSettingSchemas = {
 const booleanSettingSchema = z.boolean()
 const writableSettingKeys = new Set<unknown>([
   ...Object.keys(explicitSettingSchemas),
-  ...Object.entries(defaultSettings)
-    .filter(([, value]) => booleanSettingSchema.safeParse(value).success)
-    .map(([key]) => key),
+  ...Object.entries(defaultSettings).flatMap(([key, value]) =>
+    booleanSettingSchema.safeParse(value).success ? [key] : [],
+  ),
 ])
 
 const hasExplicitSettingSchema = (key: WritableSettingKey): key is ExplicitSettingKey =>
