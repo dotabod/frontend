@@ -37,7 +37,7 @@ import {
   setMinimapStatus,
 } from '../redux/store'
 
-let socket: Socket | null = null
+let socket: OverlaySocket | null = null
 
 // While the connection is down the game can move on without the overlay hearing about it. Two
 // blockers would then cover the match the streamer loads into: strategy-2, the last one in hero
@@ -192,6 +192,13 @@ const socketEventNames = [
   'update-radiant-win-chance',
   'refresh',
 ] as const
+
+type OverlaySocket = Omit<Socket, 'on'> & {
+  on: (
+    event: Exclude<(typeof socketEventNames)[number], 'auth_error'>,
+    listener: Parameters<Socket['on']>[1],
+  ) => void
+}
 
 export const useSocket = ({
   setPollData,
@@ -465,9 +472,6 @@ export const useSocket = ({
       }
       setRoshan(data)
     })
-    // There is deliberately no `auth_error` listener. The server emits it before the namespace
-    // connects, so socket.io buffers it and replays it after the next successful connect, where
-    // disconnecting would kill a healthy connection. The handshake guard covers rejections.
     socket.on('connect', () => {
       console.log('Socket connected event fired')
       updateLastReceived()
