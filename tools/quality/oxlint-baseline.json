@@ -110480,26 +110480,6 @@
         "severity": "error"
       }
     },
-    "e0befe3e55bf060d73a85175b8ee1c5ca3731ae1597b8ea79f40ee7e6945ac1b": {
-      "count": 1,
-      "summary": {
-        "code": "vitest(require-mock-type-parameters)",
-        "file": "src/__tests__/pages/api/webhooks/nowpayments.test.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "findUnique: vi.fn(),",
-              "next": "update: vi.fn(),",
-              "previous": "nowPaymentsInvoice: {"
-            },
-            "span": "fn",
-            "text": ""
-          }
-        ],
-        "message": "Missing type parameters on mock function call",
-        "severity": "error"
-      }
-    },
     "e0ca557f2336fabdff5dd9295147fa3498f706f544956464b2ac4d88564ad753": {
       "count": 1,
       "summary": {
@@ -126555,7 +126535,6 @@
           "src/__tests__/lib/nowpayments-get-payment.test.ts",
           "src/__tests__/lib/nowpayments-payment-status.test.ts",
           "src/__tests__/lib/nowpayments-payment.test.ts",
-          "src/__tests__/lib/nowpayments-progress.test.ts",
           "src/__tests__/lib/nowpayments-reconcile.test.ts",
           "src/__tests__/lib/nowpayments.test.ts",
           "src/__tests__/lib/opennode-payment.test.ts",

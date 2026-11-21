@@ -1,5 +1,6 @@
 import crypto from 'node:crypto'
 
+import type { NowPaymentsInvoice } from '@prisma/client'
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { createMocks } from 'node-mocks-http'
 import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
@@ -13,7 +14,9 @@ vi.stubEnv('VERCEL_ENV', 'production')
 const mocks = vi.hoisted(() => ({
   prisma: {
     nowPaymentsInvoice: {
-      findUnique: vi.fn(),
+      findUnique: vi.fn<
+        () => Promise<Pick<NowPaymentsInvoice, 'nowPaymentsId' | 'status' | 'stripeInvoiceId'> | null>
+      >(),
     },
   },
   processConfirmedNowPaymentsPayment: vi.fn(),
