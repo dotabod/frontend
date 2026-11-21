@@ -194,10 +194,12 @@ const socketEventNames = [
   'refresh',
 ] as const
 
+type SocketListener = Parameters<Socket['on']>[1]
+
 type OverlaySocket = Omit<Socket, 'on'> & {
   on: (
     event: Exclude<(typeof socketEventNames)[number], 'auth_error'>,
-    listener: Parameters<Socket['on']>[1],
+    listener: (...args: Parameters<SocketListener>) => void | Promise<void>,
   ) => void
 }
 
