@@ -164,6 +164,8 @@ jobs:
             fi
           done
 
+          pnpm exec prisma generate
+
           if ! pnpm exec vitest run \
             src/__tests__/pages/api/webhooks/nowpayments.postgres.test.ts \
             -t 'honors signed progress over HTTP'; then
