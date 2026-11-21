@@ -167,7 +167,7 @@ jobs:
 
           pnpm exec prisma generate
 
-          if ! pnpm exec vitest run \
+          if ! pnpm exec vitest run --environment node \
             src/__tests__/pages/api/webhooks/nowpayments.postgres.test.ts \
             -t 'honors signed progress over HTTP'; then
             cat "${log_file}"
