@@ -7,6 +7,8 @@ import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { sortObject } from '@/lib/nowpayments'
 
+type InvoiceLookup = Pick<NowPaymentsInvoice, 'nowPaymentsId' | 'status' | 'stripeInvoiceId'>
+
 vi.stubEnv('NOWPAYMENTS_API_KEY', 'test-api-key')
 vi.stubEnv('NOWPAYMENTS_IPN_SECRET', 'test-ipn-secret')
 vi.stubEnv('VERCEL_ENV', 'production')
@@ -14,9 +16,7 @@ vi.stubEnv('VERCEL_ENV', 'production')
 const mocks = vi.hoisted(() => ({
   prisma: {
     nowPaymentsInvoice: {
-      findUnique: vi.fn<
-        () => Promise<Pick<NowPaymentsInvoice, 'nowPaymentsId' | 'status' | 'stripeInvoiceId'> | null>
-      >(),
+      findUnique: vi.fn<() => Promise<InvoiceLookup | null>>(),
     },
   },
   processConfirmedNowPaymentsPayment: vi.fn(),

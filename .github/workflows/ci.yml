@@ -13,25 +13,6 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  nowpayments-model:
-    runs-on: ubuntu-latest
-    timeout-minutes: 5
-    steps:
-      - uses: actions/checkout@v7
-      - uses: actions/setup-java@v5
-        with:
-          distribution: temurin
-          java-version: '21'
-      - name: Check NOWPayments progress and replay historical failures
-        run: |
-          curl --fail --silent --show-error --location \
-            --output "$RUNNER_TEMP/tla2tools.jar" \
-            https://github.com/tlaplus/tlaplus/releases/download/v1.7.4/tla2tools.jar
-          printf '%s  %s\n' \
-            936a262061c914694dfd669a543be24573c45d5aa0ff20a8b96b23d01e050e88 \
-            "$RUNNER_TEMP/tla2tools.jar" | sha256sum --check
-          bash formal/nowpayments-progress/check.sh "$RUNNER_TEMP/tla2tools.jar"
-
   test:
     runs-on: ubuntu-latest
     timeout-minutes: 30
@@ -74,6 +55,19 @@ jobs:
           DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:5432/dotabod_test
           DIRECT_URL: postgresql://postgres:postgres@127.0.0.1:5432/dotabod_test
           RUN_NOWPAYMENTS_POSTGRES_TESTS: 'true'
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '21'
+      - name: Check NOWPayments progress and replay historical failures
+        run: |
+          curl --fail --silent --show-error --location \
+            --output "$RUNNER_TEMP/tla2tools.jar" \
+            https://github.com/tlaplus/tlaplus/releases/download/v1.7.4/tla2tools.jar
+          printf '%s  %s\n' \
+            936a262061c914694dfd669a543be24573c45d5aa0ff20a8b96b23d01e050e88 \
+            "$RUNNER_TEMP/tla2tools.jar" | sha256sum --check
+          bash formal/nowpayments-progress/check.sh "$RUNNER_TEMP/tla2tools.jar"
       - name: Run quality checks
         run: pnpm quality
       - name: Run tests
