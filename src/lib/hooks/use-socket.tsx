@@ -198,7 +198,7 @@ type SocketListener = Parameters<Socket['on']>[1]
 type OverlaySocket = Omit<Socket, 'on'> & {
   on: (
     event: Exclude<(typeof socketEventNames)[number], 'auth_error'>,
-    listener: (...args: Parameters<SocketListener>) => unknown,
+    listener: (...args: Parameters<SocketListener>) => void | Promise<void>,
   ) => void
 }
 
