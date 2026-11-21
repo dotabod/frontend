@@ -35,11 +35,7 @@ export const recordNowPaymentsProgress = async function recordNowPaymentsProgres
       paymentId: String(payment.payment_id),
       status: payment.payment_status,
     },
-    where: {
-      nowPaymentsId: invoice.nowPaymentsId,
-      OR: [{ lastWebhookAt: null }, { status: { not: payment.payment_status } }],
-      status: { not: 'finished' },
-    },
+    where: { nowPaymentsId: invoice.nowPaymentsId },
   })
 
   if (count > 0 && payment.payment_status === 'partially_paid') {
