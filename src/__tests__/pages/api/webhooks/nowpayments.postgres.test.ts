@@ -1,4 +1,3 @@
-// @vitest-environment node
 import { createHmac, randomUUID } from 'node:crypto'
 
 import { afterAll, afterEach, describe, expect, it } from 'vitest'
