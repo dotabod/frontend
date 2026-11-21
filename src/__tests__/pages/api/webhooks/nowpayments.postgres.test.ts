@@ -1,10 +1,10 @@
 import { createHmac, randomUUID } from 'node:crypto'
 
-import { afterAll, afterEach, describe, expect, it } from 'vitest'
+import { PrismaPg } from '@prisma/adapter-pg'
+import { PrismaClient } from '@prisma/client'
+import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest'
 
-import prisma from '@/lib/db'
 import type { NowPaymentsPaymentStatus } from '@/lib/nowpayments'
-import { recordNowPaymentsProgress } from '@/lib/nowpayments-progress'
 
 const webhookOrigin = process.env.NOWPAYMENTS_TEST_WEBHOOK_ORIGIN
 const describePostgres =
@@ -30,6 +30,7 @@ const partialPayment = (orderId: string): NowPaymentsPaymentStatus => ({
 
 describePostgres('NOWPayments invoice progress in PostgreSQL', () => {
   const userIds = new Set<string>()
+  let prisma: PrismaClient
 
   const createInvoice = async () => {
     const id = randomUUID()
@@ -49,6 +50,19 @@ describePostgres('NOWPayments invoice progress in PostgreSQL', () => {
     })
   }
 
+  beforeAll(async () => {
+    if (webhookOrigin === undefined) {
+      ;({ default: prisma } = await import('@/lib/db'))
+      return
+    }
+
+    const connectionString = process.env.DATABASE_URL
+    if (connectionString === undefined) {
+      throw new Error('Set DATABASE_URL for the Worker webhook HTTP check')
+    }
+    prisma = new PrismaClient({ adapter: new PrismaPg({ connectionString }) })
+  })
+
   afterEach(async () => {
     await prisma.user.deleteMany({ where: { id: { in: [...userIds] } } })
     userIds.clear()
@@ -59,6 +73,7 @@ describePostgres('NOWPayments invoice progress in PostgreSQL', () => {
   })
 
   it('keeps a finished invoice when progress writes from a stale read', async () => {
+    const { recordNowPaymentsProgress } = await import('@/lib/nowpayments-progress')
     const waiting = await createInvoice()
     await prisma.nowPaymentsInvoice.update({
       data: { actuallyPaid: 6, lastWebhookAt: new Date(), status: 'finished' },
@@ -73,6 +88,7 @@ describePostgres('NOWPayments invoice progress in PostgreSQL', () => {
   })
 
   it('warns once when two sources deliver the same partially paid status', async () => {
+    const { recordNowPaymentsProgress } = await import('@/lib/nowpayments-progress')
     const waiting = await createInvoice()
     const payment = partialPayment(waiting.stripeInvoiceId)
     let warnings = 0
