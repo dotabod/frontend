@@ -37,6 +37,8 @@ jobs:
           cache: pnpm
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
+      - name: Typecheck the historical overlay listener
+        run: pnpm typecheck:app
       - name: Prepare webhook reliability database
         run: pnpm exec prisma db push --skip-generate
         env:

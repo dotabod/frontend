@@ -184,6 +184,7 @@ const socketEventNames = [
   'aegis-picked-up',
   'chatMessage',
   'roshan-killed',
+  'auth_error',
   'refresh-settings',
   'diagnostic-overlay-probe',
   'channelPollOrBet',
@@ -471,6 +472,10 @@ export const useSocket = ({
         return
       }
       setRoshan(data)
+    })
+    socket.on('auth_error', (message) => {
+      console.error('Authentication failed:', message)
+      socket?.disconnect()
     })
     socket.on('connect', () => {
       console.log('Socket connected event fired')
