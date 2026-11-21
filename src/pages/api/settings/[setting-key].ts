@@ -79,7 +79,7 @@ const handlePatchRequest = async function handlePatchRequest(
   req: NextApiRequest,
   res: NextApiResponse,
   userId: string,
-  settingKey: keyof typeof settingKeySchema.Values,
+  settingKey: z.infer<typeof settingKeySchema>,
 ) {
   const session = await getServerSession(req, res, authOptions)
   if (session?.user?.isImpersonating) {

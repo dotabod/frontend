@@ -1,16 +1,19 @@
 import * as z from 'zod'
 
-import { commands } from '@/lib/default-settings'
+import { defaultSettings } from '@/lib/default-settings'
+import type { SettingKeys } from '@/lib/default-settings'
 import { canAccessFeature } from '@/utils/subscription'
 import type { SubscriptionRow } from '@/utils/subscription'
 
-// Define schemas for each specific setting
-const settingsSchema = {
-  aegis: z.boolean(),
+type BooleanSettingKey = {
+  [Key in SettingKeys]: (typeof defaultSettings)[Key] extends boolean ? Key : never
+}[SettingKeys]
+
+type WritableSettingKey = Exclude<SettingKeys, 'customMmr'>
+type ExplicitSettingKey = Exclude<WritableSettingKey, BooleanSettingKey>
+
+const explicitSettingSchemas = {
   autoCommandsOnMatchStart: z.array(z.string().max(45)),
-  autoTranslate: z.boolean(),
-  battlepass: z.boolean(),
-  bets: z.boolean(),
   betsInfo: z.object({
     duration: z
       .string()
@@ -23,14 +26,6 @@ const settingsSchema = {
     title: z.string().max(45),
     yes: z.string().max(25),
   }),
-  chatter: z.boolean(),
-  autoOptInNewFeatures: z.boolean(),
-  // Tri-state: the null "follow autoOptInNewFeatures" state is the ABSENCE of a settings row
-  // (the default), not a persisted value. The UI only ever PATCHes true/false, and Prisma Json
-  // columns can't store raw null, so the write schema is boolean.
-  cosmeticsAnnounce: z.boolean(),
-  // Same tri-state new-feature toggle as cosmeticsAnnounce (the "team smoked without you" roast).
-  smokeActivated: z.boolean(),
   chatters: z
     .object({
       bounties: z.object({ enabled: z.boolean() }),
@@ -52,46 +47,21 @@ const settingsSchema = {
       tip: z.object({ enabled: z.boolean() }),
     })
     .partial(),
-  // Command on/off toggles are derived from the single source of truth (`commands` in
-  // defaultSettings) so this allowlist can never drift from the dashboard toggles again.
-  // Previously these were hand-listed and had silently dropped keys like `commandSet`,
-  // making the API reject them with "Invalid setting key". Every command setting is a boolean.
-  ...(Object.fromEntries(Object.keys(commands).map((key) => [key, z.boolean()])) as Record<
-    keyof typeof commands,
-    z.ZodBoolean
-  >),
+  cosmeticsAnnounce: z.boolean(),
   crypto_payment_interest: z.object({
     interested: z.boolean(),
     tier: z.enum(['FREE', 'PRO']),
     transactionType: z.enum(['RECURRING', 'LIFETIME']),
   }),
-  disableAutoClipping: z.boolean(),
-  discardZeroBets: z.boolean(),
-  lastFmOverlay: z.boolean(),
   lastFmRefreshRate: z.number().min(5).max(60),
   lastFmUsername: z.string().max(45).optional(),
-  livePolls: z.boolean(),
-  'minimap-blocker': z.boolean(),
   'minimap-opacity': z.number().min(0).max(1),
-  'minimap-simple': z.boolean(),
-  'minimap-xl': z.boolean(),
-  minimapRight: z.boolean(),
   mmr: z.number().min(0).max(30_000),
-  'mmr-tracker': z.boolean(),
-  notablePlayersOverlay: z.boolean(),
-  notablePlayersOverlayFlags: z.boolean(),
-  notablePlayersOverlayFlagsCmd: z.boolean(),
   'obs-dc': z.string().max(200).max(45),
   'obs-minimap': z.string().max(200).max(45),
   'obs-picks': z.string().max(200).max(45),
-  'obs-scene-switcher': z.boolean(),
   obsServerPassword: z.string().max(45),
   obsServerPort: z.number().min(1).max(65_535),
-  'only-block-ranked': z.boolean(),
-  onlyParty: z.boolean(),
-  'picks-blocker': z.boolean(),
-  queueBlocker: z.boolean(),
-  queueBlockerFindMatch: z.boolean(),
   queueBlockerFindMatchText: z.string().max(45),
   rankOnly: z.object({
     enabled: z.boolean(),
@@ -107,18 +77,9 @@ const settingsSchema = {
     ]),
     minimumRankTier: z.number().min(0).max(100),
   }),
-  rosh: z.boolean(),
-  showRankImage: z.boolean(),
-  showRankLeader: z.boolean(),
-  showRankMmr: z.boolean(),
+  smokeActivated: z.boolean(),
   streamDelay: z.number().min(0).max(3_000_000),
-  streamersAnnounce: z.boolean(),
-  streamersNpSuffix: z.boolean(),
-  tellChatBets: z.boolean(),
-  tellChatNewMMR: z.boolean(),
-  translateOnOverlay: z.boolean(),
   translationLanguage: z.string().max(5),
-  winProbabilityOverlay: z.boolean(),
   winProbabilityOverlayIntervalMinutes: z.number().min(0).max(60),
   wlStatsDays: z.number().int().min(1).max(365).nullable(),
   wlStatsStartDate: z
@@ -129,22 +90,29 @@ const settingsSchema = {
       return Number.isFinite(date.getTime()) && date.toISOString().slice(0, 10) === value
     })
     .nullable(),
-}
+} satisfies Record<ExplicitSettingKey, z.ZodType>
 
-type SettingKeys = keyof typeof settingsSchema
-export const settingKeySchema = z.enum(
-  Object.keys(settingsSchema) as [SettingKeys, ...SettingKeys[]],
-)
+const booleanSettingSchema = z.boolean()
+const writableSettingKeys = new Set<unknown>([
+  ...Object.keys(explicitSettingSchemas),
+  ...Object.entries(defaultSettings)
+    .filter(([, value]) => booleanSettingSchema.safeParse(value).success)
+    .map(([key]) => key),
+])
 
-// Add subscription validation to dynamic schema
+const hasExplicitSettingSchema = (key: WritableSettingKey): key is ExplicitSettingKey =>
+  Object.hasOwn(explicitSettingSchemas, key)
+
+export const settingKeySchema = z.custom<WritableSettingKey>((key) => writableSettingKeys.has(key))
+
 export const dynamicSettingSchema = (
-  key: SettingKeys,
+  key: WritableSettingKey,
   subscription: Partial<SubscriptionRow> | null,
 ) =>
   z
     .object({
       key: z.literal(key),
-      value: settingsSchema[key],
+      value: hasExplicitSettingSchema(key) ? explicitSettingSchemas[key] : booleanSettingSchema,
     })
     .refine(() => canAccessFeature(key, subscription).hasAccess, {
       message: 'Your subscription tier does not have access to this feature',
