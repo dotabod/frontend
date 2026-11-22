@@ -35865,26 +35865,6 @@
         "severity": "error"
       }
     },
-    "4695c3d2073d33aeb63d802afbf4f77e772212b494396fd1e2f6565c1283d8b2": {
-      "count": 1,
-      "summary": {
-        "code": "typescript(strict-void-return)",
-        "file": "src/lib/hooks/use-socket.tsx",
-        "labels": [
-          {
-            "context": {
-              "current": "socket.on('requestHeroData', async ({ allTime, heroId, steam32Id }, cb) => {",
-              "next": "updateLastReceived()",
-              "previous": ""
-            },
-            "span": "async ({ allTime, heroId, steam32Id }, cb) => {\n      updateLastReceived()\n      const wl = { lose: 0, win: 0 }\n      const response = await fetcher(\n        `https://api.opendota.com/api/players/${steam32Id}/wl/?hero_id=${heroId}&having=1${\n          allTime ? '' : '&date=30'\n        }`,\n      )\n\n      if (response) {\n        wl.win = response.win\n        wl.lose = response.lose\n      }\n\n      cb(wl)\n    }",
-            "text": ""
-          }
-        ],
-        "message": "Async function used in a context where a void function is expected.",
-        "severity": "error"
-      }
-    },
     "469607bc78f6ed81124548368df46ebd906e180c21d86ea25577ea56ccfe9029": {
       "count": 1,
       "summary": {
