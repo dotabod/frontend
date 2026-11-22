@@ -51499,26 +51499,6 @@
         "severity": "error"
       }
     },
-    "67d3996964d7e257aff2ebe883a4086c7cb0d39bc01e76c87d845c8988cd9ffa": {
-      "count": 1,
-      "summary": {
-        "code": "typescript(no-unsafe-assignment)",
-        "file": "src/__tests__/pages/api/webhooks/nowpayments.test.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "data: expect.objectContaining({ status: 'confirming' }),",
-              "next": "where: { nowPaymentsId: 'np_inv_1', status: { not: 'finished' } },",
-              "previous": "expect(mocks.prisma.nowPaymentsInvoice.updateMany).toHaveBeenCalledWith({"
-            },
-            "span": "data: expect.objectContaining({ status: 'confirming' })",
-            "text": ""
-          }
-        ],
-        "message": "Unsafe assignment of an any value.",
-        "severity": "error"
-      }
-    },
     "67dad1f0eb19747ca76ca006c10d44b847ca71892ffcc45e359da0abf76b826d": {
       "count": 1,
       "summary": {
@@ -71592,26 +71572,6 @@
           }
         ],
         "message": "Unexpected nullable string value in conditional. Please handle the nullish and empty string cases explicitly.",
-        "severity": "error"
-      }
-    },
-    "905ef8f2b6e3f85154a0827a6620c850c3b2839ae9e391536e82413db91c8daa": {
-      "count": 1,
-      "summary": {
-        "code": "vitest(require-mock-type-parameters)",
-        "file": "src/__tests__/pages/api/webhooks/nowpayments.test.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "update: vi.fn(),",
-              "next": "updateMany:",
-              "previous": "findUnique: vi.fn(),"
-            },
-            "span": "fn",
-            "text": ""
-          }
-        ],
-        "message": "Missing type parameters on mock function call",
         "severity": "error"
       }
     },
@@ -110420,26 +110380,6 @@
         "severity": "error"
       }
     },
-    "e0befe3e55bf060d73a85175b8ee1c5ca3731ae1597b8ea79f40ee7e6945ac1b": {
-      "count": 1,
-      "summary": {
-        "code": "vitest(require-mock-type-parameters)",
-        "file": "src/__tests__/pages/api/webhooks/nowpayments.test.ts",
-        "labels": [
-          {
-            "context": {
-              "current": "findUnique: vi.fn(),",
-              "next": "update: vi.fn(),",
-              "previous": "nowPaymentsInvoice: {"
-            },
-            "span": "fn",
-            "text": ""
-          }
-        ],
-        "message": "Missing type parameters on mock function call",
-        "severity": "error"
-      }
-    },
     "e0ca557f2336fabdff5dd9295147fa3498f706f544956464b2ac4d88564ad753": {
       "count": 1,
       "summary": {
@@ -126475,7 +126415,6 @@
           "src/__tests__/lib/nowpayments-get-payment.test.ts",
           "src/__tests__/lib/nowpayments-payment-status.test.ts",
           "src/__tests__/lib/nowpayments-payment.test.ts",
-          "src/__tests__/lib/nowpayments-progress.test.ts",
           "src/__tests__/lib/nowpayments-reconcile.test.ts",
           "src/__tests__/lib/nowpayments.test.ts",
           "src/__tests__/lib/opennode-payment.test.ts",

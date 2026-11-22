@@ -1,11 +1,13 @@
 import crypto from 'node:crypto'
 
-import type { Prisma } from '@prisma/client'
+import type { NowPaymentsInvoice } from '@prisma/client'
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { createMocks } from 'node-mocks-http'
 import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { sortObject } from '@/lib/nowpayments'
+
+type InvoiceLookup = Pick<NowPaymentsInvoice, 'nowPaymentsId' | 'status' | 'stripeInvoiceId'>
 
 vi.stubEnv('NOWPAYMENTS_API_KEY', 'test-api-key')
 vi.stubEnv('NOWPAYMENTS_IPN_SECRET', 'test-ipn-secret')
@@ -14,10 +16,7 @@ vi.stubEnv('VERCEL_ENV', 'production')
 const mocks = vi.hoisted(() => ({
   prisma: {
     nowPaymentsInvoice: {
-      findUnique: vi.fn(),
-      update: vi.fn(),
-      updateMany:
-        vi.fn<(args: Prisma.NowPaymentsInvoiceUpdateManyArgs) => Promise<{ count: number }>>(),
+      findUnique: vi.fn<() => Promise<InvoiceLookup | null>>(),
     },
   },
   processConfirmedNowPaymentsPayment: vi.fn(),
@@ -127,65 +126,6 @@ describe('POST /api/webhooks/nowpayments', () => {
       invoice,
       expect.objectContaining({ payment_id: 9999, payment_status: 'finished' }),
     )
-  })
-
-  it('updates status only for non-terminal events like confirming', async () => {
-    const confirmingBody = { ...finishedBody, payment_status: 'confirming' }
-    const invoice = {
-      lastWebhookAt: null,
-      nowPaymentsId: 'np_inv_1',
-      status: 'waiting',
-      stripeInvoiceId: 'in_1',
-    }
-    mocks.prisma.nowPaymentsInvoice.findUnique.mockResolvedValue(invoice)
-    mocks.prisma.nowPaymentsInvoice.updateMany.mockResolvedValue({ count: 1 })
-
-    const { req, res } = buildReq(confirmingBody, sign(confirmingBody))
-    await handler(req, res)
-
-    expect(res._getStatusCode()).toBe(200)
-    expect(mocks.processConfirmedNowPaymentsPayment).not.toHaveBeenCalled()
-    expect(mocks.prisma.nowPaymentsInvoice.updateMany).toHaveBeenCalledWith({
-      data: expect.objectContaining({ status: 'confirming' }),
-      where: { nowPaymentsId: 'np_inv_1', status: { not: 'finished' } },
-    })
-  })
-
-  it('does not move a finished payment back to a later status', async () => {
-    const confirmingBody = { ...finishedBody, payment_status: 'confirming' }
-    const invoice = {
-      lastWebhookAt: new Date('2026-05-18T00:00:00.000Z'),
-      nowPaymentsId: 'np_inv_1',
-      status: 'finished',
-      stripeInvoiceId: 'in_1',
-    }
-    mocks.prisma.nowPaymentsInvoice.findUnique.mockResolvedValue(invoice)
-    mocks.prisma.nowPaymentsInvoice.updateMany.mockResolvedValue({ count: 0 })
-
-    const { req, res } = buildReq(confirmingBody, sign(confirmingBody))
-    await handler(req, res)
-
-    const write = mocks.prisma.nowPaymentsInvoice.updateMany.mock.calls[0]?.[0]
-    expect(res._getStatusCode()).toBe(200)
-    expect(write?.where).toStrictEqual({ nowPaymentsId: 'np_inv_1', status: { not: 'finished' } })
-    expect(mocks.prisma.nowPaymentsInvoice.update).not.toHaveBeenCalled()
-  })
-
-  it('skips a duplicate non-confirmed webhook (same status, already seen)', async () => {
-    const confirmingBody = { ...finishedBody, payment_status: 'confirming' }
-    const invoice = {
-      lastWebhookAt: new Date('2026-05-18T00:00:00.000Z'),
-      nowPaymentsId: 'np_inv_1',
-      status: 'confirming',
-      stripeInvoiceId: 'in_1',
-    }
-    mocks.prisma.nowPaymentsInvoice.findUnique.mockResolvedValue(invoice)
-
-    const { req, res } = buildReq(confirmingBody, sign(confirmingBody))
-    await handler(req, res)
-
-    expect(res._getStatusCode()).toBe(200)
-    expect(mocks.prisma.nowPaymentsInvoice.updateMany).not.toHaveBeenCalled()
   })
 
   it('returns 500 when payment processing throws so NOWPayments retries', async () => {

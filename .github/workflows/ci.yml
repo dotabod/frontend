@@ -49,6 +49,25 @@ jobs:
           DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:5432/dotabod_test
           DIRECT_URL: postgresql://postgres:postgres@127.0.0.1:5432/dotabod_test
           RUN_STRIPE_WEBHOOK_POSTGRES_TESTS: 'true'
+      - name: Prove NOWPayments progress writes in PostgreSQL
+        run: pnpm exec vitest run src/__tests__/pages/api/webhooks/nowpayments.postgres.test.ts
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:5432/dotabod_test
+          DIRECT_URL: postgresql://postgres:postgres@127.0.0.1:5432/dotabod_test
+          RUN_NOWPAYMENTS_POSTGRES_TESTS: 'true'
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '21'
+      - name: Check NOWPayments progress and replay historical failures
+        run: |
+          curl --fail --silent --show-error --location \
+            --output "$RUNNER_TEMP/tla2tools.jar" \
+            https://github.com/tlaplus/tlaplus/releases/download/v1.7.4/tla2tools.jar
+          printf '%s  %s\n' \
+            936a262061c914694dfd669a543be24573c45d5aa0ff20a8b96b23d01e050e88 \
+            "$RUNNER_TEMP/tla2tools.jar" | sha256sum --check
+          bash formal/nowpayments-progress/check.sh "$RUNNER_TEMP/tla2tools.jar"
       - name: Run quality checks
         run: pnpm quality
       - name: Run tests
@@ -102,6 +121,11 @@ jobs:
         shell: bash
         env:
           CLOUDFLARE_HYPERDRIVE_LOCAL_CONNECTION_STRING_HYPERDRIVE: postgresql://postgres:postgres@127.0.0.1:5432/dotabod_test
+          DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:5432/dotabod_test
+          DIRECT_URL: postgresql://postgres:postgres@127.0.0.1:5432/dotabod_test
+          NOWPAYMENTS_IPN_SECRET: ci-nowpayments-ipn-secret
+          NOWPAYMENTS_TEST_WEBHOOK_ORIGIN: http://127.0.0.1:8787
+          RUN_NOWPAYMENTS_POSTGRES_TESTS: 'true'
         run: |
           set -euo pipefail
 
@@ -114,6 +138,7 @@ jobs:
             --var MONGO_URL:mongodb://127.0.0.1:27017/dotabod \
             --var NEXTAUTH_SECRET:github-actions-build-secret \
             --var NEXTAUTH_URL:http://127.0.0.1:8787 \
+            --var NOWPAYMENTS_IPN_SECRET:"${NOWPAYMENTS_IPN_SECRET}" \
             --var OPENNODE_API_KEY:dummy-opennode-key \
             --var STRIPE_SECRET_KEY:sk_test_dummy \
             --var TWITCH_CLIENT_ID:dummy-client-id \
@@ -151,3 +176,12 @@ jobs:
               exit 1
             fi
           done
+
+          pnpm exec prisma generate
+
+          if ! pnpm exec vitest run --environment node \
+            src/__tests__/pages/api/webhooks/nowpayments.postgres.test.ts \
+            -t 'honors signed progress over HTTP'; then
+            cat "${log_file}"
+            exit 1
+          fi
