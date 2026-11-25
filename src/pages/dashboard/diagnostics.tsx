@@ -215,7 +215,7 @@ const DiagnosticsPage = () => {
                   />
                   <span>{row.label}</span>
                 </div>
-                <div className='text-right'>
+                <div className='text-end'>
                   <Tag color={failed ? 'red' : pending ? 'blue' : 'green'}>{row.status}</Tag>
                   {index > 0 && (
                     <div className='mt-1 text-xs text-gray-500'>{formatSeen(row.value)}</div>

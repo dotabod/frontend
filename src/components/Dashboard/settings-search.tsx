@@ -338,7 +338,7 @@ export const SettingsSearch = () => {
 
     if (query && searchResults.length === 0) {
       return (
-        <div style={{ width: 400 }}>
+        <div style={{ maxWidth: 'calc(100dvw - 2rem)', width: 400 }}>
           <Empty
             image={<Settings className='mx-auto h-8 w-8 text-gray-400' />}
             description={
@@ -386,12 +386,12 @@ export const SettingsSearch = () => {
           <List.Item.Meta
             avatar={<Icon className='h-4 w-4 text-gray-400' />}
             title={
-              <div className='flex items-center justify-between'>
-                <div className='flex items-center gap-2'>
+              <div className='flex items-center justify-between gap-2'>
+                <div className='flex min-w-0 flex-wrap items-center gap-2'>
                   <span className='text-sm text-gray-100'>{result.label}</span>
                   {categoryLabel && <span className='text-xs text-gray-400'>{categoryLabel}</span>}
                 </div>
-                <ChevronRight className='h-4 w-4 text-gray-400' />
+                <ChevronRight className='h-4 w-4 shrink-0 text-gray-400 rtl:rotate-180' />
               </div>
             }
             description={
@@ -403,7 +403,10 @@ export const SettingsSearch = () => {
     }
 
     return (
-      <div ref={listContainerRef} style={{ maxHeight: 384, overflow: 'auto', width: 400 }}>
+      <div
+        ref={listContainerRef}
+        style={{ maxHeight: 384, maxWidth: 'calc(100dvw - 2rem)', overflow: 'auto', width: 400 }}
+      >
         {navResults.length > 0 && (
           <>
             <Typography.Text className='block px-3 py-1 text-xs font-medium text-gray-400'>

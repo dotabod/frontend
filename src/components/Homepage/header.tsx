@@ -57,7 +57,7 @@ export const Header: FC = () => (
                           transition: { duration: 0.2 },
                           y: -32,
                         }}
-                        className='absolute inset-x-0 top-0 z-0 origin-top rounded-b-2xl bg-gray-800 px-6 pt-32 pb-6 shadow-2xl shadow-gray-900/20'
+                        className='absolute inset-x-0 top-0 z-0 max-h-dvh origin-top overflow-y-auto rounded-b-2xl bg-gray-800 px-6 pt-32 pb-[max(1.5rem,env(safe-area-inset-bottom))] shadow-2xl shadow-gray-900/20'
                       >
                         {/* Derived from the same primaryNavLinks the desktop nav uses
                             so the two never drift. Legal + GitHub/Discord live in the footer. */}

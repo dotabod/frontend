@@ -817,7 +817,7 @@ const Plan = ({
         className={clsx(
           'relative flex flex-col rounded-2xl p-6 sm:p-8',
           featured
-            ? 'order-first bg-gray-900 shadow-lg ring-1 shadow-black/20 ring-purple-500/50 lg:order-none'
+            ? 'bg-gray-900 shadow-lg ring-1 shadow-black/20 ring-purple-500/50'
             : 'bg-gray-900/40 ring-1 ring-gray-800',
         )}
       >
@@ -877,8 +877,6 @@ const Plan = ({
           formattedCreditBalance={formattedCreditBalance}
           hasTrial={hasTrial}
         />
-
-        <FeatureList features={features} featured={featured} payWithCrypto={payWithCrypto} />
 
         {tier === SUBSCRIPTION_TIERS.PRO &&
           (isCryptoPaymentsEnabled || isPaypalPaymentsEnabled) && (
@@ -982,6 +980,8 @@ const Plan = ({
             </Tooltip>
           </div>
         )}
+
+        <FeatureList features={features} featured={featured} payWithCrypto={payWithCrypto} />
       </section>
     </ErrorBoundary>
   )

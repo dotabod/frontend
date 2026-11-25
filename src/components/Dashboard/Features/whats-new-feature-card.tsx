@@ -141,7 +141,7 @@ const WhatsNewFeatureCard = ({
               hideTierBadge
             />
           )}
-          <div className='flex flex-wrap items-center gap-x-5 gap-y-2 sm:ml-auto'>
+          <div className='flex flex-wrap items-center gap-x-6 gap-y-2 sm:ms-auto'>
             {entry.deepLink && (
               <Link
                 href={`${entry.deepLink.path}${entry.deepLink.section ? `#${entry.deepLink.section}` : ''}`}

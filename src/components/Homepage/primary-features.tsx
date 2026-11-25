@@ -162,6 +162,8 @@ const OBSScreen = ({
   </AppScreen>
 )
 
+const EMOTE_ICON_CLASS = 'ms-1 inline'
+
 const features = [
   {
     description: (
@@ -172,7 +174,7 @@ const features = [
     ),
     icon: (props?: { className?: string }) => (
       <Image
-        className={clsx('ml-1 inline', props?.className)}
+        className={clsx(EMOTE_ICON_CLASS, props?.className)}
         alt='peepogamba emote'
         height={32}
         width={32}
@@ -188,7 +190,7 @@ const features = [
       'Dotabod sends timely, context-aware chat messages to engage your audience with insights relevant to your gameplay—never spammy, always helpful.',
     icon: (props?: { className?: string }) => (
       <Image
-        className={clsx('ml-1 inline', props?.className)}
+        className={clsx(EMOTE_ICON_CLASS, props?.className)}
         alt='chatting emote'
         height={40}
         width={40}
@@ -207,7 +209,7 @@ const features = [
     ),
     icon: (props?: { className?: string }) => (
       <Image
-        className={clsx('ml-1 inline', props?.className)}
+        className={clsx(EMOTE_ICON_CLASS, props?.className)}
         alt='ttours emote'
         height={32}
         width={32}
@@ -252,7 +254,7 @@ const FeaturesDesktop = () => {
       onChange={onChange}
       vertical
     >
-      <TabList className='relative z-10 order-last col-span-6 space-y-6'>
+      <TabList className='relative z-10 col-span-6 space-y-6'>
         {features.map((feature, featureIndex) => (
           <div
             key={feature.name}
@@ -269,7 +271,7 @@ const FeaturesDesktop = () => {
             <div className='relative z-10 p-8'>
               <feature.icon className='h-8 w-8' />
               <h3 className='mt-6 text-lg font-semibold text-white'>
-                <Tab className='text-left not-focus-visible:focus:outline-hidden'>
+                <Tab className='text-start not-focus-visible:focus:outline-hidden'>
                   <span className='absolute inset-0 rounded-2xl' />
                   {feature.name}
                 </Tab>

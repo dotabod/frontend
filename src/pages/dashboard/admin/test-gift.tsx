@@ -117,6 +117,77 @@ const TestGiftPage: NextPageWithLayout = () => {
 
   const subscriptionStatus = getSubscriptionStatusMessage()
 
+  let cardContent: React.ReactNode
+  if (status === 'loading') {
+    cardContent = <Paragraph>Loading...</Paragraph>
+  } else if (status === 'unauthenticated') {
+    cardContent = <Paragraph>You must be logged in to use this page.</Paragraph>
+  } else {
+    cardContent = (
+      <Space direction='vertical' style={{ width: '100%' }}>
+        <Paragraph>
+          This page allows you to create a test gift notification for development purposes. The
+          notification will appear in your dashboard.
+        </Paragraph>
+
+        {subscriptionStatus && (
+          <Alert
+            type={subscriptionStatus.type as 'info' | 'warning'}
+            message={subscriptionStatus.message}
+            style={{ marginBottom: 16 }}
+          />
+        )}
+
+        <div className='mb-4 flex flex-wrap items-center gap-2'>
+          <Text strong>Gift Type:</Text>
+          <Select
+            className='w-full max-w-[200px]'
+            value={giftType}
+            onChange={(value) => {
+              setGiftType(value)
+            }}
+          >
+            <Option value='monthly'>Monthly</Option>
+            <Option value='annual'>Annual</Option>
+            <Option value='lifetime'>Lifetime</Option>
+          </Select>
+        </div>
+
+        {giftType !== 'lifetime' && (
+          <div className='mb-4 flex flex-wrap items-center gap-2'>
+            <Text strong>Quantity:</Text>
+            <InputNumber
+              style={{ width: 100 }}
+              min={1}
+              max={100}
+              value={giftQuantity}
+              onChange={(value) => {
+                setGiftQuantity(Number(value) || 1)
+              }}
+            />
+            <Text>{giftType === 'monthly' ? 'months' : 'years'}</Text>
+          </div>
+        )}
+
+        <div style={{ marginBottom: 16 }}>
+          <Text strong>Gift Message:</Text>
+          <Input.TextArea
+            rows={3}
+            value={giftMessage}
+            onChange={(e) => {
+              setGiftMessage(e.target.value)
+            }}
+            style={{ marginTop: 8 }}
+          />
+        </div>
+
+        <Button type='primary' onClick={createTestNotification} loading={loading}>
+          Create Test Notification
+        </Button>
+      </Space>
+    )
+  }
+
   return (
     <>
       {contextHolder}
@@ -124,79 +195,10 @@ const TestGiftPage: NextPageWithLayout = () => {
         <title>Test Gift Notification | Dotabod</title>
       </Head>
       <Layout>
-        <Content style={{ margin: '0 auto', maxWidth: '800px', padding: '50px' }}>
+        <Content className='mx-auto w-full max-w-3xl'>
           <Card>
             <Title level={2}>Test Gift Notification</Title>
-
-            {status === 'loading' ? (
-              <Paragraph>Loading...</Paragraph>
-            ) : status === 'unauthenticated' ? (
-              <Paragraph>You must be logged in to use this page.</Paragraph>
-            ) : (
-              <Space direction='vertical' style={{ width: '100%' }}>
-                <Paragraph>
-                  This page allows you to create a test gift notification for development purposes.
-                  The notification will appear in your dashboard.
-                </Paragraph>
-
-                {subscriptionStatus && (
-                  <Alert
-                    type={subscriptionStatus.type as 'info' | 'warning'}
-                    message={subscriptionStatus.message}
-                    style={{ marginBottom: 16 }}
-                  />
-                )}
-
-                <div style={{ marginBottom: 16 }}>
-                  <Text strong>Gift Type:</Text>
-                  <Select
-                    style={{ marginLeft: 8, width: 200 }}
-                    value={giftType}
-                    onChange={(value) => {
-                      setGiftType(value)
-                    }}
-                  >
-                    <Option value='monthly'>Monthly</Option>
-                    <Option value='annual'>Annual</Option>
-                    <Option value='lifetime'>Lifetime</Option>
-                  </Select>
-                </div>
-
-                {giftType !== 'lifetime' && (
-                  <div style={{ marginBottom: 16 }}>
-                    <Text strong>Quantity:</Text>
-                    <InputNumber
-                      style={{ marginLeft: 8, width: 100 }}
-                      min={1}
-                      max={100}
-                      value={giftQuantity}
-                      onChange={(value) => {
-                        setGiftQuantity(Number(value) || 1)
-                      }}
-                    />
-                    <Text style={{ marginLeft: 8 }}>
-                      {giftType === 'monthly' ? 'months' : 'years'}
-                    </Text>
-                  </div>
-                )}
-
-                <div style={{ marginBottom: 16 }}>
-                  <Text strong>Gift Message:</Text>
-                  <Input.TextArea
-                    rows={3}
-                    value={giftMessage}
-                    onChange={(e) => {
-                      setGiftMessage(e.target.value)
-                    }}
-                    style={{ marginTop: 8 }}
-                  />
-                </div>
-
-                <Button type='primary' onClick={createTestNotification} loading={loading}>
-                  Create Test Notification
-                </Button>
-              </Space>
-            )}
+            {cardContent}
           </Card>
         </Content>
       </Layout>

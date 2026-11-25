@@ -325,7 +325,7 @@ const DashboardShell = ({ children, seo }: { children: React.ReactElement; seo?:
               background: colorBgLayout,
             }}
             width={250}
-            className='h-dvh shrink-0 overflow-hidden border-r-transparent'
+            className='h-dvh shrink-0 overflow-hidden border-e-transparent'
             trigger={null}
             collapsible
             collapsed={broken}
@@ -421,7 +421,7 @@ const DashboardShell = ({ children, seo }: { children: React.ReactElement; seo?:
                   <PastDueNotice pathname={router.pathname} subscription={subscription} />
                   {children}
                 </Content>
-                <footer className='shrink-0 border-t border-gray-700 bg-gray-900 px-4 pt-4 pb-1 text-center text-xs text-gray-400'>
+                <footer className='shrink-0 border-t border-gray-700 bg-gray-900 px-4 pt-4 pb-[max(0.25rem,env(safe-area-inset-bottom))] text-center text-xs text-gray-400'>
                   <p>
                     Dota 2 and the Dota 2 logo are registered trademarks of Valve Corporation. This
                     site is not affiliated with Valve Corporation.

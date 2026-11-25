@@ -17,7 +17,7 @@ import { signIn, useSession } from 'next-auth/react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useCallback, useEffect, useState } from 'react'
-import type { ReactElement } from 'react'
+import type { ReactElement, ReactNode } from 'react'
 
 import { Container } from '@/components/container'
 import HomepageShell from '@/components/Homepage/homepage-shell'
@@ -493,8 +493,8 @@ const VerifyPage: NextPageWithLayout = () => {
   if (status === 'loading' || status === 'unauthenticated') {
     return (
       <Container>
-        <div className='flex min-h-[60vh] flex-col'>
-          <Skeleton.Avatar active size={80} shape='circle' />
+        <div className='flex min-h-[60dvh] flex-col'>
+          <Skeleton.Avatar active size={80} />
           <Skeleton.Input active style={{ marginTop: 16, width: 200 }} />
         </div>
       </Container>
@@ -505,7 +505,7 @@ const VerifyPage: NextPageWithLayout = () => {
   if (checkingAccount) {
     return (
       <Container>
-        <div className='flex min-h-[60vh] flex-col'>
+        <div className='flex min-h-[60dvh] flex-col'>
           <Title level={2} className='mb-6'>
             Get Dotabod Verified
           </Title>
@@ -517,9 +517,174 @@ const VerifyPage: NextPageWithLayout = () => {
     )
   }
 
+  const renderAccountRank = (account: LinkedAccount) => {
+    if (account.loading) {
+      return <Skeleton.Avatar active size={56} />
+    }
+    if (account.profile && account.profile.rank_tier > 0) {
+      return (
+        <Space align='center'>
+          <img
+            src={getRankImageUrl(account.profile.rank_tier)}
+            alt='Rank Medal'
+            className='h-12 w-12'
+          />
+          <div className='flex flex-col gap-2'>
+            <Text strong>
+              {formatRankTitle(account.profile.rank_tier, account.profile.leaderboard_rank)}
+            </Text>
+            {account.profile.leaderboard_rank && <Tag color='gold'>Leaderboard</Tag>}
+          </div>
+        </Space>
+      )
+    }
+    return <Text type='secondary'>Uncalibrated</Text>
+  }
+
+  let steamAccountsSection: ReactNode
+  if (linkedAccounts.length > 0) {
+    steamAccountsSection = (
+      <div>
+        <Divider orientation='left'>Linked Accounts</Divider>
+
+        <List
+          className='max-w-3xl'
+          itemLayout='horizontal'
+          dataSource={linkedAccounts}
+          renderItem={(account) => (
+            <List.Item
+              key={account.steam32Id}
+              actions={[
+                !account.isPrimary && (
+                  <Button
+                    key='set-primary'
+                    type='text'
+                    icon={<StarOutlined />}
+                    onClick={async () => setPrimaryAccount(account.steam32Id)}
+                    loading={actionLoading[`setPrimary_${account.steam32Id}`]}
+                    disabled={actionLoading[`setPrimary_${account.steam32Id}`]}
+                    title='Set as primary account'
+                  >
+                    Set as Primary
+                  </Button>
+                ),
+                <Button
+                  key='unlink'
+                  type='text'
+                  danger
+                  icon={<DeleteOutlined />}
+                  onClick={() => {
+                    showUnlinkConfirmation(account.steam32Id)
+                  }}
+                  loading={actionLoading[`unlink_${account.steam32Id}`]}
+                  disabled={actionLoading[`unlink_${account.steam32Id}`]}
+                  title='Unlink this account'
+                >
+                  Unlink
+                </Button>,
+              ]}
+            >
+              <List.Item.Meta
+                avatar={
+                  <div className='flex items-center'>
+                    {account.isPrimary && (
+                      <StarFilled style={{ color: 'gold', marginInlineEnd: '8px' }} />
+                    )}
+                    <Avatar src={account.profile?.profile.avatar} size='large' />
+                  </div>
+                }
+                title={
+                  <div className='flex flex-wrap items-center gap-2'>
+                    <Text strong>
+                      {account.name ?? account.profile?.profile.personaname ?? 'Unknown Player'}
+                    </Text>
+                    {account.isPrimary && <Tag color='gold'>Primary</Tag>}
+                    <Tag color='blue' icon={<CheckCircleOutlined />}>
+                      Verified
+                    </Tag>
+                  </div>
+                }
+                description={<>Steam ID: {account.steam32Id}</>}
+              />
+
+              {renderAccountRank(account)}
+            </List.Item>
+          )}
+        />
+
+        <div className='mt-6 flex flex-wrap items-center justify-between gap-3'>
+          <Button
+            type='default'
+            size='large'
+            onClick={handleSteamLogin}
+            icon={<span className='me-1'>+</span>}
+            loading={loading || actionLoading.linkSteam}
+            disabled={loading || actionLoading.linkSteam}
+          >
+            Link Another Account
+          </Button>
+
+          <Link href='/dashboard' prefetch={false}>
+            <Button type='primary' size='large' className='px-8'>
+              Go to Streamer&apos;s Dashboard
+            </Button>
+          </Link>
+        </div>
+      </div>
+    )
+  } else if (loading) {
+    steamAccountsSection = (
+      <div>
+        <Divider orientation='left'>Linked Accounts</Divider>
+        <List
+          className='max-w-3xl'
+          itemLayout='horizontal'
+          dataSource={[1, 2]}
+          renderItem={(item) => (
+            <List.Item
+              key={item}
+              actions={[
+                <Skeleton.Button key='action1' active style={{ width: 120 }} />,
+                <Skeleton.Button key='action2' active style={{ width: 80 }} />,
+              ]}
+            >
+              <List.Item.Meta
+                avatar={
+                  <div className='flex items-center'>
+                    <Skeleton.Avatar active size='large' />
+                  </div>
+                }
+                title={<Skeleton.Input active style={{ width: 200 }} />}
+                description={<Skeleton.Input active style={{ width: 120 }} />}
+              />
+              <Skeleton.Avatar active size={56} shape='circle' />
+            </List.Item>
+          )}
+        />
+        <div className='mt-6 flex'>
+          <Skeleton.Button active size='large' style={{ width: 200 }} />
+        </div>
+      </div>
+    )
+  } else {
+    steamAccountsSection = (
+      <div className='mt-4 flex flex-col gap-4'>
+        <Button
+          type='primary'
+          size='large'
+          onClick={handleSteamLogin}
+          loading={actionLoading.linkSteam}
+          disabled={actionLoading.linkSteam}
+        >
+          Authenticate with Steam
+        </Button>
+      </div>
+    )
+  }
+
   return (
     <Container>
-      <div className='flex min-h-[60vh] flex-col'>
+      <div className='flex min-h-[60dvh] flex-col'>
         <Title level={2} className='mb-6'>
           Get Dotabod Verified
         </Title>
@@ -528,7 +693,7 @@ const VerifyPage: NextPageWithLayout = () => {
         {status !== 'authenticated' && (
           <Card className='mb-6 w-full'>
             <div className='mb-2 flex items-center'>
-              <div className='mr-2 flex-shrink-0'>
+              <div className='me-2 flex-shrink-0'>
                 <span className='text-2xl text-gray-500'>○</span>
               </div>
               <Title level={4} className='m-0'>
@@ -566,171 +731,7 @@ const VerifyPage: NextPageWithLayout = () => {
             ]}
           />
 
-          {linkedAccounts.length > 0 ? (
-            <div>
-              <Divider orientation='left'>Linked Accounts</Divider>
-
-              <List
-                className='max-w-3xl'
-                itemLayout='horizontal'
-                dataSource={linkedAccounts}
-                renderItem={(account) => (
-                  <List.Item
-                    key={account.steam32Id}
-                    actions={[
-                      !account.isPrimary && (
-                        <Button
-                          key='set-primary'
-                          type='text'
-                          icon={<StarOutlined />}
-                          onClick={async () => setPrimaryAccount(account.steam32Id)}
-                          loading={actionLoading[`setPrimary_${account.steam32Id}`]}
-                          disabled={actionLoading[`setPrimary_${account.steam32Id}`]}
-                          title='Set as primary account'
-                        >
-                          Set as Primary
-                        </Button>
-                      ),
-                      <Button
-                        key='unlink'
-                        type='text'
-                        danger
-                        icon={<DeleteOutlined />}
-                        onClick={() => {
-                          showUnlinkConfirmation(account.steam32Id)
-                        }}
-                        loading={actionLoading[`unlink_${account.steam32Id}`]}
-                        disabled={actionLoading[`unlink_${account.steam32Id}`]}
-                        title='Unlink this account'
-                      >
-                        Unlink
-                      </Button>,
-                    ]}
-                  >
-                    <List.Item.Meta
-                      avatar={
-                        <div className='flex items-center'>
-                          {account.isPrimary && (
-                            <StarFilled style={{ color: 'gold', marginRight: '8px' }} />
-                          )}
-                          <Avatar src={account.profile?.profile.avatar} size='large' />
-                        </div>
-                      }
-                      title={
-                        <div className='flex flex-wrap items-center gap-2'>
-                          <Text strong>
-                            {account.name ??
-                              account.profile?.profile.personaname ??
-                              'Unknown Player'}
-                          </Text>
-                          {account.isPrimary && (
-                            <Tag color='gold' className='ml-2'>
-                              Primary
-                            </Tag>
-                          )}
-                          <Tag color='blue' icon={<CheckCircleOutlined />} className='ml-2'>
-                            Verified
-                          </Tag>
-                        </div>
-                      }
-                      description={<>Steam ID: {account.steam32Id}</>}
-                    />
-
-                    {account.loading ? (
-                      <Skeleton.Avatar active size={56} shape='circle' />
-                    ) : account.profile && account.profile.rank_tier > 0 ? (
-                      <Space align='center'>
-                        <img
-                          src={getRankImageUrl(account.profile.rank_tier)}
-                          alt='Rank Medal'
-                          className='h-12 w-12'
-                        />
-                        <div className='flex flex-col gap-2'>
-                          <Text strong>
-                            {formatRankTitle(
-                              account.profile.rank_tier,
-                              account.profile.leaderboard_rank,
-                            )}
-                          </Text>
-                          {account.profile.leaderboard_rank && <Tag color='gold'>Leaderboard</Tag>}
-                        </div>
-                      </Space>
-                    ) : (
-                      <Text type='secondary'>Uncalibrated</Text>
-                    )}
-                  </List.Item>
-                )}
-              />
-
-              <div className='mt-6 flex justify-between'>
-                <Button
-                  type='default'
-                  size='large'
-                  onClick={handleSteamLogin}
-                  icon={<span className='mr-1'>+</span>}
-                  loading={loading || actionLoading.linkSteam}
-                  disabled={loading || actionLoading.linkSteam}
-                >
-                  Link Another Account
-                </Button>
-
-                <Link href='/dashboard' prefetch={false}>
-                  <Button type='primary' size='large' className='px-8'>
-                    Go to Streamer&apos;s Dashboard
-                  </Button>
-                </Link>
-              </div>
-            </div>
-          ) : loading ? (
-            // Skeleton placeholder for loading state
-            <div>
-              <Divider orientation='left'>Linked Accounts</Divider>
-              <List
-                className='max-w-3xl'
-                itemLayout='horizontal'
-                dataSource={[1, 2]}
-                renderItem={(item) => (
-                  <List.Item
-                    key={item}
-                    actions={[
-                      <Skeleton.Button key='action1' active style={{ width: 120 }} />,
-                      <Skeleton.Button key='action2' active style={{ width: 80 }} />,
-                    ]}
-                  >
-                    <List.Item.Meta
-                      avatar={
-                        <div className='flex items-center'>
-                          <Skeleton.Avatar active size='large' />
-                        </div>
-                      }
-                      title={<Skeleton.Input active style={{ width: 200 }} />}
-                      description={<Skeleton.Input active style={{ width: 120 }} />}
-                    />
-                    <Skeleton.Avatar active size={56} shape='circle' />
-                  </List.Item>
-                )}
-              />
-              <div className='mt-6 flex'>
-                <Skeleton.Button active size='large' style={{ width: 200 }} />
-              </div>
-            </div>
-          ) : (
-            <div className='mt-4 flex flex-col gap-4'>
-              {loading ? (
-                <Skeleton.Button active size='large' style={{ height: 40, width: '100%' }} />
-              ) : (
-                <Button
-                  type='primary'
-                  size='large'
-                  onClick={handleSteamLogin}
-                  loading={loading || actionLoading.linkSteam}
-                  disabled={loading || actionLoading.linkSteam}
-                >
-                  Authenticate with Steam
-                </Button>
-              )}
-            </div>
-          )}
+          {steamAccountsSection}
         </Card>
 
         {/* Unlink Confirmation Modal */}

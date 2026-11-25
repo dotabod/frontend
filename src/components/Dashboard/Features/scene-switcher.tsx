@@ -77,7 +77,7 @@ const SceneSwitcher = (): React.ReactNode => {
       </div>
 
       {isEnabled && (
-        <ul className='mb-2 ml-4 list-decimal space-y-2 text-sm'>
+        <ul className='ms-4 mb-2 list-decimal space-y-2 text-sm'>
           <li>
             Must put the dotabod browser source in the scenes you want to block hero picks or
             minimap in.
@@ -86,7 +86,7 @@ const SceneSwitcher = (): React.ReactNode => {
             Must set browser properties to <span className='italics'>Advanced access to OBS</span>
           </li>
           <li>Must create the following scenes (case sensitive)</li>
-          <ul className='ml-4 list-none space-y-6'>
+          <ul className='ms-4 list-none space-y-6'>
             {(Object.keys(scenes) as (keyof typeof scenes)[]).map((sceneKey) => {
               const scene = scenes[sceneKey]
               return (

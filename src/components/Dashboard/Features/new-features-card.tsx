@@ -10,7 +10,7 @@ import { TierSwitch } from './tier-switch'
 // features a streamer hasn't touched; each feature's own toggle lives on the What's New page.
 const NewFeaturesCard = () => (
   <Card title='New features'>
-    <div className='ml-1 flex flex-col space-y-3'>
+    <div className='ms-1 flex flex-col space-y-3'>
       <TierSwitch
         settingKey={Settings.autoOptInNewFeatures}
         label='Automatically enable new features as they launch'

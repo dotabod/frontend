@@ -61,7 +61,7 @@ const HeroOverview = ({ heroes, username }: { heroes: HeroPerformance[]; usernam
       ) : (
         <div className='overflow-hidden rounded-lg border border-gray-700 bg-gray-900/60'>
           <table aria-label='Most played heroes' className='w-full table-fixed'>
-            <thead className='hidden text-left text-xs font-medium text-gray-400 sm:table-header-group'>
+            <thead className='hidden text-start text-xs font-medium text-gray-400 sm:table-header-group'>
               <tr className='border-b border-gray-700'>
                 <th scope='col' className='px-5 py-3 font-medium'>
                   Hero
@@ -72,7 +72,7 @@ const HeroOverview = ({ heroes, username }: { heroes: HeroPerformance[]; usernam
                 <th scope='col' className='w-32 px-3 py-3 font-medium'>
                   Record
                 </th>
-                <th scope='col' className='w-44 px-3 py-3 pr-5 font-medium'>
+                <th scope='col' className='w-44 px-3 py-3 pe-5 font-medium'>
                   Win rate
                 </th>
               </tr>
@@ -100,7 +100,7 @@ const HeroOverview = ({ heroes, username }: { heroes: HeroPerformance[]; usernam
                       <span className='truncate font-medium text-gray-100'>{hero.heroName}</span>
                     </div>
                   </td>
-                  <td className='col-start-2 row-start-1 block text-right text-sm text-gray-300 tabular-nums sm:table-cell sm:px-3 sm:py-3 sm:text-left sm:align-middle'>
+                  <td className='col-start-2 row-start-1 block text-end text-sm text-gray-300 tabular-nums sm:table-cell sm:px-3 sm:py-3 sm:text-start sm:align-middle'>
                     <span className='sm:hidden'>{hero.matches} matches</span>
                     <span className='hidden sm:inline'>{hero.matches}</span>
                   </td>
@@ -109,7 +109,7 @@ const HeroOverview = ({ heroes, username }: { heroes: HeroPerformance[]; usernam
                   </td>
                   <td
                     aria-label={`Win rate ${hero.winRate}%`}
-                    className='col-start-2 row-start-2 block sm:table-cell sm:px-3 sm:py-3 sm:pr-5 sm:align-middle'
+                    className='col-start-2 row-start-2 block sm:table-cell sm:px-3 sm:py-3 sm:pe-5 sm:align-middle'
                   >
                     <div className='flex items-center justify-end gap-3 sm:justify-start'>
                       <div
@@ -121,7 +121,7 @@ const HeroOverview = ({ heroes, username }: { heroes: HeroPerformance[]; usernam
                           style={{ width: `${hero.winRate}%` }}
                         />
                       </div>
-                      <span className='w-10 text-right text-sm text-gray-200 tabular-nums'>
+                      <span className='w-10 text-end text-sm text-gray-200 tabular-nums'>
                         {hero.winRate}%
                       </span>
                     </div>
@@ -160,7 +160,7 @@ const MatchOverview = ({ matches, username }: { matches: MatchHistoryRow[]; user
       ) : (
         <div className='overflow-hidden rounded-lg border border-gray-700 bg-gray-900/60'>
           <table aria-label='Latest matches' className='w-full table-fixed'>
-            <thead className='hidden text-left text-xs font-medium text-gray-400 md:table-header-group'>
+            <thead className='hidden text-start text-xs font-medium text-gray-400 md:table-header-group'>
               <tr className='border-b border-gray-700'>
                 <th scope='col' className='px-5 py-3 font-medium'>
                   Hero
@@ -177,7 +177,7 @@ const MatchOverview = ({ matches, username }: { matches: MatchHistoryRow[]; user
                 <th scope='col' className='w-24 px-3 py-3 font-medium'>
                   Score
                 </th>
-                <th scope='col' className='w-44 px-3 py-3 pr-5 font-medium'>
+                <th scope='col' className='w-44 px-3 py-3 pe-5 font-medium'>
                   Match
                 </th>
               </tr>
@@ -212,7 +212,7 @@ const MatchOverview = ({ matches, username }: { matches: MatchHistoryRow[]; user
                         </p>
                       </div>
                     </td>
-                    <td className='col-start-2 row-start-1 block text-right md:table-cell md:px-3 md:py-4 md:text-left md:align-middle'>
+                    <td className='col-start-2 row-start-1 block text-end md:table-cell md:px-3 md:py-4 md:text-start md:align-middle'>
                       <span
                         className={`inline-block rounded-md border px-2.5 py-1 text-xs font-semibold ${
                           match.won
@@ -227,20 +227,20 @@ const MatchOverview = ({ matches, username }: { matches: MatchHistoryRow[]; user
                       {queueLabel}
                     </td>
                     <td className='col-start-1 row-start-3 block text-sm md:table-cell md:px-3 md:py-4 md:align-middle'>
-                      <span className='mr-2 text-xs text-gray-400 md:hidden'>KDA</span>
+                      <span className='me-2 text-xs text-gray-400 md:hidden'>KDA</span>
                       <span className='text-gray-200 tabular-nums'>
                         {match.kda
                           ? `${match.kda.kills} / ${match.kda.deaths} / ${match.kda.assists}`
                           : 'Not recorded'}
                       </span>
                     </td>
-                    <td className='col-start-2 row-start-3 block text-right text-sm md:table-cell md:px-3 md:py-4 md:text-left md:align-middle'>
-                      <span className='mr-2 text-xs text-gray-400 md:hidden'>Score</span>
+                    <td className='col-start-2 row-start-3 block text-end text-sm md:table-cell md:px-3 md:py-4 md:text-start md:align-middle'>
+                      <span className='me-2 text-xs text-gray-400 md:hidden'>Score</span>
                       <span className='text-gray-300 tabular-nums'>
                         {match.score ?? 'Not recorded'}
                       </span>
                     </td>
-                    <td className='col-span-2 row-start-4 block md:table-cell md:px-3 md:py-4 md:pr-5 md:align-middle'>
+                    <td className='col-span-2 row-start-4 block md:table-cell md:px-3 md:py-4 md:pe-5 md:align-middle'>
                       <div className='flex items-center justify-between gap-3 md:block'>
                         <time className='block text-xs text-gray-400'>{match.dateLabel}</time>
                         <a

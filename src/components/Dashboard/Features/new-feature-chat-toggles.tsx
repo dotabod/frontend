@@ -33,14 +33,14 @@ const MasterFollowingToggle = ({
         }}
         label={label}
       />
-      <p className='ml-12 text-sm text-gray-400'>{description}</p>
+      <p className='ms-12 text-sm text-gray-400'>{description}</p>
     </div>
   )
 }
 
 const NewFeatureChatToggles = () => (
   <Card title='New chat features'>
-    <div className='ml-4 flex flex-col space-y-4'>
+    <div className='ms-4 flex flex-col space-y-4'>
       <MasterFollowingToggle
         settingKey={Settings.cosmeticsAnnounce}
         label='Cosmetic set announcements'

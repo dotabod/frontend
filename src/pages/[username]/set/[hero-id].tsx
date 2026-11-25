@@ -119,7 +119,7 @@ const DetailPage = ({
               aria-hidden
               src={heroImage}
               alt=''
-              className='absolute inset-y-0 right-0 hidden h-full w-2/3 object-cover object-center opacity-40 sm:block'
+              className='absolute inset-y-0 end-0 hidden h-full w-2/3 object-cover object-center opacity-40 sm:block'
             />
           )}
           <div
@@ -131,7 +131,7 @@ const DetailPage = ({
           />
           <div
             aria-hidden
-            className='absolute inset-0 bg-gradient-to-r from-gray-950 via-gray-950/85 to-transparent'
+            className='absolute inset-0 bg-gradient-to-r from-gray-950 via-gray-950/85 to-transparent rtl:bg-gradient-to-l'
           />
 
           <Container className='relative py-10 sm:py-16'>
@@ -177,7 +177,7 @@ const DetailPage = ({
                 href={`/${username}/set/${prev.heroId}`}
                 className='inline-flex min-w-0 items-center gap-1.5 text-gray-300 hover:text-white'
               >
-                <ArrowLeft size={16} className='flex-shrink-0' />
+                <ArrowLeft size={16} className='flex-shrink-0 rtl:rotate-180' />
                 <span className='truncate'>{prev.heroName}</span>
               </Link>
             ) : (
@@ -195,7 +195,7 @@ const DetailPage = ({
                 className='inline-flex min-w-0 items-center justify-end gap-1.5 text-gray-300 hover:text-white'
               >
                 <span className='truncate'>{next.heroName}</span>
-                <ArrowRight size={16} className='flex-shrink-0' />
+                <ArrowRight size={16} className='flex-shrink-0 rtl:rotate-180' />
               </Link>
             ) : (
               <span />

@@ -108,23 +108,25 @@ const GiftSuccessPage: NextPageWithLayout<GiftSuccessProps> = ({
           </div>
           <dl className='mt-4 space-y-3 text-sm'>
             <div className='flex justify-between gap-3'>
-              <dt className='text-gray-500'>Recipient</dt>
-              <dd className='text-gray-200'>{recipient || 'Not specified'}</dd>
+              <dt className='shrink-0 text-gray-500'>Recipient</dt>
+              <dd className='min-w-0 text-end break-words text-gray-200'>
+                {recipient || 'Not specified'}
+              </dd>
             </div>
             <div className='flex justify-between gap-3'>
-              <dt className='text-gray-500'>From</dt>
-              <dd className='text-gray-200'>{formattedSenderName}</dd>
+              <dt className='shrink-0 text-gray-500'>From</dt>
+              <dd className='min-w-0 text-end break-words text-gray-200'>{formattedSenderName}</dd>
             </div>
             <div className='flex justify-between gap-3'>
-              <dt className='text-gray-500'>Duration</dt>
-              <dd className='text-gray-200'>
+              <dt className='shrink-0 text-gray-500'>Duration</dt>
+              <dd className='min-w-0 text-end text-gray-200'>
                 {parsedQuantity} {parsedQuantity === 1 ? 'month' : 'months'} of Pro
               </dd>
             </div>
             {formattedGiftMessage && (
               <div className='flex justify-between gap-3'>
-                <dt className='text-gray-500'>Message</dt>
-                <dd className='text-right text-gray-300 italic'>
+                <dt className='shrink-0 text-gray-500'>Message</dt>
+                <dd className='min-w-0 text-end break-words text-gray-300 italic'>
                   &quot;{formattedGiftMessage}&quot;
                 </dd>
               </div>

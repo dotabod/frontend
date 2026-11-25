@@ -4,7 +4,7 @@ import type { ReactNode } from 'react'
 import { MagicCard } from './magic-card'
 
 const BentoGrid = ({ children, className }: { children: ReactNode; className?: string }) => (
-  <div className={clsx('grid w-full auto-rows-[22rem] grid-cols-3 gap-4', className)}>
+  <div className={clsx('grid w-full auto-rows-[minmax(22rem,auto)] grid-cols-3 gap-4', className)}>
     {children}
   </div>
 )

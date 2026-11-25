@@ -657,7 +657,7 @@ const ObsSetup: React.FC = () => {
         </Space>
         <Spin spinning={l0 || l1} tip='Loading'>
           {!connected && (
-            <Space size='middle'>
+            <Space size='middle' wrap className='w-full'>
               <Form.Item
                 name='password'
                 className='flex-1'
@@ -733,7 +733,7 @@ const ObsSetup: React.FC = () => {
                 </Space>
               }
             >
-              <div className='flex flex-row items-center space-x-4'>
+              <div className='flex flex-row flex-wrap items-center gap-4'>
                 <Select
                   className='notranslate max-w-sm'
                   disabled={!connected}

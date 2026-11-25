@@ -23,9 +23,9 @@ const CodeBlock = () => {
   }
 
   return (
-    <div className='mt-0 mb-4 max-w-full sm:max-w-sm lg:max-w-2xl'>
-      <div className='xs:p-3 xs:text-sm mb-1 flex flex-row items-center justify-between rounded-sm border-2 border-purple-400 p-5 text-lg sm:p-4 sm:text-base'>
-        <pre className='mb-0 overflow-hidden rounded-sm bg-gray-900 text-white'>
+    <div className='mt-0 mb-4 w-full max-w-full sm:max-w-sm lg:max-w-2xl'>
+      <div className='xs:p-3 xs:text-sm mb-1 flex flex-row items-center justify-between gap-2 rounded-sm border-2 border-purple-400 p-4 text-base sm:p-4 sm:text-base'>
+        <pre className='mb-0 min-w-0 flex-1 overflow-x-auto rounded-sm bg-gray-900 text-white'>
           <code>
             <span className='command-line'>
               <span style={{ color: '#F8F8F2' }}>powershell </span>
@@ -54,7 +54,7 @@ const CodeBlock = () => {
           />
         </Tooltip>
       </div>
-      <div className='flex flex-row items-center justify-between'>
+      <div className='flex flex-row flex-wrap items-center justify-between gap-2'>
         <Link
           target='_blank'
           href='https://github.com/dotabod/frontend/blob/master/src/lib/private/install.ps1'

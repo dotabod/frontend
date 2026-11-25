@@ -25,8 +25,8 @@ export const LockedFeatureOverlay = ({
   }
 
   return (
-    <div className='absolute inset-0 z-10 flex flex-col items-center justify-center rounded-lg bg-black/60 backdrop-blur-md'>
-      <div className='flex max-w-lg flex-col items-center gap-6 p-8'>
+    <div className='absolute inset-0 z-10 flex flex-col items-center justify-center overflow-y-auto rounded-lg bg-black/60 backdrop-blur-md'>
+      <div className='flex max-w-lg flex-col items-center gap-4 p-4 sm:gap-6 sm:p-8'>
         <TierBadge tooltip={false} requiredTier={requiredTier} />
 
         <div className='text-center'>

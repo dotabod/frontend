@@ -55,7 +55,7 @@ export const PriceDisplay = ({
               className={clsx(
                 'transition duration-300',
                 (activePeriod === 'annual' || activePeriod === 'lifetime') &&
-                  'pointer-events-none translate-x-6 opacity-0 select-none',
+                  'pointer-events-none translate-x-6 opacity-0 select-none rtl:-translate-x-6',
               )}
             >
               {price.monthly}
@@ -64,10 +64,10 @@ export const PriceDisplay = ({
             <span
               aria-hidden={activePeriod !== 'annual'}
               className={clsx(
-                'absolute top-0 left-0 transition duration-300',
+                'absolute start-0 top-0 transition duration-300',
                 activePeriod === 'annual'
                   ? 'translate-x-0 opacity-100'
-                  : 'pointer-events-none -translate-x-6 opacity-0 select-none',
+                  : 'pointer-events-none -translate-x-6 opacity-0 select-none rtl:translate-x-6',
               )}
             >
               {price.annual}
@@ -76,10 +76,10 @@ export const PriceDisplay = ({
             <span
               aria-hidden={activePeriod !== 'lifetime'}
               className={clsx(
-                'absolute top-0 left-0 transition duration-300',
+                'absolute start-0 top-0 transition duration-300',
                 activePeriod === 'lifetime'
                   ? 'translate-x-0 opacity-100'
-                  : 'pointer-events-none -translate-x-6 opacity-0 select-none',
+                  : 'pointer-events-none -translate-x-6 opacity-0 select-none rtl:translate-x-6',
               )}
             >
               {price.lifetime}
@@ -90,7 +90,7 @@ export const PriceDisplay = ({
       </p>
     </div>
 
-    <div className={clsx('mt-2 h-5 text-sm', featured ? 'text-purple-200' : 'text-gray-400')}>
+    <div className={clsx('mt-2 min-h-5 text-sm', featured ? 'text-purple-200' : 'text-gray-400')}>
       {activePeriod === 'annual' && !Number.isNaN(savings) ? `Saving ${savings}%` : null}
     </div>
     <div className={clsx('mt-3 text-sm', featured ? 'text-purple-200' : 'text-gray-400')}>

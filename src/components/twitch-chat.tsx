@@ -26,7 +26,7 @@ const TwitchChat = ({
         <span>
           {modOnly && <ModImage />}
           <span className='font-bold text-[#8a2be2]'>techleed</span>
-          <span className='mr-1'>: </span>
+          <span className='me-1'>: </span>
           <span>{command}</span>
         </span>
       )}

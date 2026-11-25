@@ -381,7 +381,7 @@ const UserButton = ({ user, className }: UserButtonProps) => {
           </div>
         }
       >
-        <div className='mr-4 cursor-pointer'>
+        <div className='me-4 cursor-pointer'>
           <Badge count={notificationError ? 0 : totalUnreadNotifications} size='small'>
             <BellOutlined style={{ color: '#fff', fontSize: '20px' }} />
           </Badge>
@@ -394,7 +394,7 @@ const UserButton = ({ user, className }: UserButtonProps) => {
           <div className='flex cursor-pointer items-center'>
             <div className='relative'>
               {isLive && (
-                <span className='absolute -top-2 -right-2 z-10 rounded-full bg-red-600 px-2 py-0.5 text-xs text-white'>
+                <span className='absolute -end-2 -top-2 z-10 rounded-full bg-red-600 px-2 py-0.5 text-xs text-white'>
                   Live
                 </span>
               )}
@@ -421,7 +421,7 @@ const UserButton = ({ user, className }: UserButtonProps) => {
               </div>
             </div>
 
-            <div className='ml-3 hidden flex-col sm:flex'>
+            <div className='ms-3 hidden flex-col sm:flex'>
               {isSettingsLoading ? (
                 <>
                   <Skeleton.Input active size='small' style={{ height: 16, width: 100 }} />
@@ -441,7 +441,7 @@ const UserButton = ({ user, className }: UserButtonProps) => {
               )}
             </div>
 
-            <ChevronDownIcon className='ml-2 h-5 w-5 text-gray-400' />
+            <ChevronDownIcon className='ms-2 h-5 w-5 text-gray-400' />
           </div>
         </Link>
       </Dropdown>

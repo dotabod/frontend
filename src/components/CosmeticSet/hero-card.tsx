@@ -164,7 +164,7 @@ export const HeroCard = ({
         )}
 
         {card.justPlayed && (
-          <span className='absolute top-2 left-2 rounded-full bg-black/55 px-2 py-0.5 text-[10px] font-semibold tracking-wider text-purple-200 uppercase ring-1 ring-purple-400/40 backdrop-blur-sm'>
+          <span className='absolute start-2 top-2 rounded-full bg-black/55 px-2 py-0.5 text-[10px] font-semibold tracking-wider text-purple-200 uppercase ring-1 ring-purple-400/40 backdrop-blur-sm'>
             Just played
           </span>
         )}

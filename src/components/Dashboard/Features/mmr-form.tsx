@@ -209,7 +209,7 @@ const MmrForm = ({ hideText = false }) => {
                     help={
                       multiUsedBy && (
                         <p>
-                          <ExclamationTriangleIcon className='mr-1 inline h-4 w-4 text-yellow-500' />
+                          <ExclamationTriangleIcon className='me-1 inline h-4 w-4 text-yellow-500' />
                           You will not be able to use this account until{' '}
                           <a
                             target='_blank'
@@ -218,7 +218,7 @@ const MmrForm = ({ hideText = false }) => {
                             className='mx-1 inline'
                           >
                             {multiUsedBy}
-                            <ExternalLinkIcon className='ml-1 inline h-4 w-4' />
+                            <ExternalLinkIcon className='ms-1 inline h-4 w-4' />
                           </a>
                           removes it from their dashboard. Or, join our{' '}
                           <Link href='/dashboard/help'>help page</Link> for support.
@@ -296,7 +296,7 @@ const MmrForm = ({ hideText = false }) => {
               )
             })}
             {form.isDirty() && (
-              <div className={clsx('gap-4')}>
+              <div className={clsx('flex flex-wrap gap-3')}>
                 <Button
                   htmlType='submit'
                   type='primary'
@@ -304,7 +304,7 @@ const MmrForm = ({ hideText = false }) => {
                   loading={loadingAccounts}
                   danger={form.isDirty() && form.values.accounts.some((a) => a.delete)}
                 >
-                  <span className='gap-1'>
+                  <span className='inline-flex gap-1'>
                     {form.isDirty() && form.values.accounts.some((a) => a.delete) ? (
                       <span>
                         Confirm remove {form.values.accounts.filter((a) => a.delete).length}
@@ -335,20 +335,20 @@ const MmrForm = ({ hideText = false }) => {
       {form.values.accounts.length === 0 && (
         <div className='mt-6'>
           <EmptyAccountsState hideText={hideText} />
-          <div className='flex gap-4 transition-all'>
+          <div className='flex flex-wrap gap-4'>
             <MMRBadge
               leaderboard={null}
               image={noSteamRank?.image}
               rank={null}
               className='bg-transparent'
             />
-            <div className='flex flex-col'>
+            <div className='flex min-w-0 flex-1 flex-col'>
               {loading ? (
-                <Input placeholder='Loading...' className='w-[200px]!' disabled />
+                <Input placeholder='Loading...' className='w-full! max-w-[200px]' disabled />
               ) : (
                 <InputNumber
                   placeholder='9000'
-                  className='w-[200px]!'
+                  className='w-full! max-w-[200px]'
                   id='mmr'
                   name='mmr'
                   type='number'

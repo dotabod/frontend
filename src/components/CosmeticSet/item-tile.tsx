@@ -66,9 +66,7 @@ export const ItemTile = ({
 
       <div className='flex items-start justify-between gap-2'>
         <div className='min-w-0'>
-          <p
-            className={`line-clamp-2 font-medium text-white ${featured ? 'text-base' : 'text-sm'}`}
-          >
+          <p className={`font-medium break-words text-white ${featured ? 'text-base' : 'text-sm'}`}>
             {item.name}
           </p>
           <p className='mt-0.5 text-xs text-gray-500'>{formatSlot(item.slot)}</p>

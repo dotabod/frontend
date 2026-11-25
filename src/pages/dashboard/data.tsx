@@ -123,7 +123,7 @@ const DataPage = () => {
         <Card title={<span>Export your data</span>}>
           <Space direction='vertical' className='w-full' size='large'>
             <Text>You&apos;ll get a JSON file with:</Text>
-            <ul className='list-disc pl-4'>
+            <ul className='list-disc ps-4'>
               <li>Account details</li>
               <li>Settings and preferences</li>
               <li>Connected Twitch account</li>

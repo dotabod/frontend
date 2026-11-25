@@ -82,9 +82,9 @@ const CommandsCard = ({
         {command.response && <command.response dark />}
         {command.cmd && (
           <div className='py-1'>
-            <p className='ml-1'>Command</p>
-            <div className='flex flex-wrap'>
-              <div className='mr-2 mb-2'>
+            <p className='ms-1'>Command</p>
+            <div className='flex flex-wrap gap-2'>
+              <div>
                 <Tag>{command.cmd}</Tag>
               </div>
             </div>
@@ -92,10 +92,10 @@ const CommandsCard = ({
         )}
         {command.alias?.length ? (
           <div className='py-1'>
-            <p className='ml-1'>Alias</p>
-            <div className='flex flex-wrap'>
+            <p className='ms-1'>Alias</p>
+            <div className='flex flex-wrap gap-2'>
               {command.alias.map((alias) => (
-                <div key={alias} className='mr-2 mb-2'>
+                <div key={alias}>
                   <Tag>!{alias}</Tag>
                 </div>
               ))}

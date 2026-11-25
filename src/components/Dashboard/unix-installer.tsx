@@ -27,7 +27,7 @@ const UnixInstaller = () => {
   return (
     <div className='space-y-4'>
       <div className='flex flex-col items-center space-y-4'>
-        <ol className='ml-4 list-decimal space-y-2'>
+        <ol className='ms-4 list-decimal space-y-2'>
           <li>Open Steam and go to your game library.</li>
           <li>Right-click on Dota 2 and select &quot;Manage&quot;.</li>
           <li>
@@ -49,7 +49,7 @@ const UnixInstaller = () => {
           <div className='space-y-4'>
             <div className='flex flex-col items-center space-y-4'>
               <video
-                className='rounded-lg'
+                className='h-auto max-w-full rounded-lg'
                 playsInline
                 width='508'
                 height='504'
@@ -80,7 +80,7 @@ const UnixInstaller = () => {
 
           <div className='flex flex-col items-center space-y-4'>
             <video
-              className='rounded-lg'
+              className='h-auto max-w-full rounded-lg'
               playsInline
               width='482'
               height='392'

@@ -37,7 +37,7 @@ export const ProfileWinLossCounter = ({ twitchId }: { twitchId?: string | null }
           <span className='text-emerald-300'>{win || 0} W</span>{' '}
           <span className='text-gray-600'>-</span>{' '}
           <span className='text-red-300'>{lose || 0} L</span>
-          {wl.records.length > 1 && <span className='ml-1 text-xs text-gray-500'>{type}</span>}
+          {wl.records.length > 1 && <span className='ms-1 text-xs text-gray-500'>{type}</span>}
         </span>
       ))}
       <span className='rounded-md border border-gray-700 bg-gray-900/60 px-2 py-0.5 text-xs text-gray-400'>

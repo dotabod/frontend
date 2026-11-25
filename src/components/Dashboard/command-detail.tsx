@@ -425,14 +425,14 @@ const CommandDetail: Record<
               width={24}
               height={24}
               alt='based'
-              className='mr-1 ml-1 inline'
+              className='mx-1 inline'
             />
             <Image
               src='https://cdn.betterttv.net/emote/55b6f480e66682f576dd94f5/1x.webp'
               width={24}
               height={24}
               alt='clap'
-              className='mr-1 ml-1 inline'
+              className='mx-1 inline'
             />
             . Only mods can type.
           </>
@@ -476,7 +476,7 @@ const CommandDetail: Record<
                 width={24}
                 height={24}
                 alt='south korea'
-                className='mr-1 ml-1 inline'
+                className='mx-1 inline'
               />
               DuBu (Shadow Shaman) ·
               <Image
@@ -484,7 +484,7 @@ const CommandDetail: Record<
                 width={24}
                 height={24}
                 alt='russia'
-                className='mr-1 ml-1 inline'
+                className='mx-1 inline'
               />
               Collapse (Magnus) ·
               <Image
@@ -492,7 +492,7 @@ const CommandDetail: Record<
                 width={24}
                 height={24}
                 alt='estonia'
-                className='mr-1 ml-1 inline'
+                className='mx-1 inline'
               />
               Puppy (Chen) ·
               <Image
@@ -500,7 +500,7 @@ const CommandDetail: Record<
                 width={24}
                 height={24}
                 alt='usa'
-                className='mr-1 ml-1 inline'
+                className='mx-1 inline'
               />
               PPD (Tusk) ·
               <Image
@@ -508,7 +508,7 @@ const CommandDetail: Record<
                 width={24}
                 height={24}
                 alt='usa'
-                className='mr-1 ml-1 inline'
+                className='mx-1 inline'
               />
               Rajjix (Timbersaw)
             </>

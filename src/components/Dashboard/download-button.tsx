@@ -18,7 +18,7 @@ const JustButton = ({
       href={url}
       download={`gamestate_integration_dotabod-${user.name}.${extension}`}
       onClick={onClick}
-      className='ml-4 block w-48'
+      className='ms-4 inline-block max-w-full'
     >
       {data?.beta_tester ? (
         <div>

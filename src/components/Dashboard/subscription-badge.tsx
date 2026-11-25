@@ -81,7 +81,7 @@ export const SubscriptionBadge = ({ collapsed }: { collapsed: boolean }) => {
         icon: (
           <div className='relative'>
             <CrownIcon size={14} className='inline-block flex-shrink-0' />
-            <Wallet size={10} className='absolute -top-1 -right-2 text-amber-400' />
+            <Wallet size={10} className='absolute -end-2 -top-1 text-amber-400' />
           </div>
         ),
         text: 'Pro + Credit',
