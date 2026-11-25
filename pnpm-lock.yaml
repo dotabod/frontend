@@ -84,8 +84,8 @@ importers:
         specifier: ^1.11.19
         version: 1.11.20
       dotaconstants:
-        specifier: github:dotabod/dotaconstants#216d55988c2b3c6f7830639cd9b11db4df69e0ad
-        version: https://codeload.github.com/dotabod/dotaconstants/tar.gz/216d55988c2b3c6f7830639cd9b11db4df69e0ad
+        specifier: github:dotabod/dotaconstants#279f43fceb8a9fa6d95ebd09cdb14efd892c779d
+        version: https://codeload.github.com/dotabod/dotaconstants/tar.gz/279f43fceb8a9fa6d95ebd09cdb14efd892c779d
       focus-visible:
         specifier: ^5.2.1
         version: 5.2.1
@@ -3281,9 +3281,9 @@ packages:
   dom-accessibility-api@0.6.3:
     resolution: {integrity: sha512-7ZgogeTnjuHbo+ct10G9Ffp0mif17idi0IyWNVA/wcwcm7NPOD/WEHVP3n7n3MhXqxoIYm8d6MuZohYWIZ4T3w==}
 
-  dotaconstants@https://codeload.github.com/dotabod/dotaconstants/tar.gz/216d55988c2b3c6f7830639cd9b11db4df69e0ad:
-    resolution: {gitHosted: true, tarball: https://codeload.github.com/dotabod/dotaconstants/tar.gz/216d55988c2b3c6f7830639cd9b11db4df69e0ad}
-    version: 10.8.28
+  dotaconstants@https://codeload.github.com/dotabod/dotaconstants/tar.gz/279f43fceb8a9fa6d95ebd09cdb14efd892c779d:
+    resolution: {gitHosted: true, integrity: sha512-PLCfUUDT5GY0iXVxZy2y3+u4lYm6SJVEG9InU0IvC2n7pPV9YsKwOWJiUAsNFc8tcifJw2A1/vTtcurtJYAcpA==, tarball: https://codeload.github.com/dotabod/dotaconstants/tar.gz/279f43fceb8a9fa6d95ebd09cdb14efd892c779d}
+    version: 10.8.29
 
   dotenv@16.6.1:
     resolution: {integrity: sha512-uBq4egWHTcTt33a72vpSG0z3HnPuIl6NqYcTrKEg2azoEyl2hpW0zqlxysq2pK9HlDIHyHyakeYaYnSAwd8bow==}
@@ -8464,7 +8464,7 @@ snapshots:
 
   dom-accessibility-api@0.6.3: {}
 
-  dotaconstants@https://codeload.github.com/dotabod/dotaconstants/tar.gz/216d55988c2b3c6f7830639cd9b11db4df69e0ad: {}
+  dotaconstants@https://codeload.github.com/dotabod/dotaconstants/tar.gz/279f43fceb8a9fa6d95ebd09cdb14efd892c779d: {}
 
   dotenv@16.6.1: {}
 
