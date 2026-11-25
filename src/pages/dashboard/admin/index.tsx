@@ -171,14 +171,20 @@ const AdminPage = () => {
   const columns: ColumnsType<ScheduledMessage> = [
     {
       dataIndex: 'id',
-      ellipsis: true,
+      ellipsis: { showTitle: false },
       key: 'id',
+      render: (text: string) => (
+        <Typography.Text ellipsis={{ tooltip: text }}>{text}</Typography.Text>
+      ),
       title: 'ID',
     },
     {
       dataIndex: 'message',
-      ellipsis: true,
+      ellipsis: { showTitle: false },
       key: 'message',
+      render: (text: string) => (
+        <Typography.Text ellipsis={{ tooltip: text }}>{text}</Typography.Text>
+      ),
       title: 'Message',
     },
     {
@@ -304,6 +310,7 @@ const AdminPage = () => {
             dataSource={messages}
             columns={columns}
             rowKey='id'
+            scroll={{ x: 'max-content' }}
             pagination={{ pageSize: 10 }}
           />
 
@@ -374,7 +381,7 @@ const AdminPage = () => {
   }
 
   return (
-    <div style={{ margin: '0 auto', maxWidth: 1200, padding: '24px' }}>
+    <div className='mx-auto max-w-6xl'>
       <Title level={2} style={{ marginBottom: 24 }}>
         Admin Panel - Scheduled Messages
       </Title>

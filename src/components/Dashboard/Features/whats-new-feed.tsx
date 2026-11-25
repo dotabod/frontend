@@ -69,7 +69,7 @@ const WhatsNewFeed = ({
                   onClick={() => {
                     setActiveFilter(filter.id)
                   }}
-                  className={`flex items-center justify-between gap-2 rounded-md border px-3 py-1.5 text-left text-sm font-medium transition-colors duration-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-purple-400 ${
+                  className={`flex items-center justify-between gap-2 rounded-md border px-3 py-1.5 text-start text-sm font-medium transition-colors duration-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-purple-400 ${
                     selected
                       ? 'border-gray-500 bg-gray-700 text-gray-100'
                       : 'border-transparent text-gray-400 hover:border-gray-700 hover:bg-gray-900 hover:text-gray-200'
@@ -78,7 +78,7 @@ const WhatsNewFeed = ({
                   <span>{filter.label}</span>
                   <span
                     aria-hidden='true'
-                    className={`ml-2 text-xs ${selected ? 'text-gray-300' : 'text-gray-400'}`}
+                    className={`ms-2 text-xs ${selected ? 'text-gray-300' : 'text-gray-400'}`}
                   >
                     {count}
                   </span>

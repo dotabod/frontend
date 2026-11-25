@@ -8,7 +8,7 @@ interface FeatureListProps {
 }
 
 export const FeatureList = ({ features, featured, payWithCrypto }: FeatureListProps) => (
-  <div className='order-last mt-6'>
+  <div className='mt-6'>
     <ol
       className={clsx(
         '-my-2 divide-y text-sm',
@@ -24,7 +24,7 @@ export const FeatureList = ({ features, featured, payWithCrypto }: FeatureListPr
               payWithCrypto && 'crypto-check animate-pulse-soft',
             )}
           />
-          <span className='ml-4'>{feature}</span>
+          <span className='ms-4'>{feature}</span>
         </li>
       ))}
     </ol>

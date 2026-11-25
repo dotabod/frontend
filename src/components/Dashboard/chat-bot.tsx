@@ -178,7 +178,7 @@ const SevenTvTabs = ({
               ]}
               steps={[
                 <div key={1} className='flex flex-col gap-2'>
-                  <div className='flex flex-row items-center gap-2'>
+                  <div className='flex flex-row flex-wrap items-center gap-2'>
                     {loading && <Spin size='small' spinning={loading} />}
                     {user ? (
                       <div>You have a 7TV account connected to Twitch.</div>
@@ -208,7 +208,7 @@ const SevenTvTabs = ({
                 </div>,
 
                 <div key={2}>
-                  <div className='flex flex-row items-center gap-2'>
+                  <div className='flex flex-row flex-wrap items-center gap-2'>
                     {user?.hasDotabodEditor ? (
                       <div>Dotabod is an editor on your 7TV account.</div>
                     ) : (
@@ -221,7 +221,7 @@ const SevenTvTabs = ({
                             </div>
                             <div>
                               <Button
-                                className='pl-0!'
+                                className='ps-0!'
                                 target='_blank'
                                 type='link'
                                 href='https://7tv.app/settings/editors'
@@ -240,7 +240,7 @@ const SevenTvTabs = ({
                             <div>
                               <span>You must add Dotabod as an editor </span>
                               <Button
-                                className='pl-0!'
+                                className='ps-0!'
                                 target='_blank'
                                 type='link'
                                 href='https://7tv.app/settings/editors'
@@ -259,7 +259,7 @@ const SevenTvTabs = ({
                               <span>Emote sets: Admin</span>
                             </div>
 
-                            <div className='flex flex-row items-center gap-3'>
+                            <div className='flex flex-row flex-wrap items-center gap-3'>
                               {loading && <Spin size='small' spinning={true} />}
                               <span>Waiting for Dotabod to become an editor...</span>
                               <span>Make sure you allow Dotabod to create emote sets on 7TV</span>

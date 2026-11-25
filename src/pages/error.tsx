@@ -51,12 +51,12 @@ const AuthErrorPage: NextPageWithLayout = () => {
 
   return (
     <div
-      className='grid-rows-[1fr,auto,1fr grid grid-cols-1 lg:grid-cols-[max(50%,36rem)_1fr]'
+      className='grid grid-cols-1 grid-rows-[1fr_auto_1fr] lg:grid-cols-[max(50%,36rem)_1fr]'
       style={{
         minHeight: 'inherit',
       }}
     >
-      <main className='mx-auto w-full max-w-7xl px-6 py-24 sm:py-32 lg:col-span-2 lg:col-start-1 lg:row-start-2 lg:px-8'>
+      <div className='mx-auto w-full max-w-7xl px-6 py-24 sm:py-32 lg:col-span-2 lg:col-start-1 lg:row-start-2 lg:px-8'>
         <div className='max-w-lg'>
           <h1 className='mt-4 text-3xl font-bold tracking-tight sm:text-5xl'>Error</h1>
           {errorMessage && <p className='mt-6 text-base leading-7'>{errorMessage}</p>}
@@ -67,7 +67,7 @@ const AuthErrorPage: NextPageWithLayout = () => {
             </a>
           </div>
         </div>
-      </main>
+      </div>
     </div>
   )
 }

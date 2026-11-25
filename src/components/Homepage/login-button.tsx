@@ -55,7 +55,7 @@ export const LoginButton = ({ className, ...props }: LoginButtonProps) => {
           viewBox='0 0 48 48'
           width='48px'
           height='48px'
-          className='mr-2 inline h-4 w-4'
+          className='me-2 inline h-4 w-4'
           aria-hidden='true'
           focusable='false'
           data-prefix='fab'

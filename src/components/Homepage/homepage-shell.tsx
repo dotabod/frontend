@@ -118,7 +118,7 @@ const HomepageShell = ({
       <main
         className='bg-gray-800'
         style={{
-          minHeight: 'calc(100vh - 379px)',
+          minHeight: 'calc(100dvh - 379px)',
         }}
       >
         {children}

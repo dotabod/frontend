@@ -39,7 +39,7 @@ const CopyInstructions = ({
         </Button>
       )}
     </CopyButton>
-    <div className='mt-4 gap-2 text-xs md:mt-0'>
+    <div className='mt-4 flex flex-wrap items-center gap-2 text-xs md:mt-0'>
       <Tag color='red'>Warning</Tag>
       <span>Do not share or show this URL on stream</span>
     </div>
@@ -129,7 +129,7 @@ const OBSText = ({ copyURL, track }: { copyURL: string; track: ReturnType<typeof
       4. Fill out the properties, entering your &quot;Base (Canvas) Resolution&quot; from Step 2
       earlier. If you had 1920x1080, put 1920 for width, and 1080 for height.
     </p>
-    <div className='ml-4 space-y-4'>
+    <div className='ms-4 space-y-4'>
       <p>
         Copy and paste your personal URL into the URL field (1) for the browser source. Click OK to
         save.
@@ -183,7 +183,7 @@ const OBSOverlay = () => {
         The overlay shows rank, blockers, predictions, and other game data. Commands such as !hero
         also require it.
       </p>
-      <div className='space-y-4 px-8 pb-8 text-sm text-gray-300'>
+      <div className='space-y-4 px-0 pb-4 text-sm text-gray-300 sm:px-4 md:px-8 md:pb-8'>
         <RegionalBlockingNote />
         <Tabs
           defaultActiveKey={activeKey}

@@ -61,7 +61,7 @@ const ClippingCard = (): React.ReactNode => {
               <p className='mb-2'>
                 With detection off, these commands lose match data for players with 8500+ MMR:
               </p>
-              <ul className='ml-5 list-disc'>
+              <ul className='ms-5 list-disc'>
                 {[...EXPLICIT_NOTE_COMMANDS, ...SILENT_COMMANDS].map(({ cmd, desc }) => (
                   <li key={cmd}>
                     <code className='rounded bg-gray-800 px-1 py-0.5'>{cmd}</code> - {desc}

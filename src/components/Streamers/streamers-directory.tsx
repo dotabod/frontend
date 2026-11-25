@@ -90,7 +90,7 @@ const TierGroupSection = ({
           height={36}
           className='h-9 w-9 flex-shrink-0 object-contain'
         />
-        <div className='flex-1'>
+        <div className='min-w-0 flex-1'>
           <h3 id={headingId} className='text-lg leading-tight font-semibold text-gray-100'>
             {tierLabel[group.tier]}
           </h3>
@@ -274,7 +274,7 @@ export const StreamersDirectory = ({
           size='large'
           aria-label='Sort streamers within each rank'
           popupMatchSelectWidth={false}
-          className='w-48'
+          className='w-48 max-w-full'
         />
       </div>
 

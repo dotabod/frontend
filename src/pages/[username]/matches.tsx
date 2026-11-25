@@ -92,7 +92,7 @@ const WinRateBar = ({ value }: { value: number }) => (
     <div className='h-1.5 w-16 overflow-hidden rounded-full bg-gray-700 sm:w-20' aria-hidden>
       <div className='h-full rounded-full bg-purple-500' style={{ width: `${value}%` }} />
     </div>
-    <span className='w-10 text-right font-medium text-gray-200 tabular-nums'>{value}%</span>
+    <span className='w-10 text-end font-medium text-gray-200 tabular-nums'>{value}%</span>
   </div>
 )
 
@@ -117,7 +117,7 @@ const HeroWinRatesTable = ({ heroes }: { heroes: HeroPerformance[] }) => (
     ) : (
       <div className='overflow-hidden rounded-lg border border-gray-700 bg-gray-900'>
         <table aria-label='Hero win rates' className='w-full table-fixed'>
-          <thead className='hidden bg-gray-950/40 text-left text-xs text-gray-400 sm:table-header-group'>
+          <thead className='hidden bg-gray-950/40 text-start text-xs text-gray-400 sm:table-header-group'>
             <tr className='border-b border-gray-800'>
               <th scope='col' className='px-5 py-2.5 font-medium'>
                 Hero
@@ -128,7 +128,7 @@ const HeroWinRatesTable = ({ heroes }: { heroes: HeroPerformance[] }) => (
               <th scope='col' className='w-32 px-3 py-2.5 font-medium'>
                 Record
               </th>
-              <th scope='col' className='w-44 px-3 py-2.5 pr-5 font-medium'>
+              <th scope='col' className='w-44 px-3 py-2.5 pe-5 font-medium'>
                 Win rate
               </th>
             </tr>
@@ -156,7 +156,7 @@ const HeroWinRatesTable = ({ heroes }: { heroes: HeroPerformance[] }) => (
                     <span className='truncate font-medium text-gray-100'>{hero.heroName}</span>
                   </div>
                 </td>
-                <td className='col-start-2 row-start-1 block text-right text-sm text-gray-400 tabular-nums sm:table-cell sm:px-3 sm:py-3 sm:text-left sm:align-middle'>
+                <td className='col-start-2 row-start-1 block text-end text-sm text-gray-400 tabular-nums sm:table-cell sm:px-3 sm:py-3 sm:text-start sm:align-middle'>
                   <span className='sm:hidden'>{hero.matches} matches</span>
                   <span className='hidden sm:inline'>{hero.matches}</span>
                 </td>
@@ -167,7 +167,7 @@ const HeroWinRatesTable = ({ heroes }: { heroes: HeroPerformance[] }) => (
                   </span>
                   <span className='text-red-300'>{hero.losses}L</span>
                 </td>
-                <td className='col-start-2 row-start-2 block text-sm sm:table-cell sm:px-3 sm:py-3 sm:pr-5 sm:align-middle'>
+                <td className='col-start-2 row-start-2 block text-sm sm:table-cell sm:px-3 sm:py-3 sm:pe-5 sm:align-middle'>
                   <WinRateBar value={hero.winRate} />
                 </td>
               </tr>
@@ -187,7 +187,7 @@ const MatchList = ({ matches }: { matches: MatchHistoryRow[] }) => {
   return (
     <div className='overflow-hidden rounded-lg border border-gray-700 bg-gray-900'>
       <table aria-label='Recent matches' className='w-full table-fixed'>
-        <thead className='hidden bg-gray-950/40 text-left text-xs text-gray-400 sm:table-header-group'>
+        <thead className='hidden bg-gray-950/40 text-start text-xs text-gray-400 sm:table-header-group'>
           <tr className='border-b border-gray-800'>
             <th scope='col' className='px-5 py-2.5 font-medium'>
               Hero
@@ -201,7 +201,7 @@ const MatchList = ({ matches }: { matches: MatchHistoryRow[] }) => {
             <th scope='col' className='w-28 px-3 py-2.5 font-medium'>
               Score
             </th>
-            <th scope='col' className='w-56 px-3 py-2.5 pr-5 font-medium'>
+            <th scope='col' className='w-56 px-3 py-2.5 pe-5 font-medium'>
               Match
             </th>
           </tr>
@@ -236,7 +236,7 @@ const MatchList = ({ matches }: { matches: MatchHistoryRow[] }) => {
                 </div>
               </td>
 
-              <td className='col-start-2 row-start-1 block text-right sm:table-cell sm:px-3 sm:py-4 sm:text-left sm:align-middle'>
+              <td className='col-start-2 row-start-1 block text-end sm:table-cell sm:px-3 sm:py-4 sm:text-start sm:align-middle'>
                 <span
                   className={`inline-flex items-center gap-2 text-sm font-medium ${
                     match.won ? 'text-emerald-300' : 'text-red-300'
@@ -253,7 +253,7 @@ const MatchList = ({ matches }: { matches: MatchHistoryRow[] }) => {
               </td>
 
               <td className='col-start-1 row-start-2 block text-sm text-gray-400 sm:table-cell sm:px-3 sm:py-4 sm:align-middle'>
-                <span className='mr-2 text-xs text-gray-400 sm:hidden'>KDA</span>
+                <span className='me-2 text-xs text-gray-400 sm:hidden'>KDA</span>
                 <span className='text-gray-200 tabular-nums'>
                   {match.kda
                     ? `${match.kda.kills} / ${match.kda.deaths} / ${match.kda.assists}`
@@ -261,12 +261,12 @@ const MatchList = ({ matches }: { matches: MatchHistoryRow[] }) => {
                 </span>
               </td>
 
-              <td className='col-start-2 row-start-2 block text-right text-sm text-gray-400 sm:table-cell sm:px-3 sm:py-4 sm:text-left sm:align-middle'>
-                <span className='mr-2 text-xs text-gray-400 sm:hidden'>Score</span>
+              <td className='col-start-2 row-start-2 block text-end text-sm text-gray-400 sm:table-cell sm:px-3 sm:py-4 sm:text-start sm:align-middle'>
+                <span className='me-2 text-xs text-gray-400 sm:hidden'>Score</span>
                 <span className='tabular-nums'>{match.score ?? 'Not recorded'}</span>
               </td>
 
-              <td className='col-span-2 row-start-3 flex items-center justify-between gap-3 border-t border-gray-800 pt-3 sm:table-cell sm:border-0 sm:px-3 sm:py-4 sm:pr-5 sm:align-middle'>
+              <td className='col-span-2 row-start-3 flex items-center justify-between gap-3 border-t border-gray-800 pt-3 sm:table-cell sm:border-0 sm:px-3 sm:py-4 sm:pe-5 sm:align-middle'>
                 <time className='text-xs text-gray-400'>{match.dateLabel}</time>
                 <a
                   href={`https://www.opendota.com/matches/${match.matchId}`}
@@ -347,7 +347,7 @@ const MatchHistoryPage = ({
       >
         <div
           data-testid='match-history-page'
-          className='min-h-screen bg-gray-950 font-sans text-gray-300'
+          className='min-h-dvh bg-gray-950 font-sans text-gray-300'
         >
           <header className='border-b border-gray-800 bg-gray-950'>
             <Container className='py-7 sm:py-9'>

@@ -62,7 +62,7 @@ export const BillingNotice = ({
           {children && <div className='text-sm leading-6 opacity-90'>{children}</div>}
         </div>
       </div>
-      {action && <div className='shrink-0 sm:pl-4'>{action}</div>}
+      {action && <div className='shrink-0 sm:ps-4'>{action}</div>}
     </div>
   )
 }

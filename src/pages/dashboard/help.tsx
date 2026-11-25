@@ -1,5 +1,5 @@
 import { MessageOutlined, SearchOutlined } from '@ant-design/icons'
-import { Alert, Button, Collapse, Divider, Form, Input, message, Steps, Tag } from 'antd'
+import { Alert, Button, Collapse, Form, Input, message, Steps, Tag } from 'antd'
 import type { StepProps, StepsProps } from 'antd'
 import axios from 'axios'
 import { useSession } from 'next-auth/react'
@@ -623,7 +623,6 @@ const TroubleshootPage = () => {
                 <Button type='primary' htmlType='submit' loading={submitting}>
                   Send message
                 </Button>
-                <Divider type='vertical' />
                 <Button icon={<MessageOutlined />} onClick={openChatWidget} type='default'>
                   Open live chat
                 </Button>

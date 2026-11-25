@@ -11,6 +11,7 @@ import { SessionProvider } from 'next-auth/react'
 import type { AppProps } from 'next/app'
 
 import '@mantine/core/styles.css'
+import Head from 'next/head'
 import { useRouter } from 'next/router'
 import Script from 'next/script'
 import type { ReactElement, ReactNode } from 'react'
@@ -89,6 +90,9 @@ const App = ({ Component, pageProps: { session, ...pageProps } }: AppPropsWithLa
 
   const content = (
     <ConfigProvider theme={themeConfig}>
+      <Head>
+        <meta name='viewport' content='width=device-width, initial-scale=1, viewport-fit=cover' />
+      </Head>
       {!isPublicOverlayRoute && <SentrySession />}
 
       {/* Only load Google Analytics if explicit consent has been given */}

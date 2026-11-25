@@ -30,7 +30,7 @@ const ManageCookiePreferences = () => {
         cookie settings panel.
       </p>
 
-      <Space direction='horizontal'>
+      <Space wrap>
         <Button type='primary' onClick={showCookieConsentSettings}>
           Open Cookie Settings
         </Button>
@@ -99,7 +99,7 @@ const CookiePolicy = ({ companyName = 'Dotabod', websiteUrl = 'https://dotabod.c
           browser.
         </p>
         <p className='mb-4'>We use cookies for the following purposes:</p>
-        <ul className='mb-4 list-disc pl-8'>
+        <ul className='mb-4 list-disc ps-8'>
           <li>To enable certain functions of the Service</li>
           <li>To provide analytics</li>
           <li>To store your preferences</li>
@@ -120,6 +120,7 @@ const CookiePolicy = ({ companyName = 'Dotabod', websiteUrl = 'https://dotabod.c
             <Panel header={`${category.title} Cookies - ${category.description}`} key={key}>
               <Table
                 dataSource={category.cookies}
+                scroll={{ x: 'max-content' }}
                 columns={[
                   {
                     dataIndex: 'name',
@@ -162,6 +163,7 @@ const CookiePolicy = ({ companyName = 'Dotabod', websiteUrl = 'https://dotabod.c
         <h2 className='mb-4 text-2xl font-semibold'>Complete List of Cookies</h2>
         <Table
           dataSource={allCookies}
+          scroll={{ x: 'max-content' }}
           columns={[
             {
               dataIndex: 'name',
@@ -235,7 +237,7 @@ const CookiePolicy = ({ companyName = 'Dotabod', websiteUrl = 'https://dotabod.c
         <p className='mb-4'>
           You can learn more about cookies at the following third-party websites:
         </p>
-        <ul className='mb-4 list-disc pl-8'>
+        <ul className='mb-4 list-disc ps-8'>
           <li>
             <a
               href='https://www.allaboutcookies.org/'

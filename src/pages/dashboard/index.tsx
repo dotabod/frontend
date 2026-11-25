@@ -75,6 +75,23 @@ const triggerCryptoConfetti = () => {
   frame()
 }
 
+const CryptoSuccessContent = ({
+  message,
+  description,
+}: {
+  message: string
+  description: string
+}) => (
+  <div className='crypto-success-notification animate-glow'>
+    <div className='flex items-center'>
+      <Bitcoin className='animate-spin-slow me-2 text-amber-400' size={24} />
+      <div className='crypto-gradient-text text-lg font-bold'>{message}</div>
+    </div>
+    <div className='mt-2 ps-8'>{description}</div>
+    <div className='crypto-active-bg pointer-events-none absolute start-0 top-0 h-full w-full' />
+  </div>
+)
+
 interface SettingsPayload {
   stream_online?: boolean
   settings?: { key: string }[]
@@ -215,21 +232,6 @@ const SetupPage = () => {
     frame()
   }, [])
 
-  // Crypto notification element with animations
-  const CryptoSuccessContent = useCallback(
-    ({ message, description }: { message: string; description: string }) => (
-      <div className='crypto-success-notification animate-glow'>
-        <div className='flex items-center'>
-          <Bitcoin className='animate-spin-slow mr-2 text-amber-400' size={24} />
-          <div className='crypto-gradient-text text-lg font-bold'>{message}</div>
-        </div>
-        <div className='mt-2 pl-8'>{description}</div>
-        <div className='crypto-active-bg pointer-events-none absolute top-0 left-0 h-full w-full' />
-      </div>
-    ),
-    [],
-  )
-
   useEffect(() => {
     if (didJustPay) {
       if (paidWithCrypto) {
@@ -304,7 +306,6 @@ const SetupPage = () => {
     hasGiftSubs,
     giftCount,
     paidWithCrypto,
-    CryptoSuccessContent,
   ])
 
   if (session?.data?.user?.isImpersonating) {
@@ -339,11 +340,11 @@ const SetupPage = () => {
   ]
 
   const NavigationButtons = (
-    <div className='mx-auto flex justify-between'>
+    <div className='mx-auto flex flex-wrap items-center justify-between gap-3'>
       <div>
         {active > 0 && (
           <Button size='large' onClick={prevStep}>
-            <span className='mr-1'>←</span> Back
+            <span className='me-1 inline-block rtl:rotate-180'>←</span> Back
           </Button>
         )}
       </div>
@@ -352,12 +353,12 @@ const SetupPage = () => {
         {active === steps.length - 1 ? (
           <Link href='/dashboard/features'>
             <Button size='large' type='primary'>
-              View features <span className='ml-1'>→</span>
+              View features <span className='ms-1 inline-block rtl:rotate-180'>→</span>
             </Button>
           </Link>
         ) : (
           <Button size='large' type='primary' onClick={nextStep}>
-            Next step <span className='ml-1'>→</span>
+            Next step <span className='ms-1 inline-block rtl:rotate-180'>→</span>
           </Button>
         )}
       </div>

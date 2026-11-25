@@ -67,8 +67,8 @@ export const StreamerCard: FC<{ streamer: StreamerSummary }> = ({ streamer }) =>
         </div>
       </div>
 
-      <div className='mt-4 flex items-center justify-between gap-3'>
-        <div className='flex min-h-8 items-center gap-2'>
+      <div className='mt-4 flex flex-wrap items-center justify-between gap-3'>
+        <div className='flex min-h-8 min-w-0 items-center gap-2'>
           {medal?.image ? (
             <Badge
               image={medal.image}

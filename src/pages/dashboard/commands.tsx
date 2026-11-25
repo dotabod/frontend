@@ -80,7 +80,7 @@ const CommandsPage = () => {
       </Head>
       <Header title='Commands' />
 
-      <div className='flex max-w-full flex-wrap items-baseline gap-y-2 sm:gap-x-6'>
+      <div className='flex max-w-full flex-wrap items-baseline gap-3 sm:gap-x-6'>
         <Segmented
           value={enabled}
           onChange={(v) => {
@@ -98,7 +98,7 @@ const CommandsPage = () => {
         <Input
           placeholder='Search commands...'
           value={searchTerm}
-          style={{ width: 300 }}
+          className='w-full sm:w-[300px]'
           maxLength={200}
           onChange={(e) => {
             setSearchTerm(e.target.value?.toLowerCase())

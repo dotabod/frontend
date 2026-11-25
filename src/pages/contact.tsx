@@ -1,5 +1,5 @@
 import { MessageOutlined } from '@ant-design/icons'
-import { Button, Divider, Form, Input, message } from 'antd'
+import { Button, Form, Input, message } from 'antd'
 import axios from 'axios'
 import { useSession } from 'next-auth/react'
 import type React from 'react'
@@ -196,7 +196,6 @@ const ContactPage: React.FC = () => {
                   <Button type='primary' htmlType='submit' loading={submitting} size='large'>
                     Send message
                   </Button>
-                  <Divider type='vertical' className='hidden sm:inline-block' />
                   <Button
                     icon={<MessageOutlined />}
                     onClick={openChatWidget}

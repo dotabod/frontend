@@ -39,7 +39,7 @@ const BlogPost: NextPageWithLayout<BlogPostProps> = ({ source, meta }) => (
               viewBox='0 0 16 16'
               fill='none'
               aria-hidden='true'
-              className='h-4 w-4 stroke-current'
+              className='h-4 w-4 stroke-current rtl:rotate-180'
             >
               <path
                 d='M7.25 11.25 3.75 8m0 0 3.5-3.25M3.75 8h8.5'
@@ -63,7 +63,7 @@ const BlogPost: NextPageWithLayout<BlogPostProps> = ({ source, meta }) => (
         <Title level={1} className='mb-8'>
           {meta.title}
         </Title>
-        <div className='prose prose-invert prose-headings:font-bold prose-headings:text-gray-300 prose-h1:text-3xl prose-h2:text-2xl prose-h3:text-xl prose-h4:text-lg prose-p:text-gray-300 prose-a:text-blue-400 hover:prose-a:text-blue-300 prose-ul:list-disc prose-ol:list-decimal prose-li:marker:text-gray-500 prose-li:text-gray-300 prose-ul:ml-5 prose-ol:ml-5 prose-li:pl-0 prose-code:bg-gray-800 prose-code:text-gray-200 prose-pre:bg-gray-800 prose-pre:text-gray-200 prose-blockquote:text-gray-400 prose-blockquote:border-gray-600 max-w-none'>
+        <div className='prose prose-invert prose-headings:font-bold prose-headings:text-gray-300 prose-h1:text-3xl prose-h2:text-2xl prose-h3:text-xl prose-h4:text-lg prose-p:text-gray-300 prose-a:text-blue-400 hover:prose-a:text-blue-300 prose-ul:list-disc prose-ol:list-decimal prose-li:marker:text-gray-500 prose-li:text-gray-300 prose-ul:ms-5 prose-ol:ms-5 prose-li:ps-0 prose-code:bg-gray-800 prose-code:text-gray-200 prose-pre:bg-gray-800 prose-pre:text-gray-200 prose-blockquote:text-gray-400 prose-blockquote:border-gray-600 max-w-none'>
           <Markdown rehypePlugins={[rehypeSlug, rehypeHighlight]} remarkPlugins={[remarkGfm]}>
             {source}
           </Markdown>

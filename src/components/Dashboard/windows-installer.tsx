@@ -266,7 +266,7 @@ const WindowsInstaller = () => {
           </Link>
           , and here&apos;s what it does on your computer:
         </p>
-        <ul className='ml-4 list-disc space-y-1 text-sm text-gray-400'>
+        <ul className='ms-4 list-disc space-y-1 text-sm text-gray-400'>
           <li>Opens a local page in your browser so this account can authenticate the install</li>
           <li>
             Writes one config file into your Dota 2 folder (the file Valve provides for streamer

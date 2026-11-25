@@ -793,102 +793,106 @@ const PrivacyPolicy: NextPageWithLayout = () => (
           We have collected the following categories of personal information in the past twelve (12)
           months:
         </p>
-        <table>
-          <tbody>
-            <tr>
-              <th>Category</th>
-              <th>Examples</th>
-              <th style={{ textAlign: 'center' }}>Collected</th>
-            </tr>
-            <tr>
-              <td>A. Identifiers</td>
-              <td>
-                Contact details, such as real name, alias, postal address, telephone or mobile
-                contact number, unique personal identifier, online identifier, Internet Protocol
-                address, email address, and account name
-              </td>
-              <td style={{ textAlign: 'center' }}>YES</td>
-            </tr>
-            <tr>
-              <td>B. Personal information as defined in the California Customer Records statute</td>
-              <td>
-                Name, contact information, education, employment, employment history, and financial
-                information
-              </td>
-              <td style={{ textAlign: 'center' }}>NO</td>
-            </tr>
-            <tr>
-              <td>C. Protected classification characteristics under state or federal law</td>
-              <td>
-                Gender, age, date of birth, race and ethnicity, national origin, marital status, and
-                other demographic data
-              </td>
-              <td style={{ textAlign: 'center' }}>NO</td>
-            </tr>
-            <tr>
-              <td>D. Commercial information</td>
-              <td>
-                Transaction information, purchase history, financial details, and payment
-                information
-              </td>
-              <td style={{ textAlign: 'center' }}>NO</td>
-            </tr>
-            <tr>
-              <td>E. Biometric information</td>
-              <td>Fingerprints and voiceprints</td>
-              <td style={{ textAlign: 'center' }}>NO</td>
-            </tr>
-            <tr>
-              <td>F. Internet or other similar network activity</td>
-              <td>
-                Browsing history, search history, online behavior, interest data, and interactions
-                with our and other websites, applications, systems, and advertisements
-              </td>
-              <td style={{ textAlign: 'center' }}>NO</td>
-            </tr>
-            <tr>
-              <td>G. Geolocation data</td>
-              <td>Device location</td>
-              <td style={{ textAlign: 'center' }}>YES</td>
-            </tr>
-            <tr>
-              <td>H. Audio, electronic, sensory, or similar information</td>
-              <td>
-                Images and audio, video or call recordings created in connection with our business
-                activities
-              </td>
-              <td style={{ textAlign: 'center' }}>NO</td>
-            </tr>
-            <tr>
-              <td>I. Professional or employment-related information</td>
-              <td>
-                Business contact details in order to provide you our Services at a business level or
-                job title, work history, and professional qualifications if you apply for a job with
-                us
-              </td>
-              <td style={{ textAlign: 'center' }}>NO</td>
-            </tr>
-            <tr>
-              <td>J. Education Information</td>
-              <td>Student records and directory information</td>
-              <td style={{ textAlign: 'center' }}>NO</td>
-            </tr>
-            <tr>
-              <td>K. Inferences drawn from collected personal information</td>
-              <td>
-                Inferences drawn from any of the collected personal information listed above to
-                create a profile or summary about, for example, an individual&apos;s preferences and
-                characteristics
-              </td>
-              <td style={{ textAlign: 'center' }}>NO</td>
-            </tr>
-            <tr>
-              <td>L. Sensitive personal Information</td>
-              <td aria-label='No examples' />
-              <td style={{ textAlign: 'center' }}>NO</td>
-            </tr>
-          </tbody>
-        </table>
+        <div className='my-4 overflow-x-auto'>
+          <table className='w-full text-start'>
+            <tbody>
+              <tr>
+                <th className='text-start'>Category</th>
+                <th className='text-start'>Examples</th>
+                <th style={{ textAlign: 'center' }}>Collected</th>
+              </tr>
+              <tr>
+                <td>A. Identifiers</td>
+                <td>
+                  Contact details, such as real name, alias, postal address, telephone or mobile
+                  contact number, unique personal identifier, online identifier, Internet Protocol
+                  address, email address, and account name
+                </td>
+                <td style={{ textAlign: 'center' }}>YES</td>
+              </tr>
+              <tr>
+                <td>
+                  B. Personal information as defined in the California Customer Records statute
+                </td>
+                <td>
+                  Name, contact information, education, employment, employment history, and
+                  financial information
+                </td>
+                <td style={{ textAlign: 'center' }}>NO</td>
+              </tr>
+              <tr>
+                <td>C. Protected classification characteristics under state or federal law</td>
+                <td>
+                  Gender, age, date of birth, race and ethnicity, national origin, marital status,
+                  and other demographic data
+                </td>
+                <td style={{ textAlign: 'center' }}>NO</td>
+              </tr>
+              <tr>
+                <td>D. Commercial information</td>
+                <td>
+                  Transaction information, purchase history, financial details, and payment
+                  information
+                </td>
+                <td style={{ textAlign: 'center' }}>NO</td>
+              </tr>
+              <tr>
+                <td>E. Biometric information</td>
+                <td>Fingerprints and voiceprints</td>
+                <td style={{ textAlign: 'center' }}>NO</td>
+              </tr>
+              <tr>
+                <td>F. Internet or other similar network activity</td>
+                <td>
+                  Browsing history, search history, online behavior, interest data, and interactions
+                  with our and other websites, applications, systems, and advertisements
+                </td>
+                <td style={{ textAlign: 'center' }}>NO</td>
+              </tr>
+              <tr>
+                <td>G. Geolocation data</td>
+                <td>Device location</td>
+                <td style={{ textAlign: 'center' }}>YES</td>
+              </tr>
+              <tr>
+                <td>H. Audio, electronic, sensory, or similar information</td>
+                <td>
+                  Images and audio, video or call recordings created in connection with our business
+                  activities
+                </td>
+                <td style={{ textAlign: 'center' }}>NO</td>
+              </tr>
+              <tr>
+                <td>I. Professional or employment-related information</td>
+                <td>
+                  Business contact details in order to provide you our Services at a business level
+                  or job title, work history, and professional qualifications if you apply for a job
+                  with us
+                </td>
+                <td style={{ textAlign: 'center' }}>NO</td>
+              </tr>
+              <tr>
+                <td>J. Education Information</td>
+                <td>Student records and directory information</td>
+                <td style={{ textAlign: 'center' }}>NO</td>
+              </tr>
+              <tr>
+                <td>K. Inferences drawn from collected personal information</td>
+                <td>
+                  Inferences drawn from any of the collected personal information listed above to
+                  create a profile or summary about, for example, an individual&apos;s preferences
+                  and characteristics
+                </td>
+                <td style={{ textAlign: 'center' }}>NO</td>
+              </tr>
+              <tr>
+                <td>L. Sensitive personal Information</td>
+                <td aria-label='No examples' />
+                <td style={{ textAlign: 'center' }}>NO</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
         <p>
           We may also collect other personal information outside of these categories through
           instances where you interact with us in person, online, or by phone or mail in the context

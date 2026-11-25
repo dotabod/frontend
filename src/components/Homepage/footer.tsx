@@ -12,7 +12,7 @@ export const Footer = () => (
         <div>
           <div className='flex items-center text-gray-200'>
             <Logomark className='h-10 w-auto flex-none fill-cyan-500' />
-            <div className='ml-4'>
+            <div className='ms-4 min-w-0'>
               <p className='text-base font-semibold'>Dotabod</p>
               <p className='mt-1 text-sm'>Enhance Your Dota 2 Streaming Experience</p>
             </div>
@@ -28,7 +28,7 @@ export const Footer = () => (
             <QrCodeBorder className='absolute inset-0 h-full w-full stroke-gray-300 transition-colors group-hover:stroke-red-500' />
             <Logomark className='h-16 w-16' />
           </div>
-          <div className='ml-8 lg:w-64'>
+          <div className='ms-8 min-w-0 lg:max-w-64'>
             <p className='text-base font-semibold'>
               <Link href='/dashboard' prefetch={false} className='text-gray-200!'>
                 <span className='absolute inset-0 sm:rounded-2xl' />

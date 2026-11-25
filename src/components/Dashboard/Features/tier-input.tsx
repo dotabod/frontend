@@ -48,7 +48,7 @@ export const TierInput = ({
         <label htmlFor={inputId} className='block text-sm'>
           {label}
           {!tierAccess.hasAccess && !hideTierBadge && (
-            <span className='ml-2'>
+            <span className='ms-2'>
               <TierBadge requiredTier={tierAccess.requiredTier} />
             </span>
           )}

@@ -188,7 +188,7 @@ const TroubleshootingContent = ({ isLive }: { isLive: boolean }) => (
       />
     )}
     <p>Two ways to trigger the first connection:</p>
-    <ul className='ml-5 list-disc space-y-1 text-gray-400'>
+    <ul className='ms-5 list-disc space-y-1 text-gray-400'>
       <li>
         Quick check: demo any hero, then type <Tag>!innate</Tag> in chat to confirm Dotabod sees the
         game.

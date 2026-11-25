@@ -177,7 +177,7 @@ export const Hero = () => {
             </div>
           </div>
           <div className='relative row-span-1 lg:col-span-5 lg:row-span-2 xl:col-span-6'>
-            <BackgroundIllustration className='absolute top-4 left-1/2 h-[1026px] w-[1026px] -translate-x-1/3 [mask-image:linear-gradient(to_bottom,white_20%,transparent_75%)] stroke-gray-300/70 sm:top-16 sm:-translate-x-1/2 lg:-top-16 lg:ml-12 xl:-top-14 xl:ml-0' />
+            <BackgroundIllustration className='absolute top-4 left-1/2 h-[1026px] w-[1026px] -translate-x-1/3 [mask-image:linear-gradient(to_bottom,white_20%,transparent_75%)] stroke-gray-300/70 sm:top-16 sm:-translate-x-1/2 lg:-top-16 lg:ms-12 xl:-top-14 xl:ms-0' />
             <div className='-mx-4 -mt-10 h-[180px] [mask-image:linear-gradient(to_bottom,white_60%,transparent)] px-9 sm:mx-0 lg:absolute lg:-inset-x-10 lg:-top-10 lg:-bottom-20 lg:mt-0 lg:h-auto lg:px-0 lg:pt-10 xl:-bottom-32'>
               <PhoneFrame className='mx-auto max-w-[180px] lg:max-w-[366px]' priority>
                 <Image
@@ -192,19 +192,19 @@ export const Hero = () => {
 
             <div key='twitch-streamer-list'>
               <div className='relative lg:col-span-7 xl:col-span-6'>
-                <div className='relative flex min-h-12 items-center justify-center px-10 text-center text-sm font-semibold text-gray-300 lg:min-h-0 lg:justify-start lg:gap-2 lg:px-0 lg:text-left'>
+                <div className='relative flex min-h-12 items-center justify-center px-10 text-center text-sm font-semibold text-gray-300 lg:min-h-0 lg:justify-start lg:gap-2 lg:px-0 lg:text-start'>
                   <Image
                     src={TwitchSvg}
                     width={18}
                     height={18}
                     alt='twitch logo'
-                    className='absolute left-0 lg:static'
+                    className='absolute start-0 lg:static'
                   />
                   <span>
                     Trusted by Over {new Intl.NumberFormat('en-US').format(30_000)} Twitch Streamers
                     Including:
                   </span>
-                  <span className='absolute right-0 lg:static'>
+                  <span className='absolute end-0 lg:static'>
                     <LiveIcon />
                   </span>
                 </div>
@@ -260,7 +260,7 @@ export const Hero = () => {
                 ) : (
                   <p className='text-center text-gray-300'>No top streamers found</p>
                 )}
-                <div className='mt-4 text-center lg:text-left'>
+                <div className='mt-4 text-center lg:text-start'>
                   <Link
                     href='/streamers'
                     onClick={() => {

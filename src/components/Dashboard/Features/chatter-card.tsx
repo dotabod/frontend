@@ -373,7 +373,7 @@ const ChatterCard = () => {
         <DotabodChatter />
         {(Object.keys(groupedChatterInfo || {}) || []).map((categoryName) => (
           <Card key={categoryName} title={categoryName}>
-            <div className='ml-4 flex flex-col space-y-3'>
+            <div className='ms-4 flex flex-col space-y-3'>
               {(groupedChatterInfo[categoryName] || []).map((value: GroupedChatterItem) => (
                 <div key={value.id}>
                   <Tooltip title={value?.tooltip} placement='left'>

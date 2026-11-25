@@ -220,7 +220,7 @@ const NotablePlayersPage: NextPageWithLayout = () => {
       align: 'right',
       key: 'actions',
       render: (_, record) => (
-        <Space size='small'>
+        <Space size='middle'>
           <Tooltip title='Edit player'>
             <Button
               icon={<Pencil className='h-4 w-4' />}
@@ -286,6 +286,7 @@ const NotablePlayersPage: NextPageWithLayout = () => {
             <Table
               columns={columns}
               dataSource={notablePlayers.map((player) => ({ ...player, key: player.id }))}
+              scroll={{ x: 'max-content' }}
               pagination={{
                 hideOnSinglePage: true,
                 onShowSizeChange: (_current, size) => {
@@ -363,7 +364,7 @@ const NotablePlayersPage: NextPageWithLayout = () => {
                     href='https://www.iban.com/country-codes'
                     target='_blank'
                     rel='noopener noreferrer'
-                    className='ml-1'
+                    className='ms-1'
                   >
                     View ISO country codes
                   </a>

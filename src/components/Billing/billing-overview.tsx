@@ -1,6 +1,7 @@
 import { Button, Skeleton } from 'antd'
 import { clsx } from 'clsx'
 import { ExternalLinkIcon, GiftIcon } from 'lucide-react'
+import type { ReactNode } from 'react'
 
 import { useSubscriptionContext } from '@/contexts/subscription-context'
 import { Card } from '@/ui/card'
@@ -59,6 +60,49 @@ export const BillingOverview = ({ isLoading, onOpenPortal }: BillingOverviewProp
     )
   }
 
+  let billingAction: ReactNode = null
+  if (isPayPal && isSubscriptionActive({ status: subscription?.status })) {
+    billingAction = (
+      <div className='sm:text-end'>
+        <Button
+          type='primary'
+          icon={<ExternalLinkIcon size={14} />}
+          href={PAYPAL_AUTOPAY_URL}
+          target='_blank'
+          rel='noopener noreferrer'
+        >
+          Manage PayPal subscription
+        </Button>
+        <p className='mt-2 max-w-xs text-xs leading-5 text-gray-500 sm:ms-auto'>
+          You subscribed with PayPal. Update your payment method or cancel renewal from your PayPal
+          account&apos;s automatic payments.
+        </p>
+      </div>
+    )
+  } else if (summary.canManageInStripe) {
+    billingAction = (
+      <div className='sm:text-end'>
+        <Button
+          type='primary'
+          icon={<ExternalLinkIcon size={14} />}
+          onClick={onOpenPortal}
+          disabled={isLoading}
+        >
+          {isLoading ? 'Opening Stripe…' : summary.portalButtonLabel}
+        </Button>
+        <p className='mt-2 max-w-xs text-xs leading-5 text-gray-500 sm:ms-auto'>
+          {summary.portalHelpText}
+        </p>
+      </div>
+    )
+  } else if (summary.portalHelpText) {
+    billingAction = (
+      <p className='max-w-xs text-xs leading-5 text-gray-500 sm:text-end'>
+        {summary.portalHelpText}
+      </p>
+    )
+  }
+
   return (
     <Card className='space-y-5'>
       <div className='flex flex-wrap items-center gap-2'>
@@ -89,43 +133,7 @@ export const BillingOverview = ({ isLoading, onOpenPortal }: BillingOverviewProp
           <div className='text-base font-medium text-gray-100'>{summary.nextStepValue}</div>
         </div>
 
-        {isPayPal && isSubscriptionActive({ status: subscription?.status }) ? (
-          <div className='sm:text-right'>
-            <Button
-              type='primary'
-              icon={<ExternalLinkIcon size={14} />}
-              href={PAYPAL_AUTOPAY_URL}
-              target='_blank'
-              rel='noopener noreferrer'
-            >
-              Manage PayPal subscription
-            </Button>
-            <p className='mt-2 max-w-xs text-xs leading-5 text-gray-500 sm:ml-auto'>
-              You subscribed with PayPal. Update your payment method or cancel renewal from your
-              PayPal account&apos;s automatic payments.
-            </p>
-          </div>
-        ) : summary.canManageInStripe ? (
-          <div className='sm:text-right'>
-            <Button
-              type='primary'
-              icon={<ExternalLinkIcon size={14} />}
-              onClick={onOpenPortal}
-              disabled={isLoading}
-            >
-              {isLoading ? 'Opening Stripe…' : summary.portalButtonLabel}
-            </Button>
-            <p className='mt-2 max-w-xs text-xs leading-5 text-gray-500 sm:ml-auto'>
-              {summary.portalHelpText}
-            </p>
-          </div>
-        ) : (
-          summary.portalHelpText && (
-            <p className='max-w-xs text-xs leading-5 text-gray-500 sm:text-right'>
-              {summary.portalHelpText}
-            </p>
-          )
-        )}
+        {billingAction}
       </div>
 
       {summary.creditMessage && (

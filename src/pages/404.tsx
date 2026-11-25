@@ -79,12 +79,12 @@ const NotFound: NextPageWithLayout = () => {
 
   return (
     <div
-      className='grid grid-cols-1 grid-rows-[1fr,auto,1fr] bg-gray-900 text-gray-100 lg:grid-cols-[max(50%,36rem)_1fr]'
+      className='grid grid-cols-1 grid-rows-[1fr_auto_1fr] bg-gray-900 text-gray-100 lg:grid-cols-[max(50%,36rem)_1fr]'
       style={{
         minHeight: 'inherit',
       }}
     >
-      <main className='mx-auto w-full max-w-7xl px-6 py-24 sm:py-32 lg:col-span-2 lg:col-start-1 lg:row-start-2 lg:px-8'>
+      <div className='mx-auto w-full max-w-7xl px-6 py-24 sm:py-32 lg:col-span-2 lg:col-start-1 lg:row-start-2 lg:px-8'>
         <div className='max-w-lg'>
           <div className='text-purple-400'>
             <span className='text-7xl font-bold'>404</span>
@@ -120,13 +120,13 @@ const NotFound: NextPageWithLayout = () => {
               className='inline-flex items-center rounded-md bg-purple-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-purple-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-purple-600'
             >
               <span aria-hidden='true'>&larr;</span>
-              <span className='ml-1'>Back to home</span>
+              <span className='ms-1'>Back to home</span>
             </Link>
           </div>
         </div>
-      </main>
+      </div>
       <div className='hidden lg:relative lg:col-start-2 lg:row-start-1 lg:row-end-4 lg:block'>
-        <div className='absolute inset-0 z-10 bg-gradient-to-r from-gray-900 to-transparent' />
+        <div className='absolute inset-0 z-10 bg-gradient-to-r from-gray-900 to-transparent rtl:bg-gradient-to-l' />
         <img
           src='/images/404.webp'
           alt='Lost in space illustration'

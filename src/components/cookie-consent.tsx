@@ -196,7 +196,7 @@ const CookieConsent = () => {
         <div
           role='region'
           aria-label='Cookie consent'
-          className='animate-fade-in fixed bottom-4 left-4 z-[1001] w-[min(420px,calc(100vw-2rem))] rounded-lg border border-gray-700 bg-gray-800 p-4 shadow-xl'
+          className='animate-fade-in fixed inset-x-4 bottom-[max(1rem,env(safe-area-inset-bottom))] z-[1001] max-w-[420px] rounded-lg border border-gray-700 bg-gray-800 p-4 shadow-xl sm:start-4 sm:end-auto sm:w-[420px]'
         >
           <div className='flex items-start gap-2.5'>
             <Cookie aria-hidden className='mt-0.5 h-4 w-4 shrink-0 text-gray-400' />
@@ -241,6 +241,7 @@ const CookieConsent = () => {
         style={{ maxWidth: '100%' }}
         styles={{
           body: {
+            paddingBottom: 'max(24px, env(safe-area-inset-bottom))',
             paddingTop: '20px',
           },
           header: {
@@ -249,6 +250,9 @@ const CookieConsent = () => {
             position: 'sticky',
             top: 0,
             zIndex: 10,
+          },
+          wrapper: {
+            maxHeight: '100dvh',
           },
         }}
         extra={
@@ -284,20 +288,21 @@ const CookieConsent = () => {
                     // Necessary cookies can't be disabled
                     disabled={key === 'necessary'}
                   />
-                  <Title level={5} style={{ margin: '0 0 0 8px' }}>
+                  <Title level={5} style={{ margin: 0, marginInlineStart: '8px' }}>
                     {category.title} Cookies
                   </Title>
                 </div>
-                <Paragraph style={{ marginLeft: '24px' }}>{category.description}</Paragraph>
+                <Paragraph style={{ marginInlineStart: '24px' }}>{category.description}</Paragraph>
 
                 {/* Cookie details collapsible panel */}
                 <Collapse
-                  style={{ marginBottom: '16px', marginLeft: '24px' }}
+                  style={{ marginBottom: '16px', marginInlineStart: '24px' }}
                   items={[
                     {
                       children: (
                         <Table
                           dataSource={category.cookies}
+                          scroll={{ x: 'max-content' }}
                           columns={[
                             {
                               dataIndex: 'name',

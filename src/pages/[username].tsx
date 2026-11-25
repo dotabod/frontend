@@ -287,19 +287,23 @@ const PageContent = ({
     return (
       <div className='p-6'>
         <div className='mb-12 space-y-4'>
-          <div className='flex flex-row items-center space-x-2'>
-            <Skeleton.Avatar active size={80} shape='circle' />
-            <div className='flex-grow'>
-              <div className='flex flex-row items-center space-x-4'>
-                <Skeleton.Button active size='large' shape='round' />
-                <Skeleton.Button active size='small' shape='round' style={{ width: 60 }} />
+          <div className='flex flex-row flex-wrap items-center gap-3'>
+            <Skeleton.Avatar active size={80} />
+            <div className='min-w-0 flex-grow'>
+              <div className='flex flex-row flex-wrap items-center gap-4'>
+                <Skeleton.Button active size='large' />
+                <Skeleton.Button active size='small' style={{ width: 60 }} />
               </div>
-              <Skeleton.Input active size='small' style={{ marginTop: 8, width: 200 }} />
+              <Skeleton.Input
+                active
+                size='small'
+                style={{ marginTop: 8, maxWidth: '100%', width: 200 }}
+              />
             </div>
             <div>
-              <div className='flex space-x-2'>
-                <Skeleton.Button active size='default' shape='default' style={{ width: 140 }} />
-                <Skeleton.Button active size='default' shape='default' style={{ width: 160 }} />
+              <div className='flex flex-wrap gap-2'>
+                <Skeleton.Button active size='default' style={{ width: 140 }} />
+                <Skeleton.Button active size='default' style={{ width: 160 }} />
               </div>
             </div>
           </div>
@@ -585,7 +589,7 @@ const PageContent = ({
                         ?.scrollIntoView({ behavior: 'smooth', block: 'center' })
                     }, 50)
                   }}
-                  className='w-48 flex-shrink-0 cursor-pointer rounded-lg border border-gray-700 bg-gray-900/80 px-4 py-3 text-left transition-colors hover:border-purple-500 hover:bg-gray-900'
+                  className='w-48 flex-shrink-0 cursor-pointer rounded-lg border border-gray-700 bg-gray-900/80 px-4 py-3 text-start transition-colors hover:border-purple-500 hover:bg-gray-900'
                 >
                   <div className='mb-1 font-mono text-sm font-semibold text-purple-400'>
                     {CommandDetail[key].cmd}
@@ -619,13 +623,13 @@ const PageContent = ({
             placeholder='Search commands...'
             value={searchTerm}
             maxLength={200}
-            style={{ width: 260 }}
+            className='w-full sm:w-[260px]'
             onChange={(e) => {
               setSearchTerm(e.target.value.toLowerCase())
             }}
           />
           {!finalLoading && (
-            <span className='ml-auto text-sm text-gray-500'>
+            <span className='ms-auto text-sm text-gray-500'>
               {filteredCommands.length} of {Object.keys(CommandDetail).length} commands
             </span>
           )}

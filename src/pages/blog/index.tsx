@@ -71,7 +71,7 @@ const BlogIndex: NextPageWithLayout<BlogIndexProps> = ({ posts }) => {
                       viewBox='0 0 16 16'
                       fill='none'
                       aria-hidden='true'
-                      className='ml-1 h-4 w-4 stroke-current'
+                      className='ms-1 h-4 w-4 stroke-current rtl:rotate-180'
                     >
                       <path
                         d='M6.75 5.75 9.25 8l-2.5 2.25'

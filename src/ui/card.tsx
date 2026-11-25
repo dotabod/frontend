@@ -37,7 +37,7 @@ export const FeatureWrapper = ({ feature, children, className, ...props }: Featu
       {...props}
     >
       {!hasAccess && !isHovered && requiredTier && (
-        <div className='pointer-events-none absolute top-2 right-2 z-10'>
+        <div className='pointer-events-none absolute end-2 top-2 z-10'>
           <TierBadge tooltip={false} requiredTier={requiredTier} />
         </div>
       )}
@@ -64,7 +64,7 @@ export const Card = ({ className, feature, title, children, ...props }: CardProp
     feature={feature}
     className={clsx(
       'duration-200',
-      'rounded-lg border border-transparent bg-gray-900 p-5 text-sm text-gray-300 shadow-lg transition-all hover:border hover:border-gray-600 hover:shadow-gray-500/10',
+      'min-w-0 rounded-lg border border-transparent bg-gray-900 p-5 text-sm text-gray-300 shadow-lg transition-all hover:border hover:border-gray-600 hover:shadow-gray-500/10',
       className,
     )}
     {...props}
